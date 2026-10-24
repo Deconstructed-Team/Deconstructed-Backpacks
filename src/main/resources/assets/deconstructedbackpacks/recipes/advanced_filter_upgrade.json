@@ -1,0 +1,23 @@
+{
+  "type": "deconstructedcore:upgrade_next_tier",
+  "pattern": [
+    "GPG",
+    "RRR"
+  ],
+  "key": {
+    "G": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    },
+    "P": {
+      "item": "deconstructedbackpacks:filter_upgrade"
+    },
+    "R": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:advanced_filter_upgrade"
+  }
+}

@@ -3,7 +3,10 @@ package dev.feldsher.deconstructedbackpacks.init;
 import dev.feldsher.deconstructedbackpacks.Config;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
+import dev.feldsher.deconstructedcore.upgrades.filter.FilterUpgradeItem;
+import dev.feldsher.deconstructedcore.upgrades.magnet.MagnetUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.pickup.PickupUpgradeItem;
+import dev.feldsher.deconstructedcore.upgrades.voiding.VoidUpgradeItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -46,8 +49,22 @@ public class ModItems {
 	public static final PickupUpgradeItem ADVANCED_PICKUP_UPGRADE = item(new PickupUpgradeItem(() -> Config.SERVER.advancedPickupUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_pickup_upgrade");
 
+	public static final FilterUpgradeItem FILTER_UPGRADE = item(new FilterUpgradeItem(() -> Config.SERVER.filterUpgrade.filterSlots,
+			Config.SERVER.maxUpgradesPerStorageConfig), "filter_upgrade");
+	public static final FilterUpgradeItem ADVANCED_FILTER_UPGRADE = item(new FilterUpgradeItem(() -> Config.SERVER.advancedFilterUpgrade.filterSlots,
+			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_filter_upgrade");
+	public static final MagnetUpgradeItem MAGNET_UPGRADE = item(new MagnetUpgradeItem(() -> Config.SERVER.magnetUpgrade.magnetRange,
+			() -> Config.SERVER.magnetUpgrade.filterSlots, Config.SERVER.maxUpgradesPerStorageConfig), "magnet_upgrade");
+	public static final MagnetUpgradeItem ADVANCED_MAGNET_UPGRADE = item(new MagnetUpgradeItem(() -> Config.SERVER.advancedMagnetUpgrade.magnetRange,
+			() -> Config.SERVER.advancedMagnetUpgrade.filterSlots, Config.SERVER.maxUpgradesPerStorageConfig), "advanced_magnet_upgrade");
+	public static final VoidUpgradeItem VOID_UPGRADE = item(new VoidUpgradeItem(() -> Config.SERVER.voidUpgrade.filterSlots,
+			() -> Config.SERVER.voidUpgrade.voidAnythingEnabled, Config.SERVER.maxUpgradesPerStorageConfig), "void_upgrade");
+	public static final VoidUpgradeItem ADVANCED_VOID_UPGRADE = item(new VoidUpgradeItem(() -> Config.SERVER.advancedVoidUpgrade.filterSlots,
+			() -> Config.SERVER.advancedVoidUpgrade.voidAnythingEnabled, Config.SERVER.maxUpgradesPerStorageConfig), "advanced_void_upgrade");
+
 	/** What 1.21 tags as backpack upgrades: the only items a backpack's upgrade slots take. */
-	public static final List<Item> BACKPACK_UPGRADES = Collections.unmodifiableList(Arrays.asList(PICKUP_UPGRADE, ADVANCED_PICKUP_UPGRADE));
+	public static final List<Item> BACKPACK_UPGRADES = Collections.unmodifiableList(Arrays.asList(PICKUP_UPGRADE, ADVANCED_PICKUP_UPGRADE,
+			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE));
 
 	private static <T extends Item> T item(T item, String name) {
 		item.setRegistryName(DeconstructedBackpacks.getRL(name));

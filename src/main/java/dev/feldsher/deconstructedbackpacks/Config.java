@@ -41,6 +41,18 @@ public class Config {
 		public final FilteredUpgradeConfig pickupUpgrade = new FilteredUpgradeConfig(9, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Pickup Upgrade Settings")
 		public final FilteredUpgradeConfig advancedPickupUpgrade = new FilteredUpgradeConfig(16, 4);
+		@net.minecraftforge.common.config.Config.Comment("Filter Upgrade Settings")
+		public final FilteredUpgradeConfig filterUpgrade = new FilteredUpgradeConfig(9, 3);
+		@net.minecraftforge.common.config.Config.Comment("Advanced Filter Upgrade Settings")
+		public final FilteredUpgradeConfig advancedFilterUpgrade = new FilteredUpgradeConfig(16, 4);
+		@net.minecraftforge.common.config.Config.Comment("Magnet Upgrade Settings")
+		public final MagnetUpgradeConfig magnetUpgrade = new MagnetUpgradeConfig(9, 3, 3);
+		@net.minecraftforge.common.config.Config.Comment("Advanced Magnet Upgrade Settings")
+		public final MagnetUpgradeConfig advancedMagnetUpgrade = new MagnetUpgradeConfig(16, 4, 5);
+		@net.minecraftforge.common.config.Config.Comment("Void Upgrade Settings")
+		public final VoidUpgradeConfig voidUpgrade = new VoidUpgradeConfig(9, 3);
+		@net.minecraftforge.common.config.Config.Comment("Advanced Void Upgrade Settings")
+		public final VoidUpgradeConfig advancedVoidUpgrade = new VoidUpgradeConfig(16, 4);
 
 		@net.minecraftforge.common.config.Config.Comment("Maximum number of upgrades of type per backpack in format of \"UpgradeRegistryName[or UpgradeGroup]|MaxNumber\"")
 		public String[] maxUpgradesPerStorage = {"stack_upgrades|3", "furnace_upgrades|1", "jukebox_upgrades|1"};
@@ -118,6 +130,42 @@ public class Config {
 		public int slotsInRow;
 
 		FilteredUpgradeConfig(int defaultFilterSlots, int defaultSlotsInRow) {
+			filterSlots = defaultFilterSlots;
+			slotsInRow = defaultSlotsInRow;
+		}
+	}
+
+	// Forge's config reads the fields a class declares, not inherited ones: each config class has all of its own
+
+	public static class MagnetUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Number of the upgrade's filter slots")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 20)
+		public int filterSlots;
+		@net.minecraftforge.common.config.Config.Comment("Number of filter slots displayed in a row")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 6)
+		public int slotsInRow;
+		@net.minecraftforge.common.config.Config.Comment("Range around storage in blocks at which magnet will pickup items")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 20)
+		public int magnetRange;
+
+		MagnetUpgradeConfig(int defaultFilterSlots, int defaultSlotsInRow, int defaultMagnetRange) {
+			filterSlots = defaultFilterSlots;
+			slotsInRow = defaultSlotsInRow;
+			magnetRange = defaultMagnetRange;
+		}
+	}
+
+	public static class VoidUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Number of the upgrade's filter slots")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 20)
+		public int filterSlots;
+		@net.minecraftforge.common.config.Config.Comment("Number of filter slots displayed in a row")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 6)
+		public int slotsInRow;
+		@net.minecraftforge.common.config.Config.Comment("Determines whether void upgrade allows voiding anything or it only has overflow option")
+		public boolean voidAnythingEnabled = true;
+
+		VoidUpgradeConfig(int defaultFilterSlots, int defaultSlotsInRow) {
 			filterSlots = defaultFilterSlots;
 			slotsInRow = defaultSlotsInRow;
 		}

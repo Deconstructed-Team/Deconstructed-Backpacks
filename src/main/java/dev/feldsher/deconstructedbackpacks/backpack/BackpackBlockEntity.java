@@ -120,8 +120,7 @@ public class BackpackBlockEntity extends TileEntity implements ITickable {
 	@Override
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			// The filtered input/output view comes with the upgrades that filter it
-			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(getBackpackWrapper().getInventoryHandler());
+			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(getBackpackWrapper().getInventoryForInputOutput());
 		}
 		return super.getCapability(capability, facing);
 	}
