@@ -1,0 +1,14 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "SLS",
+    "SCS",
+    "LLL"
+  ],
+  "key": {
+    "C": {"type": "forge:ore_dict", "ore": "chestWood"},
+    "L": {"type": "forge:ore_dict", "ore": "leather"},
+    "S": {"type": "forge:ore_dict", "ore": "string"}
+  },
+  "result": {"item": "deconstructedbackpacks:backpack"}
+}

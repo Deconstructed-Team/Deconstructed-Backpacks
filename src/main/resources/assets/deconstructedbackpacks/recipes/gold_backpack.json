@@ -1,0 +1,13 @@
+{
+  "type": "deconstructedbackpacks:backpack_upgrade",
+  "pattern": [
+    "MMM",
+    "MBM",
+    "MMM"
+  ],
+  "key": {
+    "B": {"item": "deconstructedbackpacks:iron_backpack"},
+    "M": {"type": "forge:ore_dict", "ore": "ingotGold"}
+  },
+  "result": {"item": "deconstructedbackpacks:gold_backpack"}
+}

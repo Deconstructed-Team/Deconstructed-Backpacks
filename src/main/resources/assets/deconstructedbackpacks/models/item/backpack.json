@@ -1,0 +1,6 @@
+{
+  "parent": "deconstructedbackpacks:block/backpack_base",
+  "textures": {
+    "clips": "deconstructedbackpacks:block/leather_clips"
+  }
+}

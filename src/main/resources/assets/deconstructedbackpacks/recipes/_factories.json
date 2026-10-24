@@ -1,0 +1,5 @@
+{
+  "recipes": {
+    "backpack_upgrade": "dev.feldsher.deconstructedbackpacks.crafting.BackpackUpgradeRecipe$Factory"
+  }
+}

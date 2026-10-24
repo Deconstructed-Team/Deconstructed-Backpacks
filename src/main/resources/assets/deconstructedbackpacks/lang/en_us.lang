@@ -1,0 +1,5 @@
+itemGroup.deconstructedbackpacks=Deconstructed Backpacks
+item.deconstructedbackpacks.backpack.name=Backpack
+item.deconstructedbackpacks.iron_backpack.name=Iron Backpack
+item.deconstructedbackpacks.gold_backpack.name=Gold Backpack
+item.deconstructedbackpacks.diamond_backpack.name=Diamond Backpack
