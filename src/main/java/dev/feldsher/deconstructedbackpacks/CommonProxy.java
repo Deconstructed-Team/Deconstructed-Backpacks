@@ -10,6 +10,10 @@ public class CommonProxy {
 		//noop
 	}
 
+	public void postInit() {
+		//noop
+	}
+
 	@Nullable
 	public Object createBackpackScreen(BackpackContainer container) {
 		return null;
