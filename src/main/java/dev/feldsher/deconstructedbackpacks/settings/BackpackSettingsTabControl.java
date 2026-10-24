@@ -1,0 +1,33 @@
+package dev.feldsher.deconstructedbackpacks.settings;
+
+import dev.feldsher.deconstructedcore.client.gui.SettingsScreen;
+import dev.feldsher.deconstructedcore.client.gui.Tab;
+import dev.feldsher.deconstructedcore.client.gui.utils.Position;
+import dev.feldsher.deconstructedcore.settings.StorageSettingsTabControlBase;
+import dev.feldsher.deconstructedcore.settings.main.MainSettingsContainer;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/** The no-sort, memory and item display tabs come with the steps that port them. */
+public class BackpackSettingsTabControl extends StorageSettingsTabControlBase {
+	private static final Map<String, ISettingsTabFactory<?, ?>> SETTINGS_TAB_FACTORIES = new HashMap<>();
+
+	static {
+		SETTINGS_TAB_FACTORIES.put(BackpackMainSettingsCategory.NAME, (ISettingsTabFactory<MainSettingsContainer, BackpackMainSettingsTab>) BackpackMainSettingsTab::new);
+	}
+
+	public BackpackSettingsTabControl(SettingsScreen screen, Position position) {
+		super(screen, position);
+	}
+
+	@Override
+	protected Tab instantiateReturnBackTab() {
+		return new BackToBackpackTab(new Position(x, getTopY()));
+	}
+
+	@Override
+	protected Map<String, ISettingsTabFactory<?, ?>> getSettingsTabFactories() {
+		return SETTINGS_TAB_FACTORIES;
+	}
+}

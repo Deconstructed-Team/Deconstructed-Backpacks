@@ -23,6 +23,11 @@ public class BackpackContainer extends StorageContainerMenuBase<IBackpackWrapper
 	}
 
 	@Override
+	protected void openSettingsScreen() {
+		backpackContext.openSettings(player);
+	}
+
+	@Override
 	protected void onUpgradeChanged() {
 		if (player instanceof EntityPlayerMP) {
 			ContainerReopener.scheduleReopen((EntityPlayerMP) player, this);

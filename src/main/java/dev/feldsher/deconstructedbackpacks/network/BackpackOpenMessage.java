@@ -6,6 +6,7 @@ import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import dev.feldsher.deconstructedbackpacks.common.gui.BackpackSettingsContainerMenu;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -46,6 +47,11 @@ public class BackpackOpenMessage implements IMessage {
 		}
 
 		private static void handle(EntityPlayerMP player, int slotIndex) {
+			// From the backpack's settings, back to the backpack
+			if (player.openContainer instanceof BackpackSettingsContainerMenu) {
+				((BackpackSettingsContainerMenu) player.openContainer).getBackpackContext().open(player);
+				return;
+			}
 			if (slotIndex >= 0) {
 				if (slotIndex < player.inventory.getSizeInventory() && isBackpack(player.inventory.getStackInSlot(slotIndex))) {
 					openBackpack(player, slotIndex);

@@ -1,6 +1,7 @@
 package dev.feldsher.deconstructedbackpacks;
 
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
+import dev.feldsher.deconstructedbackpacks.common.gui.BackpackSettingsContainerMenu;
 
 import javax.annotation.Nullable;
 
@@ -16,6 +17,11 @@ public class CommonProxy {
 
 	@Nullable
 	public Object createBackpackScreen(BackpackContainer container) {
+		return null;
+	}
+
+	@Nullable
+	public Object createBackpackSettingsScreen(BackpackSettingsContainerMenu container) {
 		return null;
 	}
 }

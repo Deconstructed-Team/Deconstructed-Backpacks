@@ -33,7 +33,16 @@ public abstract class BackpackContext {
 	 * Opens this backpack's container for the player, on the server. The client gets the backpack and its contents
 	 * first, so that it builds the container with the same upgrades, and so the same slots, as the server.
 	 */
-	public abstract void open(EntityPlayer player);
+	public void open(EntityPlayer player) {
+		openScreen(player, false);
+	}
+
+	/** Opens this backpack's settings, as {@link #open} its container. */
+	public void openSettings(EntityPlayer player) {
+		openScreen(player, true);
+	}
+
+	protected abstract void openScreen(EntityPlayer player, boolean settings);
 
 	protected static void sendContents(EntityPlayerMP player, IBackpackWrapper wrapper) {
 		// Contents are created with their UUID the first time the backpack is opened
@@ -76,7 +85,7 @@ public abstract class BackpackContext {
 		}
 
 		@Override
-		public void open(EntityPlayer player) {
+		protected void openScreen(EntityPlayer player, boolean settings) {
 			if (player instanceof EntityPlayerMP) {
 				EntityPlayerMP playerMP = (EntityPlayerMP) player;
 				ItemStack backpack = getBackpackStack(player);
@@ -84,7 +93,7 @@ public abstract class BackpackContext {
 				// windowId -2: a slot of the player's inventory, whichever container is open
 				playerMP.connection.sendPacket(new SPacketSetSlot(-2, backpackSlotIndex, backpack));
 			}
-			player.openGui(DeconstructedBackpacks.instance, GuiHandler.ITEM_BACKPACK, player.world, backpackSlotIndex, 0, 0);
+			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.ITEM_BACKPACK_SETTINGS : GuiHandler.ITEM_BACKPACK, player.world, backpackSlotIndex, 0, 0);
 		}
 	}
 
@@ -126,7 +135,7 @@ public abstract class BackpackContext {
 		}
 
 		@Override
-		public void open(EntityPlayer player) {
+		protected void openScreen(EntityPlayer player, boolean settings) {
 			TileEntity te = player.world.getTileEntity(pos);
 			if (player instanceof EntityPlayerMP && te instanceof BackpackBlockEntity) {
 				EntityPlayerMP playerMP = (EntityPlayerMP) player;
@@ -136,7 +145,7 @@ public abstract class BackpackContext {
 					playerMP.connection.sendPacket(updatePacket);
 				}
 			}
-			player.openGui(DeconstructedBackpacks.instance, GuiHandler.BLOCK_BACKPACK, player.world, pos.getX(), pos.getY(), pos.getZ());
+			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.BLOCK_BACKPACK_SETTINGS : GuiHandler.BLOCK_BACKPACK, player.world, pos.getX(), pos.getY(), pos.getZ());
 		}
 	}
 }

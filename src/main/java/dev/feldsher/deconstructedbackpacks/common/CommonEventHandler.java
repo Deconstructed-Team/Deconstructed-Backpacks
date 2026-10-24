@@ -2,11 +2,14 @@ package dev.feldsher.deconstructedbackpacks.common;
 
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
+import dev.feldsher.deconstructedbackpacks.settings.BackpackMainSettingsCategory;
 import dev.feldsher.deconstructedbackpacks.util.PlayerInventoryProvider;
+import dev.feldsher.deconstructedcore.settings.SettingsManager;
 import dev.feldsher.deconstructedcore.upgrades.IPickupResponseUpgrade;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeHandler;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
@@ -15,12 +18,35 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Mod.EventBusSubscriber(modid = DeconstructedBackpacks.MOD_ID)
 public class CommonEventHandler {
+	@SubscribeEvent
+	public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+		syncPlayerSettings(event.player);
+	}
+
+	@SubscribeEvent
+	public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+		syncPlayerSettings(event.player);
+	}
+
+	@SubscribeEvent
+	public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+		syncPlayerSettings(event.player);
+	}
+
+	/** The client's player is new on each of these, with none of the player's settings, which the server keeps. */
+	private static void syncPlayerSettings(EntityPlayer player) {
+		if (player instanceof EntityPlayerMP) {
+			SettingsManager.syncPlayerSettings((EntityPlayerMP) player, BackpackMainSettingsCategory.PLAYER_SETTINGS_TAG);
+		}
+	}
+
 	private CommonEventHandler() {}
 
 	/**

@@ -48,6 +48,7 @@ public class ContainerReopener {
 
 		ItemStack cursorStack = player.inventory.getItemStack();
 		player.inventory.setItemStack(ItemStack.EMPTY);
+		((BackpackContainer) container).setReopening();
 		context.open(player);
 		player.inventory.setItemStack(cursorStack);
 		player.updateHeldItem();

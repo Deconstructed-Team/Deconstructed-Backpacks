@@ -8,6 +8,7 @@ import dev.feldsher.deconstructedcore.common.gui.SortBy;
 import dev.feldsher.deconstructedcore.util.InventorySorter;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.inventory.StorageWrapperRepository;
+import dev.feldsher.deconstructedcore.settings.SettingsHandler;
 import dev.feldsher.deconstructedcore.storage.StorageContents;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeHandler;
 import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeItem;
@@ -40,6 +41,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 
 	private static final String INVENTORY_HANDLER = "inventory";
 	private static final String UPGRADE_HANDLER = "upgrades";
+	private static final String SETTINGS_HANDLER = "settings";
 
 	@Nullable
 	private UpgradeHandler dummyUpgradeHandler = null;
@@ -109,6 +111,12 @@ public class BackpackWrapper implements IBackpackWrapper {
 				return super.isItemValid(slot, stack) && (stack.isEmpty() || ModItems.isBackpackUpgrade(stack.getItem()));
 			}
 		});
+	}
+
+	@Override
+	public SettingsHandler getSettingsHandler() {
+		StorageContents contents = getContents();
+		return contents.getShared(SETTINGS_HANDLER, () -> new BackpackSettingsHandler(contents.getNbt(), contents::markDirty));
 	}
 
 	private void onUpgradesChanged() {
