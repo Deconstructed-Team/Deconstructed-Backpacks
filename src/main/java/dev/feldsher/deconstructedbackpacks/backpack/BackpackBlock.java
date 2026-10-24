@@ -1,7 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
-import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
+import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContext;
 import dev.feldsher.deconstructedcore.util.StorageNbt;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -165,7 +165,7 @@ public class BackpackBlock extends Block {
 			return true;
 		}
 
-		player.openGui(DeconstructedBackpacks.instance, GuiHandler.BLOCK_BACKPACK, world, pos.getX(), pos.getY(), pos.getZ());
+		new BackpackContext.Block(pos).open(player);
 		return true;
 	}
 

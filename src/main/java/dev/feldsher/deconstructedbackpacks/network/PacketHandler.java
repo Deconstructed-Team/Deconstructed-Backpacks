@@ -13,5 +13,6 @@ public class PacketHandler {
 	public static void init() {
 		int id = 0;
 		INSTANCE.registerMessage(BackpackOpenMessage.Handler.class, BackpackOpenMessage.class, id++, Side.SERVER);
+		INSTANCE.registerMessage(BackpackContentsMessage.Handler.class, BackpackContentsMessage.class, id++, Side.CLIENT);
 	}
 }

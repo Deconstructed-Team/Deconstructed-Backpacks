@@ -1,11 +1,18 @@
 package dev.feldsher.deconstructedbackpacks.common.gui;
 
+import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlockEntity;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
+import dev.feldsher.deconstructedbackpacks.backpack.BackpackStorage;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
+import dev.feldsher.deconstructedbackpacks.network.BackpackContentsMessage;
+import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
@@ -21,6 +28,19 @@ public abstract class BackpackContext {
 	public abstract int getBackpackSlotIndex();
 
 	public abstract boolean canInteractWith(EntityPlayer player);
+
+	/**
+	 * Opens this backpack's container for the player, on the server. The client gets the backpack and its contents
+	 * first, so that it builds the container with the same upgrades, and so the same slots, as the server.
+	 */
+	public abstract void open(EntityPlayer player);
+
+	protected static void sendContents(EntityPlayerMP player, IBackpackWrapper wrapper) {
+		// Contents are created with their UUID the first time the backpack is opened
+		wrapper.getInventoryHandler();
+		wrapper.getContentsUuid().ifPresent(uuid ->
+				PacketHandler.INSTANCE.sendTo(new BackpackContentsMessage(uuid, BackpackStorage.get().getOrCreateBackpackContents(uuid)), player));
+	}
 
 	/** A backpack in the player's inventory, by its slot there: 0-35 the main inventory, 36-39 armor, 40 the offhand. */
 	public static class Item extends BackpackContext {
@@ -53,6 +73,18 @@ public abstract class BackpackContext {
 		@Override
 		public boolean canInteractWith(EntityPlayer player) {
 			return getBackpackStack(player).getItem() instanceof BackpackItem;
+		}
+
+		@Override
+		public void open(EntityPlayer player) {
+			if (player instanceof EntityPlayerMP) {
+				EntityPlayerMP playerMP = (EntityPlayerMP) player;
+				ItemStack backpack = getBackpackStack(player);
+				sendContents(playerMP, BackpackWrapper.fromStack(backpack));
+				// windowId -2: a slot of the player's inventory, whichever container is open
+				playerMP.connection.sendPacket(new SPacketSetSlot(-2, backpackSlotIndex, backpack));
+			}
+			player.openGui(DeconstructedBackpacks.instance, GuiHandler.ITEM_BACKPACK, player.world, backpackSlotIndex, 0, 0);
 		}
 	}
 
@@ -91,6 +123,20 @@ public abstract class BackpackContext {
 		public boolean canInteractWith(EntityPlayer player) {
 			return player.world.getTileEntity(pos) instanceof BackpackBlockEntity
 					&& player.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
+		}
+
+		@Override
+		public void open(EntityPlayer player) {
+			TileEntity te = player.world.getTileEntity(pos);
+			if (player instanceof EntityPlayerMP && te instanceof BackpackBlockEntity) {
+				EntityPlayerMP playerMP = (EntityPlayerMP) player;
+				sendContents(playerMP, ((BackpackBlockEntity) te).getBackpackWrapper());
+				SPacketUpdateTileEntity updatePacket = te.getUpdatePacket();
+				if (updatePacket != null) {
+					playerMP.connection.sendPacket(updatePacket);
+				}
+			}
+			player.openGui(DeconstructedBackpacks.instance, GuiHandler.BLOCK_BACKPACK, player.world, pos.getX(), pos.getY(), pos.getZ());
 		}
 	}
 }

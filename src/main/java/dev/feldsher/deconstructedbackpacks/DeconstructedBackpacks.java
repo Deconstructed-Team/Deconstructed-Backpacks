@@ -1,6 +1,7 @@
 package dev.feldsher.deconstructedbackpacks;
 
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
+import dev.feldsher.deconstructedbackpacks.init.ModUpgradeContainers;
 import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
@@ -33,6 +34,7 @@ public class DeconstructedBackpacks {
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
+		ModUpgradeContainers.register();
 		proxy.init();
 	}
 

@@ -189,6 +189,27 @@ public class BackpackWrapper implements IBackpackWrapper {
 	}
 
 	@Override
+	public Optional<Integer> getOpenTabId() {
+		NBTTagCompound tag = getBackpackStack().getTagCompound();
+		return tag != null && tag.hasKey(StorageNbt.OPEN_TAB_ID) ? Optional.of(tag.getInteger(StorageNbt.OPEN_TAB_ID)) : Optional.empty();
+	}
+
+	@Override
+	public void setOpenTabId(int openTabId) {
+		StorageNbt.getOrCreateTag(getBackpackStack()).setInteger(StorageNbt.OPEN_TAB_ID, openTabId);
+		backpackSaveHandler.run();
+	}
+
+	@Override
+	public void removeOpenTabId() {
+		NBTTagCompound tag = getBackpackStack().getTagCompound();
+		if (tag != null) {
+			tag.removeTag(StorageNbt.OPEN_TAB_ID);
+		}
+		backpackSaveHandler.run();
+	}
+
+	@Override
 	public int getMainColor() {
 		return StorageNbt.getInt(getBackpackStack(), StorageNbt.MAIN_COLOR, DEFAULT_MAIN_COLOR);
 	}

@@ -3,6 +3,7 @@ package dev.feldsher.deconstructedbackpacks.backpack;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
+import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContext;
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
 import dev.feldsher.deconstructedbackpacks.init.ModBlocks;
 import dev.feldsher.deconstructedbackpacks.init.ModItems;
@@ -89,7 +90,7 @@ public class BackpackItem extends Item {
 
 		if (!world.isRemote) {
 			int slot = hand == EnumHand.MAIN_HAND ? player.inventory.currentItem : GuiHandler.OFFHAND_SLOT;
-			player.openGui(DeconstructedBackpacks.instance, GuiHandler.ITEM_BACKPACK, world, slot, 0, 0);
+			new BackpackContext.Item(slot).open(player);
 		}
 		return new ActionResult<>(EnumActionResult.SUCCESS, stack);
 	}

@@ -1,7 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.network;
 
-import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
+import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContext;
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -71,7 +71,7 @@ public class BackpackOpenMessage implements IMessage {
 		}
 
 		private static void openBackpack(EntityPlayerMP player, int slot) {
-			player.openGui(DeconstructedBackpacks.instance, GuiHandler.ITEM_BACKPACK, player.world, slot, 0, 0);
+			new BackpackContext.Item(slot).open(player);
 		}
 	}
 }

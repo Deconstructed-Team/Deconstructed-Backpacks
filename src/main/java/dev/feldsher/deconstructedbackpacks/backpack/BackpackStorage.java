@@ -91,6 +91,12 @@ public class BackpackStorage extends WorldSavedData {
 		});
 	}
 
+	/** The client's copy gets a backpack's contents as the server sends them. */
+	public void setBackpackContents(UUID backpackUuid, NBTTagCompound contents) {
+		backpackContents.put(backpackUuid, contents);
+		markDirty();
+	}
+
 	public void removeBackpackContents(UUID backpackUuid) {
 		backpackContents.remove(backpackUuid);
 		markDirty();
