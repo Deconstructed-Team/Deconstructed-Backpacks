@@ -9,6 +9,7 @@ import dev.feldsher.deconstructedcore.util.InventorySorter;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.inventory.StorageWrapperRepository;
 import dev.feldsher.deconstructedcore.settings.SettingsHandler;
+import dev.feldsher.deconstructedcore.settings.nosort.NoSortSettingsCategory;
 import dev.feldsher.deconstructedcore.storage.StorageContents;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeHandler;
 import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeItem;
@@ -19,6 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -319,10 +321,11 @@ public class BackpackWrapper implements IBackpackWrapper {
 		backpackSaveHandler.run();
 	}
 
-	/** The slots that settings leave out of sorting come with the settings that set them. */
+	/** Around the slots that settings leave out of sorting; the memorized slots come with the memory settings. */
 	@Override
 	public void sort() {
-		InventorySorter.sortHandler(getInventoryHandler(), InventorySorter.getComparator(getSortBy()), new HashSet<>());
+		Set<Integer> slotIndexesExcludedFromSort = new HashSet<>(getSettingsHandler().getTypeCategory(NoSortSettingsCategory.class).getNoSortSlots());
+		InventorySorter.sortHandler(getInventoryHandler(), InventorySorter.getComparator(getSortBy()), slotIndexesExcludedFromSort);
 	}
 
 	@Override
