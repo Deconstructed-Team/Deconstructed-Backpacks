@@ -2,6 +2,7 @@ package dev.feldsher.deconstructedbackpacks.backpack;
 
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
+import dev.feldsher.deconstructedcore.upgrades.ITickableUpgrade;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,6 +10,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -18,10 +20,10 @@ import javax.annotation.Nullable;
 
 /**
  * A placed backpack: it holds the backpack stack, and through it the contents.
- * Upgrade ticking, fluid and energy handlers, the storage controller and render state for tanks and battery come with
+ * Fluid and energy handlers, the storage controller and render state for tanks and battery come with
  * the stages that port them.
  */
-public class BackpackBlockEntity extends TileEntity {
+public class BackpackBlockEntity extends TileEntity implements ITickable {
 	@Nullable
 	private IBackpackWrapper backpackWrapper = null;
 
@@ -50,6 +52,14 @@ public class BackpackBlockEntity extends TileEntity {
 			IBlockState state = world.getBlockState(pos);
 			world.notifyBlockUpdate(pos, state, state, 3);
 		}
+	}
+
+	@Override
+	public void update() {
+		if (world == null || world.isRemote || backpackWrapper == null) {
+			return;
+		}
+		backpackWrapper.getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class).forEach(upgrade -> upgrade.tick(null, world, pos));
 	}
 
 	@Override

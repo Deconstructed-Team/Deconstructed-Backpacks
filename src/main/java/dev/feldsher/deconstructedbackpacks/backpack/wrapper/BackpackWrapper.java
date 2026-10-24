@@ -2,9 +2,11 @@ package dev.feldsher.deconstructedbackpacks.backpack.wrapper;
 
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackStorage;
+import dev.feldsher.deconstructedbackpacks.init.ModItems;
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.inventory.StorageWrapperRepository;
+import dev.feldsher.deconstructedcore.upgrades.UpgradeHandler;
 import dev.feldsher.deconstructedcore.util.StorageNbt;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,7 +19,7 @@ import java.util.UUID;
  * A backpack stack and its contents. The stack carries the contents' UUID, its slot counts and colors;
  * the contents themselves are in {@link BackpackStorage}.
  * <p>
- * Upgrades, settings, fluids, energy, loot and render info come with the stages that port them.
+ * Settings, fluids, energy, loot and render info come with the stages that port them.
  */
 public class BackpackWrapper implements IBackpackWrapper {
 	public static final int DEFAULT_MAIN_COLOR = 0xFF_CC613A;
@@ -32,6 +34,11 @@ public class BackpackWrapper implements IBackpackWrapper {
 
 	@Nullable
 	private InventoryHandler handler = null;
+	@Nullable
+	private UpgradeHandler upgradeHandler = null;
+	private boolean upgradeHandlerIsDummy = false;
+	private Runnable upgradeCachesInvalidatedHandler = () -> {
+	};
 
 	public BackpackWrapper(ItemStack backpackStack) {
 		setBackpackStack(backpackStack);
@@ -70,6 +77,52 @@ public class BackpackWrapper implements IBackpackWrapper {
 		return handler;
 	}
 
+	/**
+	 * A backpack whose contents don't exist yet has no upgrades: it gets an empty handler, as 1.21's Noop, so that
+	 * ticking every backpack in an inventory doesn't create contents for each.
+	 */
+	@Override
+	public UpgradeHandler getUpgradeHandler() {
+		if (upgradeHandler == null) {
+			if (getContentsUuid().isPresent()) {
+				upgradeHandlerIsDummy = false;
+				upgradeHandler = new UpgradeHandler(getNumberOfUpgradeSlots(), this, getBackpackContentsNbt(), this::markBackpackContentsDirty, this::onUpgradesChanged) {
+					@Override
+					public boolean isItemValid(int slot, ItemStack stack) {
+						return super.isItemValid(slot, stack) && (stack.isEmpty() || ModItems.isBackpackUpgrade(stack.getItem()));
+					}
+				};
+			} else {
+				upgradeHandlerIsDummy = true;
+				upgradeHandler = new UpgradeHandler(0, this, new NBTTagCompound(), () -> {
+				}, () -> {
+				});
+				upgradeHandler.setPersistent(false);
+			}
+		}
+		return upgradeHandler;
+	}
+
+	private void onUpgradesChanged() {
+		upgradeCachesInvalidatedHandler.run();
+	}
+
+	@Override
+	public void setUpgradeCachesInvalidatedHandler(Runnable handler) {
+		upgradeCachesInvalidatedHandler = handler;
+	}
+
+	private int getNumberOfUpgradeSlots() {
+		NBTTagCompound tag = getBackpackStack().getTagCompound();
+		if (tag != null && tag.hasKey(StorageNbt.NUMBER_OF_UPGRADE_SLOTS)) {
+			return tag.getInteger(StorageNbt.NUMBER_OF_UPGRADE_SLOTS);
+		}
+
+		int itemUpgradeSlots = ((BackpackItem) getBackpackStack().getItem()).getNumberOfUpgradeSlots();
+		setNumberOfUpgradeSlots(itemUpgradeSlots);
+		return itemUpgradeSlots;
+	}
+
 	private int getNumberOfInventorySlots() {
 		NBTTagCompound tag = getBackpackStack().getTagCompound();
 		if (tag != null && tag.hasKey(StorageNbt.NUMBER_OF_INVENTORY_SLOTS)) {
@@ -105,7 +158,10 @@ public class BackpackWrapper implements IBackpackWrapper {
 
 	@Override
 	public void copyDataTo(IStorageWrapper otherStorageWrapper) {
-		getContentsUuid().ifPresent(originalUuid -> getInventoryHandler().copyStacksTo(otherStorageWrapper.getInventoryHandler()));
+		getContentsUuid().ifPresent(originalUuid -> {
+			getInventoryHandler().copyStacksTo(otherStorageWrapper.getInventoryHandler());
+			getUpgradeHandler().copyTo(otherStorageWrapper.getUpgradeHandler());
+		});
 	}
 
 	@Override
@@ -123,6 +179,9 @@ public class BackpackWrapper implements IBackpackWrapper {
 		Optional<UUID> contentsUuid = getContentsUuid();
 		if (contentsUuid.isPresent()) {
 			return contentsUuid.get();
+		}
+		if (upgradeHandlerIsDummy) {
+			upgradeHandler = null;
 		}
 		UUID newUuid = UUID.randomUUID();
 		setContentsUuid(newUuid);
@@ -162,6 +221,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Override
 	public void setPersistent(boolean persistent) {
 		getInventoryHandler().setPersistent(persistent);
+		getUpgradeHandler().setPersistent(persistent);
 	}
 
 	@Override
@@ -207,6 +267,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Override
 	public void onContentsNbtUpdated() {
 		handler = null;
+		upgradeHandler = null;
 	}
 
 	@Override

@@ -6,11 +6,13 @@ import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
 import dev.feldsher.deconstructedbackpacks.init.ModBlocks;
 import dev.feldsher.deconstructedbackpacks.init.ModItems;
+import dev.feldsher.deconstructedcore.upgrades.ITickableUpgrade;
 import dev.feldsher.deconstructedcore.util.StorageNbt;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumDyeColor;
@@ -33,7 +35,7 @@ import java.util.function.IntSupplier;
 
 /**
  * A backpack: a storage carried as an item, opened from the hand.
- * Wearing it, stashing items into it from a slot and the upgrades' ticking come with the
+ * Stashing items into it from a slot comes with the
  * stages that port them.
  */
 public class BackpackItem extends Item {
@@ -136,6 +138,20 @@ public class BackpackItem extends Item {
 
 	public BackpackBlock getBlock() {
 		return ModBlocks.getBlock(this);
+	}
+
+	/** The upgrades of every backpack a player carries tick, wherever in the inventory it is. */
+	@Override
+	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
+		if (world.isRemote || !(entity instanceof EntityPlayer)) {
+			return;
+		}
+		EntityPlayer player = (EntityPlayer) entity;
+		if (player.isSpectator() || player.isDead) {
+			return;
+		}
+		BackpackWrapper.fromStack(stack).getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class)
+				.forEach(upgrade -> upgrade.tick(player, world, player.getPosition()));
 	}
 
 	public int getNumberOfSlots() {

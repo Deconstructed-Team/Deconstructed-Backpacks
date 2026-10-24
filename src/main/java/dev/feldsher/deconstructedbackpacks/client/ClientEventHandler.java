@@ -25,8 +25,8 @@ public class ClientEventHandler {
 
 	@SubscribeEvent
 	public static void registerModels(ModelRegistryEvent event) {
-		for (Item backpack : ModItems.BACKPACKS) {
-			ModelLoader.setCustomModelResourceLocation(backpack, 0, new ModelResourceLocation(Objects.requireNonNull(backpack.getRegistryName()), "inventory"));
+		for (Item item : ModItems.getAllItems()) {
+			ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(Objects.requireNonNull(item.getRegistryName()), "inventory"));
 		}
 	}
 

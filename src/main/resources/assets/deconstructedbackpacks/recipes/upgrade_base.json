@@ -1,0 +1,25 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "SIS",
+    "ILI",
+    "SIS"
+  ],
+  "key": {
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "L": {
+      "type": "forge:ore_dict",
+      "ore": "leather"
+    },
+    "S": {
+      "type": "forge:ore_dict",
+      "ore": "string"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:upgrade_base"
+  }
+}

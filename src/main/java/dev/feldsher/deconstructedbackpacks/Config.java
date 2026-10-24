@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedcore.upgrades.IUpgradeCountLimitConfig;
+import dev.feldsher.deconstructedcore.upgrades.UpgradeGroup;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigManager;
@@ -8,7 +10,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @net.minecraftforge.common.config.Config(modid = DeconstructedBackpacks.MOD_ID)
@@ -33,9 +37,33 @@ public class Config {
 		@net.minecraftforge.common.config.Config.Comment("Diamond Backpack Settings")
 		public final BackpackConfig diamondBackpack = new BackpackConfig(108, 5);
 
+		@net.minecraftforge.common.config.Config.Comment("Pickup Upgrade Settings")
+		public final FilteredUpgradeConfig pickupUpgrade = new FilteredUpgradeConfig(9, 3);
+		@net.minecraftforge.common.config.Config.Comment("Advanced Pickup Upgrade Settings")
+		public final FilteredUpgradeConfig advancedPickupUpgrade = new FilteredUpgradeConfig(16, 4);
+
+		@net.minecraftforge.common.config.Config.Comment("Maximum number of upgrades of type per backpack in format of \"UpgradeRegistryName[or UpgradeGroup]|MaxNumber\"")
+		public String[] maxUpgradesPerStorage = {"stack_upgrades|3", "furnace_upgrades|1", "jukebox_upgrades|1"};
+
+		@net.minecraftforge.common.config.Config.Ignore
+		public final IUpgradeCountLimitConfig maxUpgradesPerStorageConfig = new IUpgradeCountLimitConfig() {
+			@Override
+			public int getMaxUpgradesPerStorage(String storageType, @Nullable ResourceLocation upgradeRegistryName) {
+				return upgradeRegistryName == null ? Integer.MAX_VALUE : getMaxUpgrades().getOrDefault(upgradeRegistryName.getPath(), Integer.MAX_VALUE);
+			}
+
+			@Override
+			public int getMaxUpgradesInGroupPerStorage(String storageType, UpgradeGroup upgradeGroup) {
+				return getMaxUpgrades().getOrDefault(upgradeGroup.name(), Integer.MAX_VALUE);
+			}
+		};
+
 		@net.minecraftforge.common.config.Config.Ignore
 		@Nullable
 		private Set<ResourceLocation> disallowedItemsSet = null;
+		@net.minecraftforge.common.config.Config.Ignore
+		@Nullable
+		private Map<String, Integer> maxUpgrades = null;
 
 		public boolean isItemDisallowed(Item item) {
 			if (disallowedItemsSet == null) {
@@ -47,8 +75,23 @@ public class Config {
 			return disallowedItemsSet.contains(item.getRegistryName());
 		}
 
+		private Map<String, Integer> getMaxUpgrades() {
+			if (maxUpgrades == null) {
+				maxUpgrades = new HashMap<>();
+				for (String mapping : maxUpgradesPerStorage) {
+					String[] upgradeMax = mapping.split("\\|");
+					if (upgradeMax.length < 2 || !upgradeMax[1].matches("\\d+")) {
+						continue;
+					}
+					maxUpgrades.put(upgradeMax[0], Integer.parseInt(upgradeMax[1]));
+				}
+			}
+			return maxUpgrades;
+		}
+
 		private void clearCache() {
 			disallowedItemsSet = null;
+			maxUpgrades = null;
 		}
 	}
 
@@ -63,6 +106,20 @@ public class Config {
 		BackpackConfig(int inventorySlotCountDefault, int upgradeSlotCountDefault) {
 			inventorySlotCount = inventorySlotCountDefault;
 			upgradeSlotCount = upgradeSlotCountDefault;
+		}
+	}
+
+	public static class FilteredUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Number of the upgrade's filter slots")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 20)
+		public int filterSlots;
+		@net.minecraftforge.common.config.Config.Comment("Number of filter slots displayed in a row")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 6)
+		public int slotsInRow;
+
+		FilteredUpgradeConfig(int defaultFilterSlots, int defaultSlotsInRow) {
+			filterSlots = defaultFilterSlots;
+			slotsInRow = defaultSlotsInRow;
 		}
 	}
 
