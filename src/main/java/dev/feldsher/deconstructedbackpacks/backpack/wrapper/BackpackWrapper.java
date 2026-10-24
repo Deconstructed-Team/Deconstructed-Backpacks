@@ -6,6 +6,7 @@ import dev.feldsher.deconstructedbackpacks.init.ModItems;
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.inventory.StorageWrapperRepository;
+import dev.feldsher.deconstructedcore.storage.StorageContents;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeHandler;
 import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeItem;
 import dev.feldsher.deconstructedcore.util.StorageNbt;
@@ -18,7 +19,8 @@ import java.util.UUID;
 
 /**
  * A backpack stack and its contents. The stack carries the contents' UUID, its slot counts and colors;
- * the contents themselves are in {@link BackpackStorage}.
+ * the contents themselves are in {@link BackpackStorage}. The inventory and upgrade handlers live with the contents,
+ * not here: every stack with the same UUID works on the same ones, and so sees the same backpack.
  * <p>
  * Settings, fluids, energy, loot and render info come with the stages that port them.
  */
@@ -33,11 +35,15 @@ public class BackpackWrapper implements IBackpackWrapper {
 	private Runnable inventorySlotChangeHandler = () -> {
 	};
 
+	private static final String INVENTORY_HANDLER = "inventory";
+	private static final String UPGRADE_HANDLER = "upgrades";
+
 	@Nullable
-	private InventoryHandler handler = null;
+	private UpgradeHandler dummyUpgradeHandler = null;
+	// kept here: the contents hold it weakly, so that it goes with this wrapper
+	private final Runnable slotChangeListener = () -> inventorySlotChangeHandler.run();
 	@Nullable
-	private UpgradeHandler upgradeHandler = null;
-	private boolean upgradeHandlerIsDummy = false;
+	private StorageContents listenedContents = null;
 	private Runnable upgradeCachesInvalidatedHandler = () -> {
 	};
 
@@ -68,14 +74,13 @@ public class BackpackWrapper implements IBackpackWrapper {
 
 	@Override
 	public InventoryHandler getInventoryHandler() {
-		if (handler == null) {
-			handler = new BackpackInventoryHandler(getNumberOfInventorySlots() - (getNumberOfSlotRows() * getColumnsTaken()),
-					this, getBackpackContentsNbt(), () -> {
-				markBackpackContentsDirty();
-				inventorySlotChangeHandler.run();
-			}, StackUpgradeItem.getInventorySlotLimit(this));
+		StorageContents contents = getContents();
+		if (listenedContents != contents) {
+			contents.addSlotChangeListener(this, slotChangeListener);
+			listenedContents = contents;
 		}
-		return handler;
+		return contents.getShared(INVENTORY_HANDLER, () -> new BackpackInventoryHandler(getNumberOfInventorySlots() - (getNumberOfSlotRows() * getColumnsTaken()),
+				this, contents.getNbt(), contents::onSlotChanged, StackUpgradeItem.getInventorySlotLimit(this)));
 	}
 
 	/**
@@ -84,30 +89,27 @@ public class BackpackWrapper implements IBackpackWrapper {
 	 */
 	@Override
 	public UpgradeHandler getUpgradeHandler() {
-		if (upgradeHandler == null) {
-			if (getContentsUuid().isPresent()) {
-				upgradeHandlerIsDummy = false;
-				upgradeHandler = new UpgradeHandler(getNumberOfUpgradeSlots(), this, getBackpackContentsNbt(), this::markBackpackContentsDirty, this::onUpgradesChanged) {
-					@Override
-					public boolean isItemValid(int slot, ItemStack stack) {
-						return super.isItemValid(slot, stack) && (stack.isEmpty() || ModItems.isBackpackUpgrade(stack.getItem()));
-					}
-				};
-			} else {
-				upgradeHandlerIsDummy = true;
-				upgradeHandler = new UpgradeHandler(0, this, new NBTTagCompound(), () -> {
+		if (!getContentsUuid().isPresent()) {
+			if (dummyUpgradeHandler == null) {
+				dummyUpgradeHandler = new UpgradeHandler(0, this, new NBTTagCompound(), () -> {
 				}, () -> {
 				});
-				upgradeHandler.setPersistent(false);
+				dummyUpgradeHandler.setPersistent(false);
 			}
+			return dummyUpgradeHandler;
 		}
-		return upgradeHandler;
+		dummyUpgradeHandler = null;
+		StorageContents contents = getContents();
+		return contents.getShared(UPGRADE_HANDLER, () -> new UpgradeHandler(getNumberOfUpgradeSlots(), this, contents.getNbt(), contents::markDirty, this::onUpgradesChanged) {
+			@Override
+			public boolean isItemValid(int slot, ItemStack stack) {
+				return super.isItemValid(slot, stack) && (stack.isEmpty() || ModItems.isBackpackUpgrade(stack.getItem()));
+			}
+		});
 	}
 
 	private void onUpgradesChanged() {
-		if (handler != null) {
-			handler.setBaseSlotLimit(StackUpgradeItem.getInventorySlotLimit(this));
-		}
+		getInventoryHandler().setBaseSlotLimit(StackUpgradeItem.getInventorySlotLimit(this));
 		upgradeCachesInvalidatedHandler.run();
 	}
 
@@ -152,12 +154,8 @@ public class BackpackWrapper implements IBackpackWrapper {
 		StorageNbt.getOrCreateTag(getBackpackStack()).setInteger(StorageNbt.NUMBER_OF_UPGRADE_SLOTS, numberOfUpgradeSlots);
 	}
 
-	private NBTTagCompound getBackpackContentsNbt() {
-		return BackpackStorage.get().getOrCreateBackpackContents(getOrCreateContentsUuid());
-	}
-
-	private void markBackpackContentsDirty() {
-		BackpackStorage.get().markDirty();
+	private StorageContents getContents() {
+		return BackpackStorage.getContents(getOrCreateContentsUuid());
 	}
 
 	@Override
@@ -183,9 +181,6 @@ public class BackpackWrapper implements IBackpackWrapper {
 		Optional<UUID> contentsUuid = getContentsUuid();
 		if (contentsUuid.isPresent()) {
 			return contentsUuid.get();
-		}
-		if (upgradeHandlerIsDummy) {
-			upgradeHandler = null;
 		}
 		UUID newUuid = UUID.randomUUID();
 		setContentsUuid(newUuid);
@@ -262,7 +257,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 
 	@Override
 	public void removeContentsUuid() {
-		getContentsUuid().ifPresent(BackpackStorage.get()::removeBackpackContents);
+		getContentsUuid().ifPresent(BackpackStorage::removeBackpackContents);
 		removeContentsUUIDTag();
 	}
 
@@ -289,10 +284,10 @@ public class BackpackWrapper implements IBackpackWrapper {
 		return StorageNbt.getInt(getBackpackStack(), StorageNbt.COLUMNS_TAKEN, 0);
 	}
 
+	/** The client's contents and their handlers were replaced as a whole when the server sent them: nothing to drop here. */
 	@Override
 	public void onContentsNbtUpdated() {
-		handler = null;
-		upgradeHandler = null;
+		//noop
 	}
 
 	@Override

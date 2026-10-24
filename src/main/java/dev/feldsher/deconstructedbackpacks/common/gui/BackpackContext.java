@@ -39,7 +39,7 @@ public abstract class BackpackContext {
 		// Contents are created with their UUID the first time the backpack is opened
 		wrapper.getInventoryHandler();
 		wrapper.getContentsUuid().ifPresent(uuid ->
-				PacketHandler.INSTANCE.sendTo(new BackpackContentsMessage(uuid, BackpackStorage.get().getOrCreateBackpackContents(uuid)), player));
+				PacketHandler.INSTANCE.sendTo(new BackpackContentsMessage(uuid, BackpackStorage.getOrCreateBackpackContents(uuid)), player));
 	}
 
 	/** A backpack in the player's inventory, by its slot there: 0-35 the main inventory, 36-39 armor, 40 the offhand. */

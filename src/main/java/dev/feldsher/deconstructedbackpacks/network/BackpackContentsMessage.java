@@ -53,7 +53,7 @@ public class BackpackContentsMessage implements IMessage {
 			UUID uuid = message.backpackUuid;
 			NBTTagCompound contents = message.backpackContents;
 			if (uuid != null && contents != null) {
-				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> BackpackStorage.get().setBackpackContents(uuid, contents));
+				FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> BackpackStorage.setClientBackpackContents(uuid, contents));
 			}
 			return null;
 		}
