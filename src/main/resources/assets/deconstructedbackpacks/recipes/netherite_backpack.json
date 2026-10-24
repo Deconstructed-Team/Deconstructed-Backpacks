@@ -1,0 +1,25 @@
+{
+  "conditions": [
+    {
+      "type": "deconstructedbackpacks:tier_enabled",
+      "tier": "netherite"
+    }
+  ],
+  "type": "deconstructedbackpacks:backpack_upgrade",
+  "pattern": [
+    "N",
+    "B"
+  ],
+  "key": {
+    "B": {
+      "item": "deconstructedbackpacks:diamond_backpack"
+    },
+    "N": {
+      "type": "forge:ore_dict",
+      "ore": "ingotNetherite"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:netherite_backpack"
+  }
+}

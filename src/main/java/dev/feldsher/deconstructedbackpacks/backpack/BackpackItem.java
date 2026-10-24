@@ -14,6 +14,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumDyeColor;
@@ -42,6 +43,7 @@ import java.util.function.IntSupplier;
 public class BackpackItem extends Item {
 	private final IntSupplier numberOfSlots;
 	private final IntSupplier numberOfUpgradeSlots;
+	private boolean fireResistant = false;
 
 	public BackpackItem(String name, IntSupplier numberOfSlots, IntSupplier numberOfUpgradeSlots) {
 		this.numberOfSlots = numberOfSlots;
@@ -50,6 +52,23 @@ public class BackpackItem extends Item {
 		setTranslationKey(DeconstructedBackpacks.MOD_ID + "." + name);
 		setMaxStackSize(1);
 		setCreativeTab(ModItems.CREATIVE_TAB);
+	}
+
+	/** As 1.21's fire resistant items: dropped, it doesn't burn in fire or lava. */
+	public BackpackItem setFireResistant() {
+		fireResistant = true;
+		return this;
+	}
+
+	@Override
+	public boolean hasCustomEntity(ItemStack stack) {
+		return fireResistant;
+	}
+
+	@Nullable
+	@Override
+	public Entity createEntity(World world, Entity location, ItemStack stack) {
+		return fireResistant && location instanceof EntityItem ? new FireResistantItemEntity(world, (EntityItem) location, stack) : null;
 	}
 
 	public static void setColors(ItemStack backpackStack, int mainColor, int accentColor) {

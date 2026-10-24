@@ -1,0 +1,26 @@
+{
+  "conditions": [
+    {
+      "type": "deconstructedbackpacks:tier_enabled",
+      "tier": "copper"
+    }
+  ],
+  "type": "deconstructedbackpacks:backpack_upgrade",
+  "pattern": [
+    " I ",
+    "IBI",
+    " I "
+  ],
+  "key": {
+    "B": {
+      "item": "deconstructedbackpacks:copper_backpack"
+    },
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:iron_backpack"
+  }
+}

@@ -1,5 +1,8 @@
 {
   "recipes": {
     "backpack_upgrade": "dev.feldsher.deconstructedbackpacks.crafting.BackpackUpgradeRecipe$Factory"
+  },
+  "conditions": {
+    "tier_enabled": "dev.feldsher.deconstructedbackpacks.crafting.TierEnabledCondition"
   }
 }

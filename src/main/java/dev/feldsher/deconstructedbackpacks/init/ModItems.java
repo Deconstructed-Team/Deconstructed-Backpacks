@@ -34,6 +34,8 @@ public class ModItems {
 	// No copper or netherite in 1.12: the iron backpack is made from the leather one
 	public static final BackpackItem BACKPACK = new BackpackItem("backpack",
 			() -> Config.SERVER.leatherBackpack.inventorySlotCount, () -> Config.SERVER.leatherBackpack.upgradeSlotCount);
+	public static final BackpackItem COPPER_BACKPACK = new BackpackItem("copper_backpack",
+			() -> Config.SERVER.copperBackpack.inventorySlotCount, () -> Config.SERVER.copperBackpack.upgradeSlotCount);
 	public static final BackpackItem IRON_BACKPACK = new BackpackItem("iron_backpack",
 			() -> Config.SERVER.ironBackpack.inventorySlotCount, () -> Config.SERVER.ironBackpack.upgradeSlotCount);
 	public static final BackpackItem GOLD_BACKPACK = new BackpackItem("gold_backpack",
@@ -41,7 +43,20 @@ public class ModItems {
 	public static final BackpackItem DIAMOND_BACKPACK = new BackpackItem("diamond_backpack",
 			() -> Config.SERVER.diamondBackpack.inventorySlotCount, () -> Config.SERVER.diamondBackpack.upgradeSlotCount);
 
-	public static final List<BackpackItem> BACKPACKS = Collections.unmodifiableList(Arrays.asList(BACKPACK, IRON_BACKPACK, GOLD_BACKPACK, DIAMOND_BACKPACK));
+	public static final BackpackItem NETHERITE_BACKPACK = new BackpackItem("netherite_backpack",
+			() -> Config.SERVER.netheriteBackpack.inventorySlotCount, () -> Config.SERVER.netheriteBackpack.upgradeSlotCount).setFireResistant();
+
+	/** The backpack tiers the config enables. */
+	public static List<BackpackItem> getBackpacks() {
+		List<BackpackItem> backpacks = new ArrayList<>(Arrays.asList(BACKPACK, IRON_BACKPACK, GOLD_BACKPACK, DIAMOND_BACKPACK));
+		if (Config.SERVER.copperTierEnabled) {
+			backpacks.add(1, COPPER_BACKPACK);
+		}
+		if (Config.SERVER.netheriteTierEnabled) {
+			backpacks.add(NETHERITE_BACKPACK);
+		}
+		return backpacks;
+	}
 
 	public static final Item UPGRADE_BASE = item(new Item(), "upgrade_base");
 
@@ -63,7 +78,8 @@ public class ModItems {
 	public static final VoidUpgradeItem ADVANCED_VOID_UPGRADE = item(new VoidUpgradeItem(() -> Config.SERVER.advancedVoidUpgrade.filterSlots,
 			() -> Config.SERVER.advancedVoidUpgrade.voidAnythingEnabled, Config.SERVER.maxUpgradesPerStorageConfig), "advanced_void_upgrade");
 
-	// No copper in 1.12: no starter tier, which 1.21 makes from copper blocks
+	// With the copper tier only, as 1.21 makes it from copper blocks
+	public static final StackUpgradeItem STACK_UPGRADE_STARTER_TIER = item(new StackUpgradeItem(1.5, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_starter_tier");
 	public static final StackUpgradeItem STACK_UPGRADE_TIER_1 = item(new StackUpgradeItem(2, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_tier_1");
 	public static final StackUpgradeItem STACK_UPGRADE_TIER_2 = item(new StackUpgradeItem(4, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_tier_2");
 	public static final StackUpgradeItem STACK_UPGRADE_TIER_3 = item(new StackUpgradeItem(8, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_tier_3");
@@ -87,14 +103,17 @@ public class ModItems {
 	}
 
 	public static List<Item> getAllItems() {
-		List<Item> items = new ArrayList<>(BACKPACKS);
+		List<Item> items = new ArrayList<>(getBackpacks());
 		items.add(UPGRADE_BASE);
 		items.addAll(BACKPACK_UPGRADES);
+		if (Config.SERVER.copperTierEnabled) {
+			items.add(STACK_UPGRADE_STARTER_TIER);
+		}
 		return items;
 	}
 
 	public static boolean isBackpackUpgrade(Item item) {
-		return BACKPACK_UPGRADES.contains(item);
+		return BACKPACK_UPGRADES.contains(item) || (item == STACK_UPGRADE_STARTER_TIER && Config.SERVER.copperTierEnabled);
 	}
 
 	@SubscribeEvent

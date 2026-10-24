@@ -1,0 +1,7 @@
+{
+  "parent": "deconstructedbackpacks:block/backpack_base",
+  "textures": {
+    "particle": "deconstructedbackpacks:block/particle",
+    "clips": "deconstructedbackpacks:block/copper_clips"
+  }
+}

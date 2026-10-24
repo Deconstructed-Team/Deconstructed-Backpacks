@@ -38,7 +38,7 @@ public class ClientEventHandler {
 				return -1;
 			}
 			return getColor(BackpackWrapper.fromStack(stack), tintIndex);
-		}, ModItems.BACKPACKS.toArray(new Item[0]));
+		}, ModItems.getBackpacks().toArray(new Item[0]));
 	}
 
 	@SubscribeEvent
@@ -49,7 +49,7 @@ public class ClientEventHandler {
 			}
 			TileEntity te = world.getTileEntity(pos);
 			return te instanceof BackpackBlockEntity ? getColor(((BackpackBlockEntity) te).getBackpackWrapper(), tintIndex) : -1;
-		}, ModBlocks.BACKPACKS.toArray(new Block[0]));
+		}, ModBlocks.getBackpacks().toArray(new Block[0]));
 	}
 
 	private static int getColor(IBackpackWrapper backpackWrapper, int tintIndex) {

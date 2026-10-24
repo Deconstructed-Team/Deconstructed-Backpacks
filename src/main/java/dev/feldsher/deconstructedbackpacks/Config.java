@@ -29,14 +29,25 @@ public class Config {
 		@net.minecraftforge.common.config.Config.Comment("List of items that are not allowed to be put in backpacks - e.g. \"minecraft:shulker_box\"")
 		public String[] disallowedItems = new String[0];
 
+		@net.minecraftforge.common.config.Config.Comment("Whether the copper backpack and the starter tier stack upgrade exist. Their recipes take copper from the ore dictionary (ingotCopper, blockCopper); in a pack with none, they're left without recipes.")
+		@net.minecraftforge.common.config.Config.RequiresMcRestart
+		public boolean copperTierEnabled = false;
+		@net.minecraftforge.common.config.Config.Comment("Whether the netherite backpack exists. Its recipe takes netherite from the ore dictionary (ingotNetherite, as Future MC and Unseen's Nether Backport register); in a pack with none, it's left without a recipe.")
+		@net.minecraftforge.common.config.Config.RequiresMcRestart
+		public boolean netheriteTierEnabled = false;
+
 		@net.minecraftforge.common.config.Config.Comment("Leather Backpack Settings")
 		public final BackpackConfig leatherBackpack = new BackpackConfig(27, 1);
+		@net.minecraftforge.common.config.Config.Comment("Copper Backpack Settings")
+		public final BackpackConfig copperBackpack = new BackpackConfig(45, 1);
 		@net.minecraftforge.common.config.Config.Comment("Iron Backpack Settings")
 		public final BackpackConfig ironBackpack = new BackpackConfig(54, 2);
 		@net.minecraftforge.common.config.Config.Comment("Gold Backpack Settings")
 		public final BackpackConfig goldBackpack = new BackpackConfig(81, 3);
 		@net.minecraftforge.common.config.Config.Comment("Diamond Backpack Settings")
 		public final BackpackConfig diamondBackpack = new BackpackConfig(108, 5);
+		@net.minecraftforge.common.config.Config.Comment("Netherite Backpack Settings")
+		public final BackpackConfig netheriteBackpack = new BackpackConfig(120, 7);
 
 		@net.minecraftforge.common.config.Config.Comment("Pickup Upgrade Settings")
 		public final FilteredUpgradeConfig pickupUpgrade = new FilteredUpgradeConfig(9, 3);

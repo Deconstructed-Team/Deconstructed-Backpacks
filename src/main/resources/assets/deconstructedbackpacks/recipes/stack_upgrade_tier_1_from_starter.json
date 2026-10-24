@@ -1,0 +1,26 @@
+{
+  "conditions": [
+    {
+      "type": "deconstructedbackpacks:tier_enabled",
+      "tier": "copper"
+    }
+  ],
+  "type": "forge:ore_shaped",
+  "pattern": [
+    " I ",
+    "ISI",
+    " I "
+  ],
+  "key": {
+    "S": {
+      "item": "deconstructedbackpacks:stack_upgrade_starter_tier"
+    },
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "blockIron"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:stack_upgrade_tier_1"
+  }
+}

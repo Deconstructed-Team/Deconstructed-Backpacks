@@ -1,0 +1,26 @@
+{
+  "conditions": [
+    {
+      "type": "deconstructedbackpacks:tier_enabled",
+      "tier": "copper"
+    }
+  ],
+  "type": "deconstructedbackpacks:backpack_upgrade",
+  "pattern": [
+    "CCC",
+    "CBC",
+    "CCC"
+  ],
+  "key": {
+    "B": {
+      "item": "deconstructedbackpacks:backpack"
+    },
+    "C": {
+      "type": "forge:ore_dict",
+      "ore": "ingotCopper"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:copper_backpack"
+  }
+}
