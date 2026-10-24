@@ -9,6 +9,7 @@ import dev.feldsher.deconstructedcore.util.InventorySorter;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.inventory.StorageWrapperRepository;
 import dev.feldsher.deconstructedcore.settings.SettingsHandler;
+import dev.feldsher.deconstructedcore.settings.memory.MemorySettingsCategory;
 import dev.feldsher.deconstructedcore.settings.nosort.NoSortSettingsCategory;
 import dev.feldsher.deconstructedcore.storage.StorageContents;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeHandler;
@@ -118,7 +119,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Override
 	public SettingsHandler getSettingsHandler() {
 		StorageContents contents = getContents();
-		return contents.getShared(SETTINGS_HANDLER, () -> new BackpackSettingsHandler(contents.getNbt(), contents::markDirty));
+		return contents.getShared(SETTINGS_HANDLER, () -> new BackpackSettingsHandler(contents.getNbt(), contents::markDirty, this::getInventoryHandler));
 	}
 
 	private void onUpgradesChanged() {
@@ -321,10 +322,11 @@ public class BackpackWrapper implements IBackpackWrapper {
 		backpackSaveHandler.run();
 	}
 
-	/** Around the slots that settings leave out of sorting; the memorized slots come with the memory settings. */
+	/** Around the slots that settings leave out of sorting, and the memorized slots, which keep what they remember. */
 	@Override
 	public void sort() {
 		Set<Integer> slotIndexesExcludedFromSort = new HashSet<>(getSettingsHandler().getTypeCategory(NoSortSettingsCategory.class).getNoSortSlots());
+		slotIndexesExcludedFromSort.addAll(getSettingsHandler().getTypeCategory(MemorySettingsCategory.class).getSlotIndexes());
 		InventorySorter.sortHandler(getInventoryHandler(), InventorySorter.getComparator(getSortBy()), slotIndexesExcludedFromSort);
 	}
 
