@@ -4,6 +4,8 @@ import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackStorage;
 import dev.feldsher.deconstructedbackpacks.init.ModItems;
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
+import dev.feldsher.deconstructedcore.common.gui.SortBy;
+import dev.feldsher.deconstructedcore.util.InventorySorter;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.inventory.StorageWrapperRepository;
 import dev.feldsher.deconstructedcore.storage.StorageContents;
@@ -14,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -294,6 +297,24 @@ public class BackpackWrapper implements IBackpackWrapper {
 	public void setColumnsTaken(int columnsTaken, boolean hasChanged) {
 		StorageNbt.getOrCreateTag(getBackpackStack()).setInteger(StorageNbt.COLUMNS_TAKEN, columnsTaken);
 		backpackSaveHandler.run();
+	}
+
+	@Override
+	public SortBy getSortBy() {
+		NBTTagCompound tag = getBackpackStack().getTagCompound();
+		return tag != null && tag.hasKey(StorageNbt.SORT_BY) ? SortBy.fromName(tag.getString(StorageNbt.SORT_BY)) : SortBy.NAME;
+	}
+
+	@Override
+	public void setSortBy(SortBy sortBy) {
+		StorageNbt.getOrCreateTag(getBackpackStack()).setString(StorageNbt.SORT_BY, sortBy.getSerializedName());
+		backpackSaveHandler.run();
+	}
+
+	/** The slots that settings leave out of sorting come with the settings that set them. */
+	@Override
+	public void sort() {
+		InventorySorter.sortHandler(getInventoryHandler(), InventorySorter.getComparator(getSortBy()), new HashSet<>());
 	}
 
 	@Override
