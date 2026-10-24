@@ -1,6 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.common.gui;
 
-import dev.feldsher.deconstructedbackpacks.client.gui.BackpackScreen;
+import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -41,6 +41,6 @@ public class GuiHandler implements IGuiHandler {
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
 		BackpackContext context = getContext(id, x, y, z);
-		return context != null && context.canInteractWith(player) ? new BackpackScreen(new BackpackContainer(player, context)) : null;
+		return context != null && context.canInteractWith(player) ? DeconstructedBackpacks.proxy.createBackpackScreen(new BackpackContainer(player, context)) : null;
 	}
 }

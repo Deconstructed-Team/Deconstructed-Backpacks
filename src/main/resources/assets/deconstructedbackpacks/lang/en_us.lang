@@ -7,3 +7,5 @@ tile.deconstructedbackpacks.backpack.name=Backpack
 tile.deconstructedbackpacks.iron_backpack.name=Iron Backpack
 tile.deconstructedbackpacks.gold_backpack.name=Gold Backpack
 tile.deconstructedbackpacks.diamond_backpack.name=Diamond Backpack
+keybind.deconstructedbackpacks.category=Deconstructed Backpacks
+keybind.deconstructedbackpacks.open_backpack=Open Backpack

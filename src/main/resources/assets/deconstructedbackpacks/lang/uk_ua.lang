@@ -7,3 +7,5 @@ tile.deconstructedbackpacks.backpack.name=Ранець
 tile.deconstructedbackpacks.iron_backpack.name=Залізний ранець
 tile.deconstructedbackpacks.gold_backpack.name=Золотий ранець
 tile.deconstructedbackpacks.diamond_backpack.name=Діамантовий ранець
+keybind.deconstructedbackpacks.category=Deconstructed Backpacks
+keybind.deconstructedbackpacks.open_backpack=Відкрити ранець

@@ -1,8 +1,10 @@
 package dev.feldsher.deconstructedbackpacks;
 
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
+import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -18,14 +20,19 @@ public class DeconstructedBackpacks {
 	@Mod.Instance(MOD_ID)
 	public static DeconstructedBackpacks instance;
 
+	@SidedProxy(clientSide = "dev.feldsher.deconstructedbackpacks.client.ClientProxy", serverSide = "dev.feldsher.deconstructedbackpacks.CommonProxy")
+	public static CommonProxy proxy;
+
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		LOGGER.info("{} {} loading", Tags.MOD_NAME, Tags.VERSION);
+		PacketHandler.init();
 	}
 
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
+		proxy.init();
 	}
 
 	public static ResourceLocation getRL(String regName) {
