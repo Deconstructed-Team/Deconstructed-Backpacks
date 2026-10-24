@@ -1,11 +1,15 @@
 package dev.feldsher.deconstructedbackpacks.client;
 
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
+import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlockEntity;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
+import dev.feldsher.deconstructedbackpacks.init.ModBlocks;
 import dev.feldsher.deconstructedbackpacks.init.ModItems;
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -33,8 +37,22 @@ public class ClientEventHandler {
 			if (tintIndex < 0 || tintIndex > 1 || stack.isEmpty()) {
 				return -1;
 			}
-			IBackpackWrapper backpackWrapper = BackpackWrapper.fromStack(stack);
-			return tintIndex == 0 ? backpackWrapper.getMainColor() : backpackWrapper.getAccentColor();
+			return getColor(BackpackWrapper.fromStack(stack), tintIndex);
 		}, ModItems.BACKPACKS.toArray(new Item[0]));
+	}
+
+	@SubscribeEvent
+	public static void registerBlockColors(ColorHandlerEvent.Block event) {
+		event.getBlockColors().registerBlockColorHandler((state, world, pos, tintIndex) -> {
+			if (tintIndex < 0 || tintIndex > 1 || world == null || pos == null) {
+				return -1;
+			}
+			TileEntity te = world.getTileEntity(pos);
+			return te instanceof BackpackBlockEntity ? getColor(((BackpackBlockEntity) te).getBackpackWrapper(), tintIndex) : -1;
+		}, ModBlocks.BACKPACKS.toArray(new Block[0]));
+	}
+
+	private static int getColor(IBackpackWrapper backpackWrapper, int tintIndex) {
+		return tintIndex == 0 ? backpackWrapper.getMainColor() : backpackWrapper.getAccentColor();
 	}
 }

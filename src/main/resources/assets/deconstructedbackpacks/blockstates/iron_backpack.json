@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "deconstructedbackpacks:iron_backpack"
+    },
+    "facing=east": {
+      "model": "deconstructedbackpacks:iron_backpack",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "deconstructedbackpacks:iron_backpack",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "deconstructedbackpacks:iron_backpack",
+      "y": 270
+    }
+  }
+}

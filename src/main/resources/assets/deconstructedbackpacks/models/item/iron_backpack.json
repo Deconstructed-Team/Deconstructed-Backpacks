@@ -1,6 +1,3 @@
 {
-  "parent": "deconstructedbackpacks:block/backpack_base",
-  "textures": {
-    "clips": "deconstructedbackpacks:block/iron_clips"
-  }
+  "parent": "deconstructedbackpacks:block/iron_backpack"
 }

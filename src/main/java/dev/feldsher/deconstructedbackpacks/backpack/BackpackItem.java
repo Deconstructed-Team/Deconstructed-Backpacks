@@ -4,8 +4,11 @@ import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
+import dev.feldsher.deconstructedbackpacks.init.ModBlocks;
 import dev.feldsher.deconstructedbackpacks.init.ModItems;
 import dev.feldsher.deconstructedcore.util.StorageNbt;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,10 +16,14 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
@@ -26,7 +33,7 @@ import java.util.function.IntSupplier;
 
 /**
  * A backpack: a storage carried as an item, opened from the hand.
- * Placing it as a block, wearing it, stashing items into it from a slot and the upgrades' ticking come with the
+ * Wearing it, stashing items into it from a slot and the upgrades' ticking come with the
  * stages that port them.
  */
 public class BackpackItem extends Item {
@@ -83,6 +90,52 @@ public class BackpackItem extends Item {
 			player.openGui(DeconstructedBackpacks.instance, GuiHandler.ITEM_BACKPACK, world, slot, 0, 0);
 		}
 		return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+	}
+
+	/** Sneaking, a backpack is placed as a block facing the player. */
+	@Override
+	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (!player.isSneaking()) {
+			return EnumActionResult.PASS;
+		}
+
+		IBlockState clickedState = world.getBlockState(pos);
+		BlockPos placePos = clickedState.getBlock().isReplaceable(world, pos) ? pos : pos.offset(facing);
+		ItemStack backpack = player.getHeldItem(hand);
+		BackpackBlock block = getBlock();
+		if (!player.canPlayerEdit(placePos, facing, backpack) || !world.mayPlace(block, placePos, false, facing, player)) {
+			return EnumActionResult.FAIL;
+		}
+
+		IBlockState placementState = block.getDefaultState().withProperty(BackpackBlock.FACING, player.getHorizontalFacing().getOpposite());
+		if (!world.setBlockState(placePos, placementState, 11)) {
+			return EnumActionResult.FAIL;
+		}
+
+		TileEntity te = world.getTileEntity(placePos);
+		if (te instanceof BackpackBlockEntity) {
+			((BackpackBlockEntity) te).setBackpack(getBackpackCopy(player, backpack));
+			te.markDirty();
+		}
+
+		SoundType soundtype = placementState.getBlock().getSoundType(placementState, world, placePos, player);
+		world.playSound(player, placePos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+		if (!player.isCreative()) {
+			backpack.shrink(1);
+		}
+		return EnumActionResult.SUCCESS;
+	}
+
+	/** In creative the player keeps the backpack, so the placed one is a copy with contents of its own. */
+	private ItemStack getBackpackCopy(EntityPlayer player, ItemStack backpack) {
+		if (!player.isCreative()) {
+			return backpack.copy();
+		}
+		return BackpackWrapper.fromStack(backpack).cloneBackpack();
+	}
+
+	public BackpackBlock getBlock() {
+		return ModBlocks.getBlock(this);
 	}
 
 	public int getNumberOfSlots() {

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "deconstructedbackpacks:gold_backpack"
+    },
+    "facing=east": {
+      "model": "deconstructedbackpacks:gold_backpack",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "deconstructedbackpacks:gold_backpack",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "deconstructedbackpacks:gold_backpack",
+      "y": 270
+    }
+  }
+}

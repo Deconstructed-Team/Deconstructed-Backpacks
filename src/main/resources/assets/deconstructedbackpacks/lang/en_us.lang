@@ -3,3 +3,7 @@ item.deconstructedbackpacks.backpack.name=Backpack
 item.deconstructedbackpacks.iron_backpack.name=Iron Backpack
 item.deconstructedbackpacks.gold_backpack.name=Gold Backpack
 item.deconstructedbackpacks.diamond_backpack.name=Diamond Backpack
+tile.deconstructedbackpacks.backpack.name=Backpack
+tile.deconstructedbackpacks.iron_backpack.name=Iron Backpack
+tile.deconstructedbackpacks.gold_backpack.name=Gold Backpack
+tile.deconstructedbackpacks.diamond_backpack.name=Diamond Backpack
