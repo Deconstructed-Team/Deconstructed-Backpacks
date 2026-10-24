@@ -10,6 +10,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -23,12 +24,14 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -38,25 +41,6 @@ import java.util.function.Supplier;
  */
 public class BackpackBlock extends Block {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
-
-	// BackpackShapes' body, side pouches and front pouch facing north, as the one box 1.12 selects with
-	private static final AxisAlignedBB[] SHAPES = new AxisAlignedBB[4];
-
-	static {
-		double minX = 0.75, minY = 0, minZ = 4, maxX = 15.25, maxY = 14.5, maxZ = 13.25;
-		for (EnumFacing facing : EnumFacing.Plane.HORIZONTAL) {
-			// The blockstate turns the model by the facing's y rotation, clockwise seen from above: (x, z) -> (16 - z, x)
-			double x1 = minX, z1 = minZ, x2 = maxX, z2 = maxZ;
-			for (int i = 0; i < (facing.getHorizontalIndex() + 2) % 4; i++) {
-				double nx1 = 16 - z2, nz1 = x1, nx2 = 16 - z1, nz2 = x2;
-				x1 = nx1;
-				z1 = nz1;
-				x2 = nx2;
-				z2 = nz2;
-			}
-			SHAPES[facing.getHorizontalIndex()] = new AxisAlignedBB(x1 / 16, minY / 16, z1 / 16, x2 / 16, maxY / 16, z2 / 16);
-		}
-	}
 
 	private final Supplier<BackpackItem> backpackItem;
 
@@ -102,7 +86,34 @@ public class BackpackBlock extends Block {
 
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return SHAPES[state.getValue(FACING).getHorizontalIndex()];
+		return BackpackShapes.getEnvelope(state.getValue(FACING));
+	}
+
+	@Override
+	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes,
+			@Nullable Entity entity, boolean isActualState) {
+		for (AxisAlignedBB box : BackpackShapes.getShape(state.getValue(FACING))) {
+			addCollisionBoxToList(pos, entityBox, collidingBoxes, box);
+		}
+	}
+
+	/** Aimed at only where one of the shape's boxes is, not anywhere in the box around them. */
+	@Nullable
+	@Override
+	public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
+		RayTraceResult closest = null;
+		double closestDistance = Double.MAX_VALUE;
+		for (AxisAlignedBB box : BackpackShapes.getShape(state.getValue(FACING))) {
+			RayTraceResult result = rayTrace(pos, start, end, box);
+			if (result != null) {
+				double distance = result.hitVec.squareDistanceTo(start);
+				if (distance < closestDistance) {
+					closest = result;
+					closestDistance = distance;
+				}
+			}
+		}
+		return closest;
 	}
 
 	@Override
