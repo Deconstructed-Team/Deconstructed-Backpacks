@@ -9,7 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class BackpackInventoryHandler extends InventoryHandler {
 	public BackpackInventoryHandler(int numberOfInventorySlots, IStorageWrapper storageWrapper, NBTTagCompound contentsNbt, Runnable saveHandler, int slotLimit) {
-		super(numberOfInventorySlots, storageWrapper, contentsNbt, saveHandler, slotLimit);
+		super(numberOfInventorySlots, storageWrapper, contentsNbt, saveHandler, slotLimit, Config.SERVER.stackUpgrade.config);
 	}
 
 	@Override

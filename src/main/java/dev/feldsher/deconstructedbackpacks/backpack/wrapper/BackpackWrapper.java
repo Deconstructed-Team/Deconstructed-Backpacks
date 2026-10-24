@@ -7,6 +7,7 @@ import dev.feldsher.deconstructedcore.api.IStorageWrapper;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.inventory.StorageWrapperRepository;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeHandler;
+import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeItem;
 import dev.feldsher.deconstructedcore.util.StorageNbt;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -72,7 +73,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 					this, getBackpackContentsNbt(), () -> {
 				markBackpackContentsDirty();
 				inventorySlotChangeHandler.run();
-			}, 64);
+			}, StackUpgradeItem.getInventorySlotLimit(this));
 		}
 		return handler;
 	}
@@ -104,6 +105,9 @@ public class BackpackWrapper implements IBackpackWrapper {
 	}
 
 	private void onUpgradesChanged() {
+		if (handler != null) {
+			handler.setBaseSlotLimit(StackUpgradeItem.getInventorySlotLimit(this));
+		}
 		upgradeCachesInvalidatedHandler.run();
 	}
 

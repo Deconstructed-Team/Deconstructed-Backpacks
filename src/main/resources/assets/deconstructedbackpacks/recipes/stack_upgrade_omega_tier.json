@@ -1,0 +1,16 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "SSS",
+    "SSS",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "deconstructedbackpacks:stack_upgrade_tier_4"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:stack_upgrade_omega_tier"
+  }
+}

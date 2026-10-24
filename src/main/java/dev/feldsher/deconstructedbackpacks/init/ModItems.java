@@ -6,6 +6,7 @@ import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedcore.upgrades.filter.FilterUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.magnet.MagnetUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.pickup.PickupUpgradeItem;
+import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.voiding.VoidUpgradeItem;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -62,9 +63,21 @@ public class ModItems {
 	public static final VoidUpgradeItem ADVANCED_VOID_UPGRADE = item(new VoidUpgradeItem(() -> Config.SERVER.advancedVoidUpgrade.filterSlots,
 			() -> Config.SERVER.advancedVoidUpgrade.voidAnythingEnabled, Config.SERVER.maxUpgradesPerStorageConfig), "advanced_void_upgrade");
 
+	// No copper in 1.12: no starter tier, which 1.21 makes from copper blocks
+	public static final StackUpgradeItem STACK_UPGRADE_TIER_1 = item(new StackUpgradeItem(2, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_tier_1");
+	public static final StackUpgradeItem STACK_UPGRADE_TIER_2 = item(new StackUpgradeItem(4, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_tier_2");
+	public static final StackUpgradeItem STACK_UPGRADE_TIER_3 = item(new StackUpgradeItem(8, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_tier_3");
+	public static final StackUpgradeItem STACK_UPGRADE_TIER_4 = item(new StackUpgradeItem(16, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_tier_4");
+	public static final StackUpgradeItem STACK_DOWNGRADE_TIER_1 = item(new StackUpgradeItem(0.125, Config.SERVER.maxUpgradesPerStorageConfig), "stack_downgrade_tier_1");
+	public static final StackUpgradeItem STACK_DOWNGRADE_TIER_2 = item(new StackUpgradeItem(0.0625, Config.SERVER.maxUpgradesPerStorageConfig), "stack_downgrade_tier_2");
+	public static final StackUpgradeItem STACK_DOWNGRADE_TIER_3 = item(new StackUpgradeItem(0.03125, Config.SERVER.maxUpgradesPerStorageConfig), "stack_downgrade_tier_3");
+	public static final StackUpgradeItem STACK_UPGRADE_OMEGA_TIER = item(new StackUpgradeItem(Integer.MAX_VALUE, Config.SERVER.maxUpgradesPerStorageConfig), "stack_upgrade_omega_tier");
+
 	/** What 1.21 tags as backpack upgrades: the only items a backpack's upgrade slots take. */
 	public static final List<Item> BACKPACK_UPGRADES = Collections.unmodifiableList(Arrays.asList(PICKUP_UPGRADE, ADVANCED_PICKUP_UPGRADE,
-			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE));
+			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
+			STACK_UPGRADE_TIER_1, STACK_UPGRADE_TIER_2, STACK_UPGRADE_TIER_3, STACK_UPGRADE_TIER_4, STACK_UPGRADE_OMEGA_TIER,
+			STACK_DOWNGRADE_TIER_1, STACK_DOWNGRADE_TIER_2, STACK_DOWNGRADE_TIER_3));
 
 	private static <T extends Item> T item(T item, String name) {
 		item.setRegistryName(DeconstructedBackpacks.getRL(name));

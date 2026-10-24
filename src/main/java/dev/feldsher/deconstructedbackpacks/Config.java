@@ -2,6 +2,7 @@ package dev.feldsher.deconstructedbackpacks;
 
 import dev.feldsher.deconstructedcore.upgrades.IUpgradeCountLimitConfig;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeGroup;
+import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeConfig;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigManager;
@@ -54,6 +55,9 @@ public class Config {
 		@net.minecraftforge.common.config.Config.Comment("Advanced Void Upgrade Settings")
 		public final VoidUpgradeConfig advancedVoidUpgrade = new VoidUpgradeConfig(16, 4);
 
+		@net.minecraftforge.common.config.Config.Comment("Stack Upgrade Settings")
+		public final StackUpgradeSettings stackUpgrade = new StackUpgradeSettings();
+
 		@net.minecraftforge.common.config.Config.Comment("Maximum number of upgrades of type per backpack in format of \"UpgradeRegistryName[or UpgradeGroup]|MaxNumber\"")
 		public String[] maxUpgradesPerStorage = {"stack_upgrades|3", "furnace_upgrades|1", "jukebox_upgrades|1"};
 
@@ -104,7 +108,16 @@ public class Config {
 		private void clearCache() {
 			disallowedItemsSet = null;
 			maxUpgrades = null;
+			stackUpgrade.config.clearNonStackableItems();
 		}
+	}
+
+	public static class StackUpgradeSettings {
+		@net.minecraftforge.common.config.Config.Comment("List of items that are not supposed to stack in storage even when stack upgrade is inserted. Item registry names are expected here.")
+		public String[] nonStackableItems = StackUpgradeConfig.getDefaultNonStackableList();
+
+		@net.minecraftforge.common.config.Config.Ignore
+		public final StackUpgradeConfig config = new StackUpgradeConfig(() -> nonStackableItems);
 	}
 
 	public static class BackpackConfig {
