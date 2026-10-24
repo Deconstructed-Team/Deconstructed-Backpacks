@@ -42,6 +42,8 @@ import java.util.function.IntSupplier;
  * stages that port them.
  */
 public class BackpackItem extends Item {
+	/** How often a backpack's stack, carried or placed, catches up with what its contents show. */
+	public static final int RENDER_INFO_REFRESH_TICKS = 10;
 	private final IntSupplier numberOfSlots;
 	private final IntSupplier numberOfUpgradeSlots;
 	private boolean fireResistant = false;
@@ -177,6 +179,10 @@ public class BackpackItem extends Item {
 		wrapper.ensureSlotNumbersAtLeast(getNumberOfSlots(), getNumberOfUpgradeSlots());
 		wrapper.getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class)
 				.forEach(upgrade -> upgrade.tick(player, world, player.getPosition()));
+		// Another stack with these contents, or an automation, may have changed what this one shows
+		if (world.getTotalWorldTime() % RENDER_INFO_REFRESH_TICKS == 0) {
+			wrapper.refreshRenderInfo();
+		}
 	}
 
 	public int getNumberOfSlots() {

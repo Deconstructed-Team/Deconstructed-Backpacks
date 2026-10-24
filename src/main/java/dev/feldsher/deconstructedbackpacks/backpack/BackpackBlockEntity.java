@@ -60,6 +60,10 @@ public class BackpackBlockEntity extends TileEntity implements ITickable {
 			return;
 		}
 		backpackWrapper.getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class).forEach(upgrade -> upgrade.tick(null, world, pos));
+		// What it shows changes with its contents, which hoppers and other stacks with them change as well
+		if (world.getTotalWorldTime() % BackpackItem.RENDER_INFO_REFRESH_TICKS == 0) {
+			backpackWrapper.refreshRenderInfo();
+		}
 	}
 
 	@Override

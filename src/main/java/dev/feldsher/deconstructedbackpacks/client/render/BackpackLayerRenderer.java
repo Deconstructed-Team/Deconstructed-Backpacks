@@ -3,8 +3,11 @@ package dev.feldsher.deconstructedbackpacks.client.render;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
+import dev.feldsher.deconstructedcore.renderdata.RenderInfo;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -16,7 +19,7 @@ import net.minecraft.item.ItemStack;
 
 /**
  * A backpack in the chest slot, on the back of whoever wears it: players and every mob drawn with a biped model.
- * Upgrade particles and the displayed item come with the stages that port them.
+ * Its displayed item is on its front; upgrade particles come with the upgrades that make them.
  */
 public class BackpackLayerRenderer implements LayerRenderer<EntityLivingBase> {
 	private static final BackpackModel MODEL = new BackpackModel();
@@ -60,7 +63,21 @@ public class BackpackLayerRenderer implements LayerRenderer<EntityLivingBase> {
 
 		IBackpackWrapper wrapper = BackpackWrapper.fromStack(chestStack);
 		MODEL.render(wrapper.getMainColor(), wrapper.getAccentColor(), chestStack.getItem());
+		renderItemShown(wrapper.getRenderInfo());
 		GlStateManager.popMatrix();
+	}
+
+	private static void renderItemShown(RenderInfo renderInfo) {
+		renderInfo.getItemDisplayRenderInfo().getDisplayItem().ifPresent(displayItem -> {
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0, 0.9, -0.25);
+			GlStateManager.scale(0.5F, 0.5F, 0.5F);
+			GlStateManager.rotate(180F + displayItem.getRotation(), 0, 0, 1);
+			GlStateManager.enableRescaleNormal();
+			Minecraft.getMinecraft().getRenderItem().renderItem(displayItem.getItem(), ItemCameraTransforms.TransformType.FIXED);
+			GlStateManager.disableRescaleNormal();
+			GlStateManager.popMatrix();
+		});
 	}
 
 	@Override

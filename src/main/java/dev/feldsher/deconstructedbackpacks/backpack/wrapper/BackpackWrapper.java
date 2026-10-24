@@ -9,6 +9,8 @@ import dev.feldsher.deconstructedcore.util.InventorySorter;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.inventory.StorageWrapperRepository;
 import dev.feldsher.deconstructedcore.settings.SettingsHandler;
+import dev.feldsher.deconstructedcore.renderdata.RenderInfo;
+import dev.feldsher.deconstructedcore.settings.itemdisplay.ItemDisplaySettingsCategory;
 import dev.feldsher.deconstructedcore.settings.memory.MemorySettingsCategory;
 import dev.feldsher.deconstructedcore.settings.nosort.NoSortSettingsCategory;
 import dev.feldsher.deconstructedcore.storage.StorageContents;
@@ -29,7 +31,8 @@ import java.util.UUID;
  * the contents themselves are in {@link BackpackStorage}. The inventory and upgrade handlers live with the contents,
  * not here: every stack with the same UUID works on the same ones, and so sees the same backpack.
  * <p>
- * Settings, fluids, energy, loot and render info come with the stages that port them.
+ * The stack also carries what clients draw it with, its render info, which each stack's wrapper refreshes from the
+ * shared contents. Fluids, energy and loot come with the stages that port them.
  */
 public class BackpackWrapper implements IBackpackWrapper {
 	public static final int DEFAULT_MAIN_COLOR = 0xFF_CC613A;
@@ -54,6 +57,9 @@ public class BackpackWrapper implements IBackpackWrapper {
 	private StorageContents listenedContents = null;
 	private Runnable upgradeCachesInvalidatedHandler = () -> {
 	};
+	@Nullable
+	private NBTTagCompound parsedRenderInfoTag = null;
+	private RenderInfo renderInfo = RenderInfo.EMPTY;
 
 	public BackpackWrapper(ItemStack backpackStack) {
 		setBackpackStack(backpackStack);
@@ -241,6 +247,41 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Override
 	public ItemStack getBackpack() {
 		return getBackpackStack();
+	}
+
+	/** Read again only when the stack got another tag, as each sync from the server gives it. */
+	@Override
+	public RenderInfo getRenderInfo() {
+		NBTTagCompound tag = getBackpackStack().getTagCompound();
+		NBTTagCompound renderInfoTag = tag != null && tag.hasKey(RenderInfo.RENDER_INFO_TAG) ? tag.getCompoundTag(RenderInfo.RENDER_INFO_TAG) : null;
+		if (renderInfoTag != parsedRenderInfoTag) {
+			parsedRenderInfoTag = renderInfoTag;
+			renderInfo = renderInfoTag == null ? RenderInfo.EMPTY : RenderInfo.deserialize(renderInfoTag);
+		}
+		return renderInfo;
+	}
+
+	/** A backpack never opened has no contents, and nothing to show: its contents aren't made for this. */
+	@Override
+	public void refreshRenderInfo() {
+		if (!getContentsUuid().isPresent()) {
+			return;
+		}
+		ItemDisplaySettingsCategory itemDisplay = getSettingsHandler().getTypeCategory(ItemDisplaySettingsCategory.class);
+		NBTTagCompound renderInfoTag = new RenderInfo(itemDisplay.buildItemDisplayRenderInfo()).serialize();
+		NBTTagCompound tag = getBackpackStack().getTagCompound();
+		NBTTagCompound currentTag = tag != null ? tag.getCompoundTag(RenderInfo.RENDER_INFO_TAG) : new NBTTagCompound();
+		if (renderInfoTag.equals(currentTag)) {
+			return;
+		}
+		if (renderInfoTag.isEmpty()) {
+			if (tag != null) {
+				tag.removeTag(RenderInfo.RENDER_INFO_TAG);
+			}
+		} else {
+			StorageNbt.getOrCreateTag(getBackpackStack()).setTag(RenderInfo.RENDER_INFO_TAG, renderInfoTag);
+		}
+		backpackSaveHandler.run();
 	}
 
 	@Override
