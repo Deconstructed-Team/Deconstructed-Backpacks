@@ -35,6 +35,9 @@ public class Config {
 		@net.minecraftforge.common.config.Config.Comment("Whether the netherite backpack exists. Its recipe takes netherite from the ore dictionary (ingotNetherite, as Future MC and Unseen's Nether Backport register); in a pack with none, it's left without a recipe.")
 		@net.minecraftforge.common.config.Config.RequiresMcRestart
 		public boolean netheriteTierEnabled = false;
+		@net.minecraftforge.common.config.Config.Comment("With Future MC and its smithing table, the netherite backpack is made there, as in 1.21, instead of on the crafting table. False keeps it on the crafting table.")
+		@net.minecraftforge.common.config.Config.RequiresMcRestart
+		public boolean futureMcSmithingTable = true;
 
 		@net.minecraftforge.common.config.Config.Comment("Leather Backpack Settings")
 		public final BackpackConfig leatherBackpack = new BackpackConfig(27, 1);

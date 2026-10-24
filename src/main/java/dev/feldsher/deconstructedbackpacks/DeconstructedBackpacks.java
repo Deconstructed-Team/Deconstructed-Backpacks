@@ -1,6 +1,7 @@
 package dev.feldsher.deconstructedbackpacks;
 
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
+import dev.feldsher.deconstructedbackpacks.compat.FutureMcCompat;
 import dev.feldsher.deconstructedbackpacks.crafting.OreDependentRecipes;
 import dev.feldsher.deconstructedbackpacks.init.ModUpgradeContainers;
 import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
@@ -44,6 +45,7 @@ public class DeconstructedBackpacks {
 		proxy.postInit();
 		// Every mod has registered its ores by now
 		OreDependentRecipes.removeRecipesWithoutOres();
+		FutureMcCompat.addSmithingRecipes();
 	}
 
 	public static ResourceLocation getRL(String regName) {

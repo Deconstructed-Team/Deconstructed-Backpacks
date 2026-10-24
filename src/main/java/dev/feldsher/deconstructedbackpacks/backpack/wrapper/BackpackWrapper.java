@@ -246,8 +246,25 @@ public class BackpackWrapper implements IBackpackWrapper {
 
 	@Override
 	public void setSlotNumbers(int numberOfInventorySlots, int numberOfUpgradeSlots) {
+		boolean changed = getNumberOfInventorySlots() != numberOfInventorySlots || getNumberOfUpgradeSlots() != numberOfUpgradeSlots;
 		setNumberOfInventorySlots(numberOfInventorySlots);
 		setNumberOfUpgradeSlots(numberOfUpgradeSlots);
+		if (changed) {
+			// The shared handlers have the old slot counts: they're built again, from the contents, with the new ones
+			getContentsUuid().map(BackpackStorage::getContents).ifPresent(contents -> {
+				contents.removeShared(INVENTORY_HANDLER);
+				contents.removeShared(UPGRADE_HANDLER);
+			});
+		}
+	}
+
+	@Override
+	public void ensureSlotNumbersAtLeast(int numberOfInventorySlots, int numberOfUpgradeSlots) {
+		int inventorySlots = Math.max(getNumberOfInventorySlots(), numberOfInventorySlots);
+		int upgradeSlots = Math.max(getNumberOfUpgradeSlots(), numberOfUpgradeSlots);
+		if (inventorySlots != getNumberOfInventorySlots() || upgradeSlots != getNumberOfUpgradeSlots()) {
+			setSlotNumbers(inventorySlots, upgradeSlots);
+		}
 	}
 
 	@Override

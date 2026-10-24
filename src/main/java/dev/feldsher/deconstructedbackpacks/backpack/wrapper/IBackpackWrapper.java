@@ -17,6 +17,9 @@ public interface IBackpackWrapper extends IStorageWrapper {
 
 	void setSlotNumbers(int numberOfInventorySlots, int numberOfUpgradeSlots);
 
+	/** Grows the slot counts to these, never shrinks them, which would drop what's in the slots past them. */
+	void ensureSlotNumbersAtLeast(int numberOfInventorySlots, int numberOfUpgradeSlots);
+
 	void setContentsUuid(UUID storageUuid);
 
 	default void removeContentsUuid() {

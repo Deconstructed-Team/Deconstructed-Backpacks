@@ -2,6 +2,7 @@ package dev.feldsher.deconstructedbackpacks.backpack;
 
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
+import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContext;
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
@@ -170,7 +171,11 @@ public class BackpackItem extends Item {
 		if (player.isSpectator() || player.isDead) {
 			return;
 		}
-		BackpackWrapper.fromStack(stack).getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class)
+		IBackpackWrapper wrapper = BackpackWrapper.fromStack(stack);
+		// A backpack made into this tier other than by our recipes, as on Future MC's smithing table, keeps the slot
+		// counts of the one it was made from; so does one whose tier the config has grown since
+		wrapper.ensureSlotNumbersAtLeast(getNumberOfSlots(), getNumberOfUpgradeSlots());
+		wrapper.getUpgradeHandler().getWrappersThatImplement(ITickableUpgrade.class)
 				.forEach(upgrade -> upgrade.tick(player, world, player.getPosition()));
 	}
 
