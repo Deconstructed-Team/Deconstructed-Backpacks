@@ -2,6 +2,7 @@ package dev.feldsher.deconstructedbackpacks.upgrades.everlasting;
 
 import dev.feldsher.deconstructedbackpacks.backpack.FireResistantItemEntity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
@@ -15,6 +16,7 @@ public class EverlastingBackpackItemEntity extends FireResistantItemEntity {
 	private static final double FLOAT_UP_ACCELERATION = 0.06;
 	private static final double MAX_FLOAT_UP_SPEED = 0.7;
 	private static final double GRAVITY = 0.04;
+	private static final double HANGING_PICKUP_RANGE = 4;
 	private boolean wasFloatingUp = false;
 
 	@SuppressWarnings("unused") // as an entity's, for loading
@@ -52,6 +54,19 @@ public class EverlastingBackpackItemEntity extends FireResistantItemEntity {
 			}
 		}
 		super.onUpdate();
+		if (!world.isRemote && !isDead && hasNoGravity()) {
+			pickUpByNearbyPlayers();
+		}
+	}
+
+	/** Left hanging where it floated up to, as over the void, it's hard to reach: players pick it up from further away. */
+	private void pickUpByNearbyPlayers() {
+		for (EntityPlayer player : world.getEntitiesWithinAABB(EntityPlayer.class, getEntityBoundingBox().grow(HANGING_PICKUP_RANGE))) {
+			if (isDead) {
+				return;
+			}
+			onCollideWithPlayer(player);
+		}
 	}
 
 	@Override
