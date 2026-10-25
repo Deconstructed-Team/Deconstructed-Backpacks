@@ -20,8 +20,7 @@ public class BackpackSettingsHandler extends SettingsHandler {
 	}
 
 	@Override
-	protected void addSettingsCategories(NBTTagCompound settingsNbt) {
-		super.addSettingsCategories(settingsNbt);
+	protected void addItemDisplayCategory(NBTTagCompound settingsNbt) {
 		addSettingsCategory(settingsNbt, ItemDisplaySettingsCategory.NAME, markContentsDirty, (categoryNbt, saveNbt) ->
 				new ItemDisplaySettingsCategory(inventoryHandlerSupplier, categoryNbt, saveNbt, 1, () -> getTypeCategory(MemorySettingsCategory.class)));
 	}
