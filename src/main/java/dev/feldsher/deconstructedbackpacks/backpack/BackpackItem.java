@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import net.minecraft.util.math.Vec3d;
+import dev.feldsher.deconstructedcore.upgrades.jukebox.ServerStorageSoundHandler;
 import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingBackpackItemEntity;
 import dev.feldsher.deconstructedbackpacks.util.InventoryInteractionHelper;
@@ -157,6 +159,9 @@ public class BackpackItem extends Item {
 			return EnumActionResult.FAIL;
 		}
 
+		if (!world.isRemote) {
+			stopBackpackSounds(backpack, world, placePos);
+		}
 		TileEntity te = world.getTileEntity(placePos);
 		if (te instanceof BackpackBlockEntity) {
 			((BackpackBlockEntity) te).setBackpack(getBackpackCopy(player, backpack));
@@ -169,6 +174,12 @@ public class BackpackItem extends Item {
 			backpack.shrink(1);
 		}
 		return EnumActionResult.SUCCESS;
+	}
+
+	/** The disc it played following the player stops: it plays from where it's placed once it's played again. */
+	private static void stopBackpackSounds(ItemStack backpack, World world, BlockPos pos) {
+		BackpackWrapper.fromStack(backpack).getContentsUuid()
+				.ifPresent(uuid -> ServerStorageSoundHandler.stopPlayingDisc(world, new Vec3d(pos).add(0.5, 0.5, 0.5), uuid));
 	}
 
 	/** In creative the player keeps the backpack, so the placed one is a copy with contents of its own. */

@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
+import dev.feldsher.deconstructedcore.upgrades.jukebox.ServerStorageSoundHandler;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.Style;
@@ -213,6 +215,8 @@ public class BackpackBlock extends Block {
 		TileEntity te = world.getTileEntity(pos);
 		ItemStack backpack = te instanceof BackpackBlockEntity ? ((BackpackBlockEntity) te).getBackpack() : ItemStack.EMPTY;
 
+		BackpackWrapper.fromStack(backpack).getContentsUuid()
+				.ifPresent(uuid -> ServerStorageSoundHandler.stopPlayingDisc(world, new Vec3d(pos).add(0.5, 0.5, 0.5), uuid));
 		player.setHeldItem(EnumHand.MAIN_HAND, backpack.copy());
 		player.getCooldownTracker().setCooldown(backpack.getItem(), 5);
 		world.removeTileEntity(pos);

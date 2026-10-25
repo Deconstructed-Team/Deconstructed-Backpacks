@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.client.init;
 
+import dev.feldsher.deconstructedcore.upgrades.jukebox.JukeboxUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.cooking.AutoCookingUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.cooking.CookingUpgradeTab;
 import dev.feldsher.deconstructedbackpacks.upgrades.smithing.SmithingUpgradeTab;
@@ -65,6 +66,8 @@ public class ModUpgradeTabs {
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.BLASTING_TYPE, (uc, p, s) -> new CookingUpgradeTab(uc, p, s, "blasting"));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.AUTO_BLASTING_TYPE, (uc, p, s) -> new AutoCookingUpgradeTab(uc, p, s, "auto_blasting",
 				Config.SERVER.autoBlastingUpgrade.inputFilterSlotsInRow, Config.SERVER.autoBlastingUpgrade.fuelFilterSlotsInRow));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.JUKEBOX_TYPE, JukeboxUpgradeTab.Basic::new);
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.ADVANCED_JUKEBOX_TYPE, (uc, p, s) -> new JukeboxUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedJukeboxUpgrade.slotsInRow));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.INCEPTION_TYPE, InceptionUpgradeTab::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.REFILL_BASIC_TYPE, (uc, p, s) ->
 				new RefillUpgradeTab.Basic(uc, p, s, Config.SERVER.refillUpgrade.slotsInRow));

@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedcore.upgrades.jukebox.JukeboxUpgradeContainer;
+import dev.feldsher.deconstructedcore.upgrades.jukebox.JukeboxUpgradeWrapper;
 import dev.feldsher.deconstructedcore.upgrades.cooking.AutoCookingUpgradeContainer;
 import dev.feldsher.deconstructedcore.upgrades.cooking.AutoCookingUpgradeWrapper;
 import dev.feldsher.deconstructedcore.upgrades.cooking.CookingUpgradeContainer;
@@ -64,6 +66,8 @@ public class ModUpgradeContainers {
 	public static final UpgradeContainerType<AutoCookingUpgradeWrapper, AutoCookingUpgradeContainer> AUTO_SMOKING_TYPE = new UpgradeContainerType<>(AutoCookingUpgradeContainer::new);
 	public static final UpgradeContainerType<CookingUpgradeWrapper, CookingUpgradeContainer> BLASTING_TYPE = new UpgradeContainerType<>(CookingUpgradeContainer::new);
 	public static final UpgradeContainerType<AutoCookingUpgradeWrapper, AutoCookingUpgradeContainer> AUTO_BLASTING_TYPE = new UpgradeContainerType<>(AutoCookingUpgradeContainer::new);
+	public static final UpgradeContainerType<JukeboxUpgradeWrapper, JukeboxUpgradeContainer> JUKEBOX_TYPE = new UpgradeContainerType<>(JukeboxUpgradeContainer::new);
+	public static final UpgradeContainerType<JukeboxUpgradeWrapper, JukeboxUpgradeContainer> ADVANCED_JUKEBOX_TYPE = new UpgradeContainerType<>(JukeboxUpgradeContainer::new);
 	public static final UpgradeContainerType<InceptionUpgradeWrapper, InceptionUpgradeContainer> INCEPTION_TYPE = new UpgradeContainerType<>(InceptionUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_BASIC_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_ADVANCED_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
@@ -97,6 +101,8 @@ public class ModUpgradeContainers {
 		register(ModItems.AUTO_SMOKING_UPGRADE, AUTO_SMOKING_TYPE);
 		register(ModItems.BLASTING_UPGRADE, BLASTING_TYPE);
 		register(ModItems.AUTO_BLASTING_UPGRADE, AUTO_BLASTING_TYPE);
+		register(ModItems.JUKEBOX_UPGRADE, JUKEBOX_TYPE);
+		register(ModItems.ADVANCED_JUKEBOX_UPGRADE, ADVANCED_JUKEBOX_TYPE);
 		register(ModItems.INCEPTION_UPGRADE, INCEPTION_TYPE);
 		register(ModItems.REFILL_UPGRADE, REFILL_BASIC_TYPE);
 		register(ModItems.ADVANCED_REFILL_UPGRADE, REFILL_ADVANCED_TYPE);

@@ -109,6 +109,9 @@ public class Config {
 		@net.minecraftforge.common.config.Config.Comment("Auto-Blasting Upgrade Settings")
 		public final AutoCookingUpgradeConfig autoBlastingUpgrade = new AutoCookingUpgradeConfig();
 
+		@net.minecraftforge.common.config.Config.Comment("Advanced Jukebox Upgrade Settings")
+		public final JukeboxUpgradeConfig advancedJukeboxUpgrade = new JukeboxUpgradeConfig(12);
+
 		@net.minecraftforge.common.config.Config.Comment("Stack Upgrade Settings")
 		public final StackUpgradeSettings stackUpgrade = new StackUpgradeSettings();
 
@@ -259,6 +262,19 @@ public class Config {
 		VoidUpgradeConfig(int defaultFilterSlots, int defaultSlotsInRow) {
 			filterSlots = defaultFilterSlots;
 			slotsInRow = defaultSlotsInRow;
+		}
+	}
+
+	public static class JukeboxUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Number of slots for discs in jukebox upgrade")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 16)
+		public int numberOfSlots;
+		@net.minecraftforge.common.config.Config.Comment("Number of lots displayed in a row")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 6)
+		public int slotsInRow = 4;
+
+		JukeboxUpgradeConfig(int defaultNumberOfSlots) {
+			numberOfSlots = defaultNumberOfSlots;
 		}
 	}
 
