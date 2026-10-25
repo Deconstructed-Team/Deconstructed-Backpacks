@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedcore.upgrades.battery.BatteryUpgradeContainer;
+import dev.feldsher.deconstructedcore.upgrades.battery.BatteryUpgradeWrapper;
 import dev.feldsher.deconstructedcore.upgrades.xppump.XpPumpUpgradeContainer;
 import dev.feldsher.deconstructedcore.upgrades.xppump.XpPumpUpgradeWrapper;
 import dev.feldsher.deconstructedcore.upgrades.pump.PumpUpgradeContainer;
@@ -78,6 +80,7 @@ public class ModUpgradeContainers {
 	public static final UpgradeContainerType<PumpUpgradeWrapper, PumpUpgradeContainer> PUMP_TYPE = new UpgradeContainerType<>(PumpUpgradeContainer::new);
 	public static final UpgradeContainerType<PumpUpgradeWrapper, PumpUpgradeContainer> ADVANCED_PUMP_TYPE = new UpgradeContainerType<>(PumpUpgradeContainer::new);
 	public static final UpgradeContainerType<XpPumpUpgradeWrapper, XpPumpUpgradeContainer> XP_PUMP_TYPE = new UpgradeContainerType<>(XpPumpUpgradeContainer::new);
+	public static final UpgradeContainerType<BatteryUpgradeWrapper, BatteryUpgradeContainer> BATTERY_TYPE = new UpgradeContainerType<>(BatteryUpgradeContainer::new);
 	public static final UpgradeContainerType<InceptionUpgradeWrapper, InceptionUpgradeContainer> INCEPTION_TYPE = new UpgradeContainerType<>(InceptionUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_BASIC_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_ADVANCED_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
@@ -117,6 +120,7 @@ public class ModUpgradeContainers {
 		register(ModItems.PUMP_UPGRADE, PUMP_TYPE);
 		register(ModItems.ADVANCED_PUMP_UPGRADE, ADVANCED_PUMP_TYPE);
 		register(ModItems.XP_PUMP_UPGRADE, XP_PUMP_TYPE);
+		register(ModItems.BATTERY_UPGRADE, BATTERY_TYPE);
 		register(ModItems.INCEPTION_UPGRADE, INCEPTION_TYPE);
 		register(ModItems.REFILL_UPGRADE, REFILL_BASIC_TYPE);
 		register(ModItems.ADVANCED_REFILL_UPGRADE, REFILL_ADVANCED_TYPE);

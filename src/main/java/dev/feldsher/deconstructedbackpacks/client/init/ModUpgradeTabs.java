@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.client.init;
 
+import dev.feldsher.deconstructedcore.upgrades.battery.BatteryInventoryPart;
+import dev.feldsher.deconstructedcore.upgrades.battery.BatteryUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.xppump.XpPumpUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.pump.PumpUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.tank.TankInventoryPart;
@@ -77,6 +79,8 @@ public class ModUpgradeTabs {
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.PUMP_TYPE, PumpUpgradeTab.Basic::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.ADVANCED_PUMP_TYPE, PumpUpgradeTab.Advanced::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.XP_PUMP_TYPE, (uc, p, s) -> new XpPumpUpgradeTab(uc, p, s, Config.SERVER.xpPumpUpgrade.mendingOn));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.BATTERY_TYPE, BatteryUpgradeTab::new);
+		UpgradeGuiManager.registerInventoryPart(ModUpgradeContainers.BATTERY_TYPE, BatteryInventoryPart::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.INCEPTION_TYPE, InceptionUpgradeTab::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.REFILL_BASIC_TYPE, (uc, p, s) ->
 				new RefillUpgradeTab.Basic(uc, p, s, Config.SERVER.refillUpgrade.slotsInRow));

@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.energy.CapabilityEnergy;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
 import dev.feldsher.deconstructedcore.upgrades.ITickableUpgrade;
@@ -121,6 +123,7 @@ public class BackpackBlockEntity extends TileEntity implements ITickable {
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
 		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
 				|| capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && getBackpackWrapper().getFluidHandler().isPresent()
+				|| capability == CapabilityEnergy.ENERGY && getBackpackWrapper().getEnergyStorage().isPresent()
 				|| super.hasCapability(capability, facing);
 	}
 
@@ -129,6 +132,10 @@ public class BackpackBlockEntity extends TileEntity implements ITickable {
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(getBackpackWrapper().getInventoryForInputOutput());
+		}
+		if (capability == CapabilityEnergy.ENERGY) {
+			IEnergyStorage energyStorage = getBackpackWrapper().getEnergyStorage().orElse(null);
+			return energyStorage == null ? null : CapabilityEnergy.ENERGY.cast(energyStorage);
 		}
 		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
 			IFluidHandler fluidHandler = getBackpackWrapper().getFluidHandler().orElse(null);

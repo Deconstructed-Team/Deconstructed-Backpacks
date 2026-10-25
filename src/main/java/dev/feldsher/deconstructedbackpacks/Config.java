@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedcore.upgrades.battery.IBatteryUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.xppump.IXpPumpUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.pump.IPumpUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.tank.ITankUpgradeConfig;
@@ -123,6 +124,9 @@ public class Config {
 
 		@net.minecraftforge.common.config.Config.Comment("Xp Pump Upgrade Settings")
 		public final XpPumpUpgradeConfig xpPumpUpgrade = new XpPumpUpgradeConfig();
+
+		@net.minecraftforge.common.config.Config.Comment("Battery Upgrade Settings")
+		public final BatteryUpgradeConfig batteryUpgrade = new BatteryUpgradeConfig();
 
 		@net.minecraftforge.common.config.Config.Comment("Stack Upgrade Settings")
 		public final StackUpgradeSettings stackUpgrade = new StackUpgradeSettings();
@@ -367,6 +371,33 @@ public class Config {
 		@Override
 		public int getMaxXpPointsPerMending() {
 			return maxXpPointsPerMending;
+		}
+	}
+
+	public static class BatteryUpgradeConfig implements IBatteryUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Energy in FE the battery upgrade will have per row of storage slots")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 500, max = 50000)
+		public int energyPerSlotRow = 10000;
+		@net.minecraftforge.common.config.Config.Comment("Ratio that gets applied (multiplies) to inventory stack multiplier before this is applied to max energy of the battery and max in/out. Value lower than 1 makes stack multiplier affect the max energy less, higher makes it affect the max energy more. 0 turns off stack multiplier affecting battery upgrade")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0, max = 5)
+		public double stackMultiplierRatio = 1;
+		@net.minecraftforge.common.config.Config.Comment("How much FE can be transfered in / out per operation. This is a base transfer rate and same as max capacity gets multiplied by number of rows in storage and stack multiplier.")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 1000)
+		public int maxInputOutput = 20;
+
+		@Override
+		public int getEnergyPerSlotRow() {
+			return energyPerSlotRow;
+		}
+
+		@Override
+		public double getStackMultiplierRatio() {
+			return stackMultiplierRatio;
+		}
+
+		@Override
+		public int getMaxInputOutput() {
+			return maxInputOutput;
 		}
 	}
 

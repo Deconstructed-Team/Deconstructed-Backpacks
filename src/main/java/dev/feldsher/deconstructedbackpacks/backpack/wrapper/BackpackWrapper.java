@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.backpack.wrapper;
 
+import net.minecraftforge.energy.IEnergyStorage;
+import dev.feldsher.deconstructedcore.upgrades.battery.BatteryUpgradeItem;
 import dev.feldsher.deconstructedcore.inventory.IItemHandlerSimpleInserter;
 import dev.feldsher.deconstructedbackpacks.api.IInventoryWrapperUpgrade;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
@@ -36,7 +38,8 @@ import java.util.UUID;
  * not here: every stack with the same UUID works on the same ones, and so sees the same backpack.
  * <p>
  * The stack also carries what clients draw it with, its render info, which each stack's wrapper refreshes from the
- * shared contents. Its tanks are those of its tank upgrades. Energy and loot come with the stages that port them.
+ * shared contents. Its tanks are those of its tank upgrades, its energy its battery upgrade's. Loot comes with the stage that
+ * ports it.
  */
 public class BackpackWrapper implements IBackpackWrapper {
 	public static final int DEFAULT_MAIN_COLOR = 0xFF_CC613A;
@@ -383,6 +386,11 @@ public class BackpackWrapper implements IBackpackWrapper {
 			});
 		}
 		backpackSaveHandler.run();
+	}
+
+	@Override
+	public Optional<IEnergyStorage> getEnergyStorage() {
+		return getUpgradeHandler().getTypeWrappers(BatteryUpgradeItem.TYPE).stream().findFirst().map(IEnergyStorage.class::cast);
 	}
 
 	@Override
