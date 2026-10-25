@@ -1,5 +1,9 @@
 package dev.feldsher.deconstructedbackpacks.common;
 
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import dev.feldsher.deconstructedbackpacks.api.IBlockClickResponseUpgrade;
+import dev.feldsher.deconstructedbackpacks.api.IAttackEntityResponseUpgrade;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.Style;
@@ -61,6 +65,38 @@ public class CommonEventHandler {
 			event.getPlayer().sendStatusMessage(new TextComponentTranslation("gui.deconstructedbackpacks.status.infinity_upgrade_only_admin_break")
 					.setStyle(new Style().setColor(TextFormatting.RED)), true);
 		}
+	}
+
+	@SubscribeEvent
+	public static void onBlockClick(PlayerInteractEvent.LeftClickBlock event) {
+		EntityPlayer player = event.getEntityPlayer();
+		if (player.world.isRemote) {
+			return;
+		}
+		PlayerInventoryProvider.runOnBackpacks(player, (backpack, slot) -> {
+			for (IBlockClickResponseUpgrade upgrade : BackpackWrapper.fromStack(backpack).getUpgradeHandler().getWrappersThatImplement(IBlockClickResponseUpgrade.class)) {
+				if (upgrade.onBlockClick(player, event.getPos())) {
+					return true;
+				}
+			}
+			return false;
+		});
+	}
+
+	@SubscribeEvent
+	public static void onAttackEntity(AttackEntityEvent event) {
+		EntityPlayer player = event.getEntityPlayer();
+		if (player.world.isRemote) {
+			return;
+		}
+		PlayerInventoryProvider.runOnBackpacks(player, (backpack, slot) -> {
+			for (IAttackEntityResponseUpgrade upgrade : BackpackWrapper.fromStack(backpack).getUpgradeHandler().getWrappersThatImplement(IAttackEntityResponseUpgrade.class)) {
+				if (upgrade.onAttackEntity(player)) {
+					return true;
+				}
+			}
+			return false;
+		});
 	}
 
 	/**

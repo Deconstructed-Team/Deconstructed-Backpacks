@@ -77,6 +77,8 @@ public class Config {
 		public final FilteredUpgradeConfig depositUpgrade = new FilteredUpgradeConfig(9, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Deposit Upgrade Settings")
 		public final FilteredUpgradeConfig advancedDepositUpgrade = new FilteredUpgradeConfig(16, 4);
+		@net.minecraftforge.common.config.Config.Comment("Tool Swapper Upgrade Settings")
+		public final FilteredUpgradeConfig toolSwapperUpgrade = new FilteredUpgradeConfig(8, 4);
 		@net.minecraftforge.common.config.Config.Comment("Magnet Upgrade Settings")
 		public final MagnetUpgradeConfig magnetUpgrade = new MagnetUpgradeConfig(9, 3, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Magnet Upgrade Settings")

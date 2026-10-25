@@ -1,0 +1,36 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "RWR",
+    "PBA",
+    "ISI"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:wooden_axe"
+    },
+    "B": {
+      "item": "deconstructedbackpacks:upgrade_base"
+    },
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "P": {
+      "item": "minecraft:wooden_pickaxe"
+    },
+    "R": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    },
+    "S": {
+      "item": "minecraft:wooden_shovel"
+    },
+    "W": {
+      "item": "minecraft:wooden_sword"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:tool_swapper_upgrade"
+  }
+}

@@ -1,5 +1,8 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.common.Loader;
+import dev.feldsher.deconstructedbackpacks.registry.RegistryLoader;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
 import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
 import dev.feldsher.deconstructedbackpacks.compat.FutureMcCompat;
@@ -49,6 +52,12 @@ public class DeconstructedBackpacks {
 		// Every mod has registered its ores by now
 		OreDependentRecipes.removeRecipesWithoutOres();
 		FutureMcCompat.addSmithingRecipes();
+	}
+
+	/** The registry data, read again for each world, so that changes to it apply without a restart. */
+	@Mod.EventHandler
+	public void serverAboutToStart(FMLServerAboutToStartEvent event) {
+		RegistryLoader.load(Loader.instance().getConfigDir());
 	}
 
 	public static ResourceLocation getRL(String regName) {

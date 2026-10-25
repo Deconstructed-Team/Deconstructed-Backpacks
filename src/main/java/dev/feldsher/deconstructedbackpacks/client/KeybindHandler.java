@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.client;
 
+import net.minecraft.util.text.TextComponentTranslation;
+import dev.feldsher.deconstructedbackpacks.network.ToolSwapMessage;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.client.gui.BackpackScreen;
@@ -30,8 +32,8 @@ import org.lwjgl.input.Mouse;
  * player inventory it opens that one, and in a backpack's screen over anything else it closes the screen.
  * The sort key sorts the open backpack, unless the mouse is over the player's inventory, which is left to sorting mods.
  * Both are handled before those mods see the input, so a key they share sorts only one inventory.
- * The inventory interaction key runs the backpack's restock and deposit upgrades on the inventory looked at.
- * The keys of the other upgrades come with them.
+ * The inventory interaction key runs the backpack's restock and deposit upgrades on the inventory looked at, and
+ * the tool swap key its tool swapper on the block or entity looked at. The keys of the other upgrades come with them.
  */
 @Mod.EventBusSubscriber(modid = DeconstructedBackpacks.MOD_ID, value = Side.CLIENT)
 public class KeybindHandler {
@@ -42,6 +44,8 @@ public class KeybindHandler {
 			KeyConflictContext.UNIVERSAL, Keyboard.KEY_B, KEYBIND_CATEGORY);
 	public static final KeyBinding INVENTORY_INTERACTION_KEYBIND = new KeyBinding("keybind.deconstructedbackpacks.inventory_interaction",
 			KeyConflictContext.IN_GAME, Keyboard.KEY_C, KEYBIND_CATEGORY);
+	public static final KeyBinding TOOL_SWAP_KEYBIND = new KeyBinding("keybind.deconstructedbackpacks.tool_swap",
+			KeyConflictContext.IN_GAME, Keyboard.KEY_NONE, KEYBIND_CATEGORY);
 	public static final KeyBinding SORT_KEYBIND = new KeyBinding("keybind.deconstructedbackpacks.sort",
 			KeyConflictContext.GUI, MIDDLE_MOUSE_BUTTON - 100, KEYBIND_CATEGORY);
 
@@ -50,6 +54,7 @@ public class KeybindHandler {
 	public static void register() {
 		ClientRegistry.registerKeyBinding(BACKPACK_OPEN_KEYBIND);
 		ClientRegistry.registerKeyBinding(INVENTORY_INTERACTION_KEYBIND);
+		ClientRegistry.registerKeyBinding(TOOL_SWAP_KEYBIND);
 		ClientRegistry.registerKeyBinding(SORT_KEYBIND);
 	}
 
@@ -62,6 +67,25 @@ public class KeybindHandler {
 			PacketHandler.INSTANCE.sendToServer(new BackpackOpenMessage());
 		} else if (INVENTORY_INTERACTION_KEYBIND.isPressed()) {
 			sendInteractWithInventoryMessage();
+		} else if (TOOL_SWAP_KEYBIND.isPressed()) {
+			sendToolSwapMessage();
+		}
+	}
+
+	private static void sendToolSwapMessage() {
+		Minecraft mc = Minecraft.getMinecraft();
+		RayTraceResult rayTrace = mc.objectMouseOver;
+		if (mc.player == null || rayTrace == null) {
+			return;
+		}
+		if (mc.player.getHeldItemMainhand().getItem() instanceof BackpackItem) {
+			mc.player.sendStatusMessage(new TextComponentTranslation("gui.deconstructedbackpacks.status.unable_to_swap_tool_for_backpack"), true);
+			return;
+		}
+		if (rayTrace.typeOfHit == RayTraceResult.Type.BLOCK) {
+			PacketHandler.INSTANCE.sendToServer(ToolSwapMessage.block(rayTrace.getBlockPos()));
+		} else if (rayTrace.typeOfHit == RayTraceResult.Type.ENTITY && rayTrace.entityHit != null) {
+			PacketHandler.INSTANCE.sendToServer(ToolSwapMessage.entity(rayTrace.entityHit.getEntityId()));
 		}
 	}
 
