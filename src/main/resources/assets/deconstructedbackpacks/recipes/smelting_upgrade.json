@@ -1,0 +1,27 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "RIR",
+    "IBI",
+    "RFR"
+  ],
+  "key": {
+    "B": {
+      "item": "deconstructedbackpacks:upgrade_base"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "R": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:smelting_upgrade"
+  }
+}

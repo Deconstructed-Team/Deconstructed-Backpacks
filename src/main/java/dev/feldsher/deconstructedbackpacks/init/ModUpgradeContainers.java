@@ -1,5 +1,9 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedcore.upgrades.cooking.AutoCookingUpgradeContainer;
+import dev.feldsher.deconstructedcore.upgrades.cooking.AutoCookingUpgradeWrapper;
+import dev.feldsher.deconstructedcore.upgrades.cooking.CookingUpgradeContainer;
+import dev.feldsher.deconstructedcore.upgrades.cooking.CookingUpgradeWrapper;
 import dev.feldsher.deconstructedbackpacks.upgrades.smithing.SmithingUpgradeWrapper;
 import dev.feldsher.deconstructedbackpacks.upgrades.smithing.SmithingUpgradeContainer;
 import dev.feldsher.deconstructedbackpacks.upgrades.anvil.AnvilUpgradeWrapper;
@@ -54,6 +58,12 @@ public class ModUpgradeContainers {
 	public static final UpgradeContainerType<StonecutterUpgradeWrapper, StonecutterUpgradeContainer> STONECUTTER_TYPE = new UpgradeContainerType<>(StonecutterUpgradeContainer::new);
 	public static final UpgradeContainerType<AnvilUpgradeWrapper, AnvilUpgradeContainer> ANVIL_TYPE = new UpgradeContainerType<>(AnvilUpgradeContainer::new);
 	public static final UpgradeContainerType<SmithingUpgradeWrapper, SmithingUpgradeContainer> SMITHING_TYPE = new UpgradeContainerType<>(SmithingUpgradeContainer::new);
+	public static final UpgradeContainerType<CookingUpgradeWrapper, CookingUpgradeContainer> SMELTING_TYPE = new UpgradeContainerType<>(CookingUpgradeContainer::new);
+	public static final UpgradeContainerType<AutoCookingUpgradeWrapper, AutoCookingUpgradeContainer> AUTO_SMELTING_TYPE = new UpgradeContainerType<>(AutoCookingUpgradeContainer::new);
+	public static final UpgradeContainerType<CookingUpgradeWrapper, CookingUpgradeContainer> SMOKING_TYPE = new UpgradeContainerType<>(CookingUpgradeContainer::new);
+	public static final UpgradeContainerType<AutoCookingUpgradeWrapper, AutoCookingUpgradeContainer> AUTO_SMOKING_TYPE = new UpgradeContainerType<>(AutoCookingUpgradeContainer::new);
+	public static final UpgradeContainerType<CookingUpgradeWrapper, CookingUpgradeContainer> BLASTING_TYPE = new UpgradeContainerType<>(CookingUpgradeContainer::new);
+	public static final UpgradeContainerType<AutoCookingUpgradeWrapper, AutoCookingUpgradeContainer> AUTO_BLASTING_TYPE = new UpgradeContainerType<>(AutoCookingUpgradeContainer::new);
 	public static final UpgradeContainerType<InceptionUpgradeWrapper, InceptionUpgradeContainer> INCEPTION_TYPE = new UpgradeContainerType<>(InceptionUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_BASIC_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_ADVANCED_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
@@ -81,6 +91,12 @@ public class ModUpgradeContainers {
 		register(ModItems.STONECUTTER_UPGRADE, STONECUTTER_TYPE);
 		register(ModItems.ANVIL_UPGRADE, ANVIL_TYPE);
 		register(ModItems.SMITHING_UPGRADE, SMITHING_TYPE);
+		register(ModItems.SMELTING_UPGRADE, SMELTING_TYPE);
+		register(ModItems.AUTO_SMELTING_UPGRADE, AUTO_SMELTING_TYPE);
+		register(ModItems.SMOKING_UPGRADE, SMOKING_TYPE);
+		register(ModItems.AUTO_SMOKING_UPGRADE, AUTO_SMOKING_TYPE);
+		register(ModItems.BLASTING_UPGRADE, BLASTING_TYPE);
+		register(ModItems.AUTO_BLASTING_UPGRADE, AUTO_BLASTING_TYPE);
 		register(ModItems.INCEPTION_UPGRADE, INCEPTION_TYPE);
 		register(ModItems.REFILL_UPGRADE, REFILL_BASIC_TYPE);
 		register(ModItems.ADVANCED_REFILL_UPGRADE, REFILL_ADVANCED_TYPE);

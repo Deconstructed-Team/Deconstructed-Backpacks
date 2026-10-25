@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.client.init;
 
+import dev.feldsher.deconstructedcore.upgrades.cooking.AutoCookingUpgradeTab;
+import dev.feldsher.deconstructedcore.upgrades.cooking.CookingUpgradeTab;
 import dev.feldsher.deconstructedbackpacks.upgrades.smithing.SmithingUpgradeTab;
 import dev.feldsher.deconstructedbackpacks.upgrades.anvil.AnvilUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.stonecutter.StonecutterUpgradeTab;
@@ -54,6 +56,15 @@ public class ModUpgradeTabs {
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.STONECUTTER_TYPE, (uc, p, s) -> new StonecutterUpgradeTab(uc, p, s, SBPButtonDefinitions.SHIFT_CLICK_TARGET));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.ANVIL_TYPE, AnvilUpgradeTab::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.SMITHING_TYPE, SmithingUpgradeTab::new);
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.SMELTING_TYPE, (uc, p, s) -> new CookingUpgradeTab(uc, p, s, "smelting"));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.AUTO_SMELTING_TYPE, (uc, p, s) -> new AutoCookingUpgradeTab(uc, p, s, "auto_smelting",
+				Config.SERVER.autoSmeltingUpgrade.inputFilterSlotsInRow, Config.SERVER.autoSmeltingUpgrade.fuelFilterSlotsInRow));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.SMOKING_TYPE, (uc, p, s) -> new CookingUpgradeTab(uc, p, s, "smoking"));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.AUTO_SMOKING_TYPE, (uc, p, s) -> new AutoCookingUpgradeTab(uc, p, s, "auto_smoking",
+				Config.SERVER.autoSmokingUpgrade.inputFilterSlotsInRow, Config.SERVER.autoSmokingUpgrade.fuelFilterSlotsInRow));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.BLASTING_TYPE, (uc, p, s) -> new CookingUpgradeTab(uc, p, s, "blasting"));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.AUTO_BLASTING_TYPE, (uc, p, s) -> new AutoCookingUpgradeTab(uc, p, s, "auto_blasting",
+				Config.SERVER.autoBlastingUpgrade.inputFilterSlotsInRow, Config.SERVER.autoBlastingUpgrade.fuelFilterSlotsInRow));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.INCEPTION_TYPE, InceptionUpgradeTab::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.REFILL_BASIC_TYPE, (uc, p, s) ->
 				new RefillUpgradeTab.Basic(uc, p, s, Config.SERVER.refillUpgrade.slotsInRow));

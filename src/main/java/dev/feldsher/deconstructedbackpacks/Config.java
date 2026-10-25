@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedcore.upgrades.cooking.IAutoCookingUpgradeConfig;
+import dev.feldsher.deconstructedcore.upgrades.cooking.ICookingUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.IUpgradeCountLimitConfig;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeGroup;
 import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeConfig;
@@ -93,6 +95,19 @@ public class Config {
 		public final VoidUpgradeConfig voidUpgrade = new VoidUpgradeConfig(9, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Void Upgrade Settings")
 		public final VoidUpgradeConfig advancedVoidUpgrade = new VoidUpgradeConfig(16, 4);
+
+		@net.minecraftforge.common.config.Config.Comment("Smelting Upgrade Settings")
+		public final CookingUpgradeConfig smeltingUpgrade = new CookingUpgradeConfig();
+		@net.minecraftforge.common.config.Config.Comment("Smoking Upgrade Settings")
+		public final CookingUpgradeConfig smokingUpgrade = new CookingUpgradeConfig();
+		@net.minecraftforge.common.config.Config.Comment("Blasting Upgrade Settings")
+		public final CookingUpgradeConfig blastingUpgrade = new CookingUpgradeConfig();
+		@net.minecraftforge.common.config.Config.Comment("Auto-Smelting Upgrade Settings")
+		public final AutoCookingUpgradeConfig autoSmeltingUpgrade = new AutoCookingUpgradeConfig();
+		@net.minecraftforge.common.config.Config.Comment("Auto-Smoking Upgrade Settings")
+		public final AutoCookingUpgradeConfig autoSmokingUpgrade = new AutoCookingUpgradeConfig();
+		@net.minecraftforge.common.config.Config.Comment("Auto-Blasting Upgrade Settings")
+		public final AutoCookingUpgradeConfig autoBlastingUpgrade = new AutoCookingUpgradeConfig();
 
 		@net.minecraftforge.common.config.Config.Comment("Stack Upgrade Settings")
 		public final StackUpgradeSettings stackUpgrade = new StackUpgradeSettings();
@@ -244,6 +259,76 @@ public class Config {
 		VoidUpgradeConfig(int defaultFilterSlots, int defaultSlotsInRow) {
 			filterSlots = defaultFilterSlots;
 			slotsInRow = defaultSlotsInRow;
+		}
+	}
+
+	public static class CookingUpgradeConfig implements ICookingUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Smelting speed multiplier (1.0 equals speed at which vanilla furnace smelts items)")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0.25, max = 4.0)
+		public double smeltingSpeedMultiplier = 1.0;
+		@net.minecraftforge.common.config.Config.Comment("Fuel efficiency multiplier (1.0 equals speed at which it's used in vanilla furnace)")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0.25, max = 4.0)
+		public double fuelEfficiencyMultiplier = 1.0;
+
+		@Override
+		public double getCookingSpeedMultiplier() {
+			return smeltingSpeedMultiplier;
+		}
+
+		@Override
+		public double getFuelEfficiencyMultiplier() {
+			return fuelEfficiencyMultiplier;
+		}
+	}
+
+	public static class AutoCookingUpgradeConfig implements IAutoCookingUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Smelting speed multiplier (1.0 equals speed at which vanilla furnace smelts items)")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0.25, max = 4.0)
+		public double smeltingSpeedMultiplier = 1.0;
+		@net.minecraftforge.common.config.Config.Comment("Fuel efficiency multiplier (1.0 equals speed at which it's used in vanilla furnace)")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0.25, max = 4.0)
+		public double fuelEfficiencyMultiplier = 1.0;
+		@net.minecraftforge.common.config.Config.Comment("Number of input filter slots")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 20)
+		public int inputFilterSlots = 8;
+		@net.minecraftforge.common.config.Config.Comment("Number of input filter slots displayed in a row")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 6)
+		public int inputFilterSlotsInRow = 4;
+		@net.minecraftforge.common.config.Config.Comment("Number of fuel filter slots")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 20)
+		public int fuelFilterSlots = 4;
+		@net.minecraftforge.common.config.Config.Comment("Number of fuel filter slots displayed in a row")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 6)
+		public int fuelFilterSlotsInRow = 4;
+
+		@Override
+		public double getCookingSpeedMultiplier() {
+			return smeltingSpeedMultiplier;
+		}
+
+		@Override
+		public double getFuelEfficiencyMultiplier() {
+			return fuelEfficiencyMultiplier;
+		}
+
+		@Override
+		public int getInputFilterSlots() {
+			return inputFilterSlots;
+		}
+
+		@Override
+		public int getInputFilterSlotsInRow() {
+			return inputFilterSlotsInRow;
+		}
+
+		@Override
+		public int getFuelFilterSlots() {
+			return fuelFilterSlots;
+		}
+
+		@Override
+		public int getFuelFilterSlotsInRow() {
+			return fuelFilterSlotsInRow;
 		}
 	}
 
