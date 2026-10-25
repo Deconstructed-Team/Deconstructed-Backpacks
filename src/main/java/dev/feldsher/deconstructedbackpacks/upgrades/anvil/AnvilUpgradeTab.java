@@ -51,9 +51,12 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 		addHideableChild(itemNameTextBox);
 		itemNameTextBox.setEditable(getContainer().getSlots().get(0).getHasStack());
 
+		// While it's typed in, the name the server sends back of what was typed may already be behind
 		getContainer().setNameChangeListener(() -> {
-			itemNameTextBox.setValue(getContainer().getItemName());
 			itemNameTextBox.setEditable(getContainer().getSlots().get(0).getHasStack());
+			if (!itemNameTextBox.isFocused()) {
+				itemNameTextBox.setValue(getContainer().getItemName());
+			}
 		});
 	}
 
