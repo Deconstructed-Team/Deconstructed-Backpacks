@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.client.init;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.inception.InceptionUpgradeTab;
 import dev.feldsher.deconstructedbackpacks.upgrades.refill.RefillUpgradeTab;
 import dev.feldsher.deconstructedbackpacks.upgrades.toolswapper.ToolSwapperUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.compacting.CompactingUpgradeTab;
@@ -45,6 +46,7 @@ public class ModUpgradeTabs {
 				new DepositUpgradeTab.Basic(uc, p, s, Config.SERVER.depositUpgrade.slotsInRow));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.DEPOSIT_ADVANCED_TYPE, (uc, p, s) ->
 				new DepositUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedDepositUpgrade.slotsInRow));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.INCEPTION_TYPE, InceptionUpgradeTab::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.REFILL_BASIC_TYPE, (uc, p, s) ->
 				new RefillUpgradeTab.Basic(uc, p, s, Config.SERVER.refillUpgrade.slotsInRow));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.REFILL_ADVANCED_TYPE, (uc, p, s) ->

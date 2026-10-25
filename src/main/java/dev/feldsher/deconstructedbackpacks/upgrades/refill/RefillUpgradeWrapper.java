@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.upgrades.refill;
 
+import dev.feldsher.deconstructedcore.inventory.IItemHandlerSimpleInserter;
 import dev.feldsher.deconstructedbackpacks.api.IBlockPickResponseUpgrade;
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
@@ -122,7 +123,7 @@ public class RefillUpgradeWrapper extends UpgradeWrapperBase<RefillUpgradeWrappe
 		if (missingCount <= 0) {
 			return;
 		}
-		InventoryHandler extractFromHandler = storageWrapper.getInventoryForUpgradeProcessing();
+		IItemHandlerSimpleInserter extractFromHandler = storageWrapper.getInventoryForUpgradeProcessing();
 		ItemStack extracted = InventoryHelper.extractFromInventory(ItemHandlerHelper.copyStackWithSize(filter, missingCount), extractFromHandler, true);
 		if (extracted.isEmpty()) {
 			return;
@@ -147,7 +148,7 @@ public class RefillUpgradeWrapper extends UpgradeWrapperBase<RefillUpgradeWrappe
 			return false;
 		}
 
-		InventoryHandler inventoryHandler = storageWrapper.getInventoryForUpgradeProcessing();
+		IItemHandlerSimpleInserter inventoryHandler = storageWrapper.getInventoryForUpgradeProcessing();
 		int stashSlot = -1;
 		for (int slot = 0; slot < inventoryHandler.getSlots(); slot++) {
 			if (ItemHandlerHelper.canItemStacksStack(inventoryHandler.getStackInSlot(slot), filter)) {

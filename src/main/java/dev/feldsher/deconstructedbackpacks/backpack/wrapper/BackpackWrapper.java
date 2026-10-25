@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.backpack.wrapper;
 
+import dev.feldsher.deconstructedcore.inventory.IItemHandlerSimpleInserter;
+import dev.feldsher.deconstructedbackpacks.api.IInventoryWrapperUpgrade;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackStorage;
 import dev.feldsher.deconstructedbackpacks.init.ModItems;
@@ -48,6 +50,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	private static final String INVENTORY_HANDLER = "inventory";
 	private static final String UPGRADE_HANDLER = "upgrades";
 	private static final String SETTINGS_HANDLER = "settings";
+	private static final String UPGRADE_PROCESSING_INVENTORY = "upgradeProcessingInventory";
 
 	@Nullable
 	private UpgradeHandler dummyUpgradeHandler = null;
@@ -97,6 +100,26 @@ public class BackpackWrapper implements IBackpackWrapper {
 				this, contents.getNbt(), contents::onSlotChanged, StackUpgradeItem.getInventorySlotLimit(this)));
 	}
 
+	/** The inventory as each inventory wrapping upgrade, as inception, wraps it in turn; made again when upgrades change. */
+	@Override
+	public IItemHandlerSimpleInserter getInventoryForUpgradeProcessing() {
+		InventoryHandler inventoryHandler = getInventoryHandler();
+		return getContents().getShared(UPGRADE_PROCESSING_INVENTORY, () -> {
+			IItemHandlerSimpleInserter wrapped = inventoryHandler;
+			for (IInventoryWrapperUpgrade upgrade : getUpgradeHandler().getWrappersThatImplementFromMainStorage(IInventoryWrapperUpgrade.class)) {
+				wrapped = upgrade.wrapInventory(wrapped);
+			}
+			return wrapped;
+		});
+	}
+
+	@Override
+	public void refreshInventoryForUpgradeProcessing() {
+		if (getContentsUuid().isPresent()) {
+			getContents().removeShared(UPGRADE_PROCESSING_INVENTORY);
+		}
+	}
+
 	/**
 	 * A backpack whose contents don't exist yet has no upgrades: it gets an empty handler, as 1.21's Noop, so that
 	 * ticking every backpack in an inventory doesn't create contents for each.
@@ -129,6 +152,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 	}
 
 	private void onUpgradesChanged() {
+		refreshInventoryForUpgradeProcessing();
 		getInventoryHandler().setBaseSlotLimit(StackUpgradeItem.getInventorySlotLimit(this));
 		upgradeCachesInvalidatedHandler.run();
 	}

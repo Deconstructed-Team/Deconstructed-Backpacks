@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.backpack.wrapper;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.inception.InceptionUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.Config;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
@@ -12,9 +13,18 @@ public class BackpackInventoryHandler extends InventoryHandler {
 		super(numberOfInventorySlots, storageWrapper, contentsNbt, saveHandler, slotLimit, Config.SERVER.stackUpgrade.config);
 	}
 
+	/** A backpack goes into another only with the inception upgrade, and only one without it itself. */
 	@Override
 	protected boolean isAllowed(ItemStack stack) {
-		// A backpack goes into another only with the inception upgrade, which comes with the upgrades
-		return !Config.SERVER.isItemDisallowed(stack.getItem()) && !(stack.getItem() instanceof BackpackItem);
+		return !Config.SERVER.isItemDisallowed(stack.getItem())
+				&& (!(stack.getItem() instanceof BackpackItem) || hasInceptionUpgrade() && isBackpackWithoutInceptionUpgrade(stack));
+	}
+
+	private boolean hasInceptionUpgrade() {
+		return storageWrapper.getUpgradeHandler().hasUpgrade(InceptionUpgradeItem.TYPE);
+	}
+
+	private static boolean isBackpackWithoutInceptionUpgrade(ItemStack stack) {
+		return !BackpackWrapper.fromStack(stack).getUpgradeHandler().hasUpgrade(InceptionUpgradeItem.TYPE);
 	}
 }

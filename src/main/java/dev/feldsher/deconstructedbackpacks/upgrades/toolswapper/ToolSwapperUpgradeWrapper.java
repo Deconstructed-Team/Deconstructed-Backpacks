@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.upgrades.toolswapper;
 
+import dev.feldsher.deconstructedcore.inventory.IItemHandlerSimpleInserter;
 import com.google.common.collect.Multimap;
 import dev.feldsher.deconstructedbackpacks.api.IAttackEntityResponseUpgrade;
 import dev.feldsher.deconstructedbackpacks.api.IBlockClickResponseUpgrade;
@@ -125,7 +126,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		return false;
 	}
 
-	private boolean hasSpaceInBackpackOrCanPlaceInTheSlotOfSwappedTool(InventoryHandler backpackInventory, ItemStack mainHandItem, ItemStack tool, int selectedSlot) {
+	private boolean hasSpaceInBackpackOrCanPlaceInTheSlotOfSwappedTool(IItemHandlerSimpleInserter backpackInventory, ItemStack mainHandItem, ItemStack tool, int selectedSlot) {
 		return backpackInventory.insertItem(mainHandItem, true).isEmpty()
 				|| (tool.getCount() == 1 && backpackInventory.isItemValid(selectedSlot, mainHandItem));
 	}
@@ -163,7 +164,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		BestWeapons bestWeapons = new BestWeapons();
 		bestWeapons.update(mainHandItem);
 
-		InventoryHandler backpackInventory = storageWrapper.getInventoryForUpgradeProcessing();
+		IItemHandlerSimpleInserter backpackInventory = storageWrapper.getInventoryForUpgradeProcessing();
 		InventoryHelper.iterate(backpackInventory, (slot, stack) -> {
 			if (filterLogic.matchesFilter(stack)) {
 				bestWeapons.update(stack);
@@ -212,7 +213,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		}
 	}
 
-	private boolean swapWeapon(EntityPlayer player, ItemStack mainHandItem, InventoryHandler backpackInventory, ItemStack weapon) {
+	private boolean swapWeapon(EntityPlayer player, ItemStack mainHandItem, IItemHandlerSimpleInserter backpackInventory, ItemStack weapon) {
 		if (weapon == mainHandItem) {
 			return true;
 		}
@@ -297,7 +298,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 			toolCacheFor = target;
 		}
 
-		InventoryHandler backpackInventory = storageWrapper.getInventoryForUpgradeProcessing();
+		IItemHandlerSimpleInserter backpackInventory = storageWrapper.getInventoryForUpgradeProcessing();
 		if (isToolValid.test(mainHandStack) && toolCache.stream().noneMatch(st -> ItemStack.areItemsEqual(st, mainHandStack))) {
 			toolCache.offer(mainHandStack);
 		}
@@ -316,7 +317,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		return true;
 	}
 
-	private ItemStack findToolToSwap(InventoryHandler backpackInventory, Predicate<ItemStack> isValidTool) {
+	private ItemStack findToolToSwap(IItemHandlerSimpleInserter backpackInventory, Predicate<ItemStack> isValidTool) {
 		Set<ItemStack> alreadyGivenBefore = new HashSet<>();
 		ItemStack toolFound = ItemStack.EMPTY;
 		for (int slot = 0; slot < backpackInventory.getSlots() && toolFound.isEmpty(); slot++) {

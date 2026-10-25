@@ -77,6 +77,8 @@ public class Config {
 		public final FilteredUpgradeConfig depositUpgrade = new FilteredUpgradeConfig(9, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Deposit Upgrade Settings")
 		public final FilteredUpgradeConfig advancedDepositUpgrade = new FilteredUpgradeConfig(16, 4);
+		@net.minecraftforge.common.config.Config.Comment("Inception Upgrade Settings")
+		public final InceptionUpgradeConfig inceptionUpgrade = new InceptionUpgradeConfig();
 		@net.minecraftforge.common.config.Config.Comment("Refill Upgrade Settings")
 		public final FilteredUpgradeConfig refillUpgrade = new FilteredUpgradeConfig(6, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Refill Upgrade Settings")
@@ -220,6 +222,13 @@ public class Config {
 			slotsInRow = defaultSlotsInRow;
 			magnetRange = defaultMagnetRange;
 		}
+	}
+
+	public static class InceptionUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Allows / Disallows backpack upgrades to work with inventories of Backpacks in the Backpack with Inception Upgrade")
+		public boolean upgradesUseInventoriesOfBackpacksInBackpack = true;
+		@net.minecraftforge.common.config.Config.Comment("Allows / Disallows upgrades to be functional even when they are in Backpacks in the inventory of Backpack with Inception Upgrade")
+		public boolean upgradesInContainedBackpacksAreFunctional = true;
 	}
 
 	public static class VoidUpgradeConfig {
