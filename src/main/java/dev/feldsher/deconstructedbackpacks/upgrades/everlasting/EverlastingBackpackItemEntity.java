@@ -16,7 +16,7 @@ public class EverlastingBackpackItemEntity extends FireResistantItemEntity {
 	private static final double FLOAT_UP_ACCELERATION = 0.06;
 	private static final double MAX_FLOAT_UP_SPEED = 0.7;
 	private static final double GRAVITY = 0.04;
-	private static final double HANGING_PICKUP_RANGE = 4;
+	private static final double HANGING_PICKUP_RANGE = 3;
 	private boolean wasFloatingUp = false;
 
 	@SuppressWarnings("unused") // as an entity's, for loading
