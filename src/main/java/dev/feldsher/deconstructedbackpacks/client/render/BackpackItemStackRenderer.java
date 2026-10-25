@@ -38,6 +38,11 @@ public class BackpackItemStackRenderer extends TileEntityItemStackRenderer {
 			GlStateManager.rotate(displayItem.getRotation(), 0, 0, 1);
 			minecraft.getRenderItem().renderItem(displayItem.getItem(), ItemCameraTransforms.TransformType.FIXED);
 			GlStateManager.popMatrix();
+			// The inner item turns blending and rescaling off when done; the backpack's own item drawing had them on
+			GlStateManager.enableRescaleNormal();
+			GlStateManager.enableBlend();
+			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+					GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 			minecraft.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		});
 	}
