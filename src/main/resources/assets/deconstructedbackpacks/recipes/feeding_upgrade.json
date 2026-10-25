@@ -7,7 +7,8 @@
   ],
   "key": {
     "A": {
-      "item": "minecraft:golden_apple"
+      "item": "minecraft:golden_apple",
+      "data": 0
     },
     "B": {
       "item": "deconstructedbackpacks:upgrade_base"
