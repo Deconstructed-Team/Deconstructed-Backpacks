@@ -14,5 +14,6 @@ public class PacketHandler {
 		int id = 0;
 		INSTANCE.registerMessage(BackpackOpenMessage.Handler.class, BackpackOpenMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(BackpackContentsMessage.Handler.class, BackpackContentsMessage.class, id++, Side.CLIENT);
+		INSTANCE.registerMessage(InventoryInteractionMessage.Handler.class, InventoryInteractionMessage.class, id++, Side.SERVER);
 	}
 }

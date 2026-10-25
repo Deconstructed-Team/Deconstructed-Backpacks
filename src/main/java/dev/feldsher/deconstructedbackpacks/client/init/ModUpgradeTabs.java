@@ -3,6 +3,8 @@ package dev.feldsher.deconstructedbackpacks.client.init;
 import dev.feldsher.deconstructedbackpacks.Config;
 import dev.feldsher.deconstructedbackpacks.client.gui.SBPButtonDefinitions;
 import dev.feldsher.deconstructedbackpacks.init.ModUpgradeContainers;
+import dev.feldsher.deconstructedbackpacks.upgrades.deposit.DepositUpgradeTab;
+import dev.feldsher.deconstructedbackpacks.upgrades.restock.RestockUpgradeTab;
 import dev.feldsher.deconstructedcore.client.gui.UpgradeGuiManager;
 import dev.feldsher.deconstructedcore.upgrades.filter.FilterUpgradeContainer;
 import dev.feldsher.deconstructedcore.upgrades.filter.FilterUpgradeTab;
@@ -23,6 +25,14 @@ public class ModUpgradeTabs {
 				new FilterUpgradeTab.Basic(uc, p, s, Config.SERVER.filterUpgrade.slotsInRow, SBPButtonDefinitions.BACKPACK_CONTENTS_FILTER_TYPE));
 		UpgradeGuiManager.registerTab(FilterUpgradeContainer.ADVANCED_TYPE, (uc, p, s) ->
 				new FilterUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedFilterUpgrade.slotsInRow, SBPButtonDefinitions.BACKPACK_CONTENTS_FILTER_TYPE));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.RESTOCK_BASIC_TYPE, (uc, p, s) ->
+				new RestockUpgradeTab.Basic(uc, p, s, Config.SERVER.restockUpgrade.slotsInRow, SBPButtonDefinitions.BACKPACK_CONTENTS_FILTER_TYPE));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.RESTOCK_ADVANCED_TYPE, (uc, p, s) ->
+				new RestockUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedRestockUpgrade.slotsInRow, SBPButtonDefinitions.BACKPACK_CONTENTS_FILTER_TYPE));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.DEPOSIT_BASIC_TYPE, (uc, p, s) ->
+				new DepositUpgradeTab.Basic(uc, p, s, Config.SERVER.depositUpgrade.slotsInRow));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.DEPOSIT_ADVANCED_TYPE, (uc, p, s) ->
+				new DepositUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedDepositUpgrade.slotsInRow));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.MAGNET_BASIC_TYPE, (uc, p, s) ->
 				new MagnetUpgradeTab.Basic(uc, p, s, Config.SERVER.magnetUpgrade.slotsInRow, SBPButtonDefinitions.BACKPACK_CONTENTS_FILTER_TYPE));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.MAGNET_ADVANCED_TYPE, (uc, p, s) ->

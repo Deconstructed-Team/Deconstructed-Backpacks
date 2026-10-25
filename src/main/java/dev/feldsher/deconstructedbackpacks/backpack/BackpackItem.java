@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import dev.feldsher.deconstructedbackpacks.util.InventoryInteractionHelper;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
@@ -117,11 +118,17 @@ public class BackpackItem extends Item {
 		return new ActionResult<>(EnumActionResult.SUCCESS, stack);
 	}
 
-	/** Sneaking, a backpack is placed as a block facing the player. */
+	/**
+	 * Sneaking, a backpack runs its inventory interaction upgrades on the inventory clicked; with none to run, it's
+	 * placed as a block facing the player.
+	 */
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!player.isSneaking()) {
 			return EnumActionResult.PASS;
+		}
+		if (InventoryInteractionHelper.tryInventoryInteraction(pos, world, player.getHeldItem(hand), facing, player)) {
+			return EnumActionResult.SUCCESS;
 		}
 
 		IBlockState clickedState = world.getBlockState(pos);

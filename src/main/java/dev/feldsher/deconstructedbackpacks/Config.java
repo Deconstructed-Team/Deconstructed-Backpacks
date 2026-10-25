@@ -3,6 +3,7 @@ package dev.feldsher.deconstructedbackpacks;
 import dev.feldsher.deconstructedcore.upgrades.IUpgradeCountLimitConfig;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeGroup;
 import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeConfig;
+import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigManager;
@@ -60,6 +61,14 @@ public class Config {
 		public final FilteredUpgradeConfig filterUpgrade = new FilteredUpgradeConfig(9, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Filter Upgrade Settings")
 		public final FilteredUpgradeConfig advancedFilterUpgrade = new FilteredUpgradeConfig(16, 4);
+		@net.minecraftforge.common.config.Config.Comment("Restock Upgrade Settings")
+		public final FilteredUpgradeConfig restockUpgrade = new FilteredUpgradeConfig(9, 3);
+		@net.minecraftforge.common.config.Config.Comment("Advanced Restock Upgrade Settings")
+		public final FilteredUpgradeConfig advancedRestockUpgrade = new FilteredUpgradeConfig(16, 4);
+		@net.minecraftforge.common.config.Config.Comment("Deposit Upgrade Settings")
+		public final FilteredUpgradeConfig depositUpgrade = new FilteredUpgradeConfig(9, 3);
+		@net.minecraftforge.common.config.Config.Comment("Advanced Deposit Upgrade Settings")
+		public final FilteredUpgradeConfig advancedDepositUpgrade = new FilteredUpgradeConfig(16, 4);
 		@net.minecraftforge.common.config.Config.Comment("Magnet Upgrade Settings")
 		public final MagnetUpgradeConfig magnetUpgrade = new MagnetUpgradeConfig(9, 3, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Magnet Upgrade Settings")
@@ -88,9 +97,15 @@ public class Config {
 			}
 		};
 
+		@net.minecraftforge.common.config.Config.Comment("List of blocks that inventory interaction upgrades can't interact with - e.g. \"minecraft:shulker_box\"")
+		public String[] noInteractionBlocks = {};
+
 		@net.minecraftforge.common.config.Config.Ignore
 		@Nullable
 		private Set<ResourceLocation> disallowedItemsSet = null;
+		@net.minecraftforge.common.config.Config.Ignore
+		@Nullable
+		private Set<ResourceLocation> noInteractionBlocksSet = null;
 		@net.minecraftforge.common.config.Config.Ignore
 		@Nullable
 		private Map<String, Integer> maxUpgrades = null;
@@ -103,6 +118,16 @@ public class Config {
 				}
 			}
 			return disallowedItemsSet.contains(item.getRegistryName());
+		}
+
+		public boolean isBlockInteractionDisallowed(Block block) {
+			if (noInteractionBlocksSet == null) {
+				noInteractionBlocksSet = new HashSet<>();
+				for (String blockName : noInteractionBlocks) {
+					noInteractionBlocksSet.add(new ResourceLocation(blockName));
+				}
+			}
+			return noInteractionBlocksSet.contains(block.getRegistryName());
 		}
 
 		private Map<String, Integer> getMaxUpgrades() {
@@ -121,6 +146,7 @@ public class Config {
 
 		private void clearCache() {
 			disallowedItemsSet = null;
+			noInteractionBlocksSet = null;
 			maxUpgrades = null;
 			stackUpgrade.config.clearNonStackableItems();
 		}

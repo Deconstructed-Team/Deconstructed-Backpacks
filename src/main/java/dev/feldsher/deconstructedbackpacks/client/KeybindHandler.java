@@ -4,13 +4,16 @@ import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.client.gui.BackpackScreen;
 import dev.feldsher.deconstructedbackpacks.network.BackpackOpenMessage;
+import dev.feldsher.deconstructedbackpacks.network.InventoryInteractionMessage;
 import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
+import dev.feldsher.deconstructedbackpacks.util.InventoryInteractionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -27,7 +30,8 @@ import org.lwjgl.input.Mouse;
  * player inventory it opens that one, and in a backpack's screen over anything else it closes the screen.
  * The sort key sorts the open backpack, unless the mouse is over the player's inventory, which is left to sorting mods.
  * Both are handled before those mods see the input, so a key they share sorts only one inventory.
- * The keys of the upgrades come with them.
+ * The inventory interaction key runs the backpack's restock and deposit upgrades on the inventory looked at.
+ * The keys of the other upgrades come with them.
  */
 @Mod.EventBusSubscriber(modid = DeconstructedBackpacks.MOD_ID, value = Side.CLIENT)
 public class KeybindHandler {
@@ -36,6 +40,8 @@ public class KeybindHandler {
 
 	public static final KeyBinding BACKPACK_OPEN_KEYBIND = new KeyBinding("keybind.deconstructedbackpacks.open_backpack",
 			KeyConflictContext.UNIVERSAL, Keyboard.KEY_B, KEYBIND_CATEGORY);
+	public static final KeyBinding INVENTORY_INTERACTION_KEYBIND = new KeyBinding("keybind.deconstructedbackpacks.inventory_interaction",
+			KeyConflictContext.IN_GAME, Keyboard.KEY_C, KEYBIND_CATEGORY);
 	public static final KeyBinding SORT_KEYBIND = new KeyBinding("keybind.deconstructedbackpacks.sort",
 			KeyConflictContext.GUI, MIDDLE_MOUSE_BUTTON - 100, KEYBIND_CATEGORY);
 
@@ -43,14 +49,29 @@ public class KeybindHandler {
 
 	public static void register() {
 		ClientRegistry.registerKeyBinding(BACKPACK_OPEN_KEYBIND);
+		ClientRegistry.registerKeyBinding(INVENTORY_INTERACTION_KEYBIND);
 		ClientRegistry.registerKeyBinding(SORT_KEYBIND);
 	}
 
 	@SubscribeEvent
 	public static void onKeyInput(InputEvent.KeyInputEvent event) {
-		if (Minecraft.getMinecraft().currentScreen == null && BACKPACK_OPEN_KEYBIND.isPressed()) {
-			PacketHandler.INSTANCE.sendToServer(new BackpackOpenMessage());
+		if (Minecraft.getMinecraft().currentScreen != null) {
+			return;
 		}
+		if (BACKPACK_OPEN_KEYBIND.isPressed()) {
+			PacketHandler.INSTANCE.sendToServer(new BackpackOpenMessage());
+		} else if (INVENTORY_INTERACTION_KEYBIND.isPressed()) {
+			sendInteractWithInventoryMessage();
+		}
+	}
+
+	private static void sendInteractWithInventoryMessage() {
+		Minecraft mc = Minecraft.getMinecraft();
+		RayTraceResult rayTrace = mc.objectMouseOver;
+		if (rayTrace == null || rayTrace.typeOfHit != RayTraceResult.Type.BLOCK || !InventoryInteractionHelper.hasItemHandler(mc.world, rayTrace.getBlockPos(), rayTrace.sideHit)) {
+			return;
+		}
+		PacketHandler.INSTANCE.sendToServer(new InventoryInteractionMessage(rayTrace.getBlockPos(), rayTrace.sideHit));
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
