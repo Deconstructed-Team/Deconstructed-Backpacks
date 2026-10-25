@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.client.init;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.smithing.SmithingUpgradeTab;
 import dev.feldsher.deconstructedbackpacks.upgrades.anvil.AnvilUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.stonecutter.StonecutterUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.crafting.CraftingUpgradeTab;
@@ -52,6 +53,7 @@ public class ModUpgradeTabs {
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.CRAFTING_TYPE, (uc, p, s) -> new CraftingUpgradeTab(uc, p, s, SBPButtonDefinitions.SHIFT_CLICK_TARGET));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.STONECUTTER_TYPE, (uc, p, s) -> new StonecutterUpgradeTab(uc, p, s, SBPButtonDefinitions.SHIFT_CLICK_TARGET));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.ANVIL_TYPE, AnvilUpgradeTab::new);
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.SMITHING_TYPE, SmithingUpgradeTab::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.INCEPTION_TYPE, InceptionUpgradeTab::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.REFILL_BASIC_TYPE, (uc, p, s) ->
 				new RefillUpgradeTab.Basic(uc, p, s, Config.SERVER.refillUpgrade.slotsInRow));
