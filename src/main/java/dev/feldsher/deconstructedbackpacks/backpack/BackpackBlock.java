@@ -1,5 +1,8 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingUpgradeItem;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.Explosion;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContext;
 import dev.feldsher.deconstructedcore.util.StorageNbt;
@@ -145,6 +148,16 @@ public class BackpackBlock extends Block {
 	@Override
 	public TileEntity createTileEntity(World world, IBlockState state) {
 		return new BackpackBlockEntity();
+	}
+
+	/** With the everlasting upgrade, explosions don't break it, as they don't break bedrock. */
+	@Override
+	public float getExplosionResistance(World world, BlockPos pos, @Nullable Entity exploder, Explosion explosion) {
+		TileEntity te = world.getTileEntity(pos);
+		if (te instanceof BackpackBlockEntity && ((BackpackBlockEntity) te).getBackpackWrapper().getUpgradeHandler().hasUpgrade(EverlastingUpgradeItem.TYPE)) {
+			return Blocks.BEDROCK.getExplosionResistance(null);
+		}
+		return super.getExplosionResistance(world, pos, exploder, explosion);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingBackpackItemEntity;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.FireResistantItemEntity;
 import net.minecraftforge.event.RegistryEvent;
@@ -19,6 +20,12 @@ public class ModEntities {
 				.entity(FireResistantItemEntity.class)
 				.id(DeconstructedBackpacks.getRL("fire_resistant_item"), 0)
 				.name(DeconstructedBackpacks.MOD_ID + ".fire_resistant_item")
+				.tracker(64, 20, true)
+				.build());
+		event.getRegistry().register(EntityEntryBuilder.create()
+				.entity(EverlastingBackpackItemEntity.class)
+				.id(DeconstructedBackpacks.getRL("everlasting_backpack_item"), 1)
+				.name(DeconstructedBackpacks.MOD_ID + ".everlasting_backpack_item")
 				.tracker(64, 20, true)
 				.build());
 	}

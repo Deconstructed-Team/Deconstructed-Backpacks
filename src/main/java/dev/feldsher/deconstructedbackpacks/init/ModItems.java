@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedcore.upgrades.feeding.FeedingUpgradeItem;
+import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.Config;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
@@ -67,6 +69,10 @@ public class ModItems {
 	public static final PickupUpgradeItem ADVANCED_PICKUP_UPGRADE = item(new PickupUpgradeItem(() -> Config.SERVER.advancedPickupUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_pickup_upgrade");
 
+	public static final FeedingUpgradeItem FEEDING_UPGRADE = item(new FeedingUpgradeItem(() -> Config.SERVER.feedingUpgrade.filterSlots,
+			Config.SERVER.maxUpgradesPerStorageConfig), "feeding_upgrade");
+	public static final FeedingUpgradeItem ADVANCED_FEEDING_UPGRADE = item(new FeedingUpgradeItem(() -> Config.SERVER.advancedFeedingUpgrade.filterSlots,
+			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_feeding_upgrade");
 	public static final RestockUpgradeItem RESTOCK_UPGRADE = item(new RestockUpgradeItem(() -> Config.SERVER.restockUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "restock_upgrade");
 	public static final RestockUpgradeItem ADVANCED_RESTOCK_UPGRADE = item(new RestockUpgradeItem(() -> Config.SERVER.advancedRestockUpgrade.filterSlots,
@@ -75,6 +81,8 @@ public class ModItems {
 			Config.SERVER.maxUpgradesPerStorageConfig), "deposit_upgrade");
 	public static final DepositUpgradeItem ADVANCED_DEPOSIT_UPGRADE = item(new DepositUpgradeItem(() -> Config.SERVER.advancedDepositUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_deposit_upgrade");
+
+	public static final EverlastingUpgradeItem EVERLASTING_UPGRADE = item(new EverlastingUpgradeItem(Config.SERVER.maxUpgradesPerStorageConfig), "everlasting_upgrade");
 
 	public static final FilterUpgradeItem FILTER_UPGRADE = item(new FilterUpgradeItem(() -> Config.SERVER.filterUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "filter_upgrade");
@@ -102,7 +110,7 @@ public class ModItems {
 
 	/** What 1.21 tags as backpack upgrades: the only items a backpack's upgrade slots take. */
 	public static final List<Item> BACKPACK_UPGRADES = Collections.unmodifiableList(Arrays.asList(PICKUP_UPGRADE, ADVANCED_PICKUP_UPGRADE,
-			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
+			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, EVERLASTING_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
 			STACK_UPGRADE_TIER_1, STACK_UPGRADE_TIER_2, STACK_UPGRADE_TIER_3, STACK_UPGRADE_TIER_4, STACK_UPGRADE_OMEGA_TIER,
 			STACK_DOWNGRADE_TIER_1, STACK_DOWNGRADE_TIER_2, STACK_DOWNGRADE_TIER_3));
 

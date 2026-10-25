@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.client.init;
 
+import dev.feldsher.deconstructedcore.upgrades.feeding.FeedingUpgradeTab;
 import dev.feldsher.deconstructedbackpacks.Config;
 import dev.feldsher.deconstructedbackpacks.client.gui.SBPButtonDefinitions;
 import dev.feldsher.deconstructedbackpacks.init.ModUpgradeContainers;
@@ -25,6 +26,10 @@ public class ModUpgradeTabs {
 				new FilterUpgradeTab.Basic(uc, p, s, Config.SERVER.filterUpgrade.slotsInRow, SBPButtonDefinitions.BACKPACK_CONTENTS_FILTER_TYPE));
 		UpgradeGuiManager.registerTab(FilterUpgradeContainer.ADVANCED_TYPE, (uc, p, s) ->
 				new FilterUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedFilterUpgrade.slotsInRow, SBPButtonDefinitions.BACKPACK_CONTENTS_FILTER_TYPE));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.FEEDING_BASIC_TYPE, (uc, p, s) ->
+				new FeedingUpgradeTab.Basic(uc, p, s, Config.SERVER.feedingUpgrade.slotsInRow));
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.FEEDING_ADVANCED_TYPE, (uc, p, s) ->
+				new FeedingUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedFeedingUpgrade.slotsInRow));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.RESTOCK_BASIC_TYPE, (uc, p, s) ->
 				new RestockUpgradeTab.Basic(uc, p, s, Config.SERVER.restockUpgrade.slotsInRow, SBPButtonDefinitions.BACKPACK_CONTENTS_FILTER_TYPE));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.RESTOCK_ADVANCED_TYPE, (uc, p, s) ->

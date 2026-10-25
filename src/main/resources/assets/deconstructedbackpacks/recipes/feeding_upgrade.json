@@ -1,0 +1,29 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    " C ",
+    "ABM",
+    " E "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:golden_apple"
+    },
+    "B": {
+      "item": "deconstructedbackpacks:upgrade_base"
+    },
+    "C": {
+      "item": "minecraft:golden_carrot"
+    },
+    "E": {
+      "type": "forge:ore_dict",
+      "ore": "enderpearl"
+    },
+    "M": {
+      "item": "minecraft:speckled_melon"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:feeding_upgrade"
+  }
+}

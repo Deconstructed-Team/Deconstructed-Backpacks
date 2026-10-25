@@ -1,0 +1,22 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "CSC",
+    "SBS",
+    "CSC"
+  ],
+  "key": {
+    "B": {
+      "item": "deconstructedbackpacks:upgrade_base"
+    },
+    "C": {
+      "item": "minecraft:end_crystal"
+    },
+    "S": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:everlasting_upgrade"
+  }
+}

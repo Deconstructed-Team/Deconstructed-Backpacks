@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingUpgradeItem;
+import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingBackpackItemEntity;
 import dev.feldsher.deconstructedbackpacks.util.InventoryInteractionHelper;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
@@ -66,13 +68,24 @@ public class BackpackItem extends Item {
 
 	@Override
 	public boolean hasCustomEntity(ItemStack stack) {
-		return fireResistant;
+		return true;
 	}
 
+	/** Dropped with the everlasting upgrade, it's indestructible; fire resistant ones don't burn. */
 	@Nullable
 	@Override
 	public Entity createEntity(World world, Entity location, ItemStack stack) {
-		return fireResistant && location instanceof EntityItem ? new FireResistantItemEntity(world, (EntityItem) location, stack) : null;
+		if (!(location instanceof EntityItem)) {
+			return null;
+		}
+		if (hasEverlastingUpgrade(stack)) {
+			return new EverlastingBackpackItemEntity(world, (EntityItem) location, stack);
+		}
+		return fireResistant ? new FireResistantItemEntity(world, (EntityItem) location, stack) : null;
+	}
+
+	private static boolean hasEverlastingUpgrade(ItemStack stack) {
+		return BackpackWrapper.fromStack(stack).getUpgradeHandler().hasUpgrade(EverlastingUpgradeItem.TYPE);
 	}
 
 	public static void setColors(ItemStack backpackStack, int mainColor, int accentColor) {

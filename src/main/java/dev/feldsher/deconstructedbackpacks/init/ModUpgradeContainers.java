@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedcore.upgrades.feeding.FeedingUpgradeWrapper;
+import dev.feldsher.deconstructedcore.upgrades.feeding.FeedingUpgradeContainer;
 import dev.feldsher.deconstructedbackpacks.upgrades.deposit.DepositUpgradeContainer;
 import dev.feldsher.deconstructedbackpacks.upgrades.deposit.DepositUpgradeWrapper;
 import dev.feldsher.deconstructedbackpacks.upgrades.restock.RestockUpgradeWrapper;
@@ -23,6 +25,8 @@ public class ModUpgradeContainers {
 	public static final UpgradeContainerType<PickupUpgradeWrapper, ContentsFilteredUpgradeContainer<PickupUpgradeWrapper>> PICKUP_BASIC_TYPE = new UpgradeContainerType<>(ContentsFilteredUpgradeContainer::new);
 	public static final UpgradeContainerType<PickupUpgradeWrapper, ContentsFilteredUpgradeContainer<PickupUpgradeWrapper>> PICKUP_ADVANCED_TYPE = new UpgradeContainerType<>(ContentsFilteredUpgradeContainer::new);
 
+	public static final UpgradeContainerType<FeedingUpgradeWrapper, FeedingUpgradeContainer> FEEDING_BASIC_TYPE = new UpgradeContainerType<>(FeedingUpgradeContainer::new);
+	public static final UpgradeContainerType<FeedingUpgradeWrapper, FeedingUpgradeContainer> FEEDING_ADVANCED_TYPE = new UpgradeContainerType<>(FeedingUpgradeContainer::new);
 	public static final UpgradeContainerType<RestockUpgradeWrapper, ContentsFilteredUpgradeContainer<RestockUpgradeWrapper>> RESTOCK_BASIC_TYPE = new UpgradeContainerType<>(ContentsFilteredUpgradeContainer::new);
 	public static final UpgradeContainerType<RestockUpgradeWrapper, ContentsFilteredUpgradeContainer<RestockUpgradeWrapper>> RESTOCK_ADVANCED_TYPE = new UpgradeContainerType<>(ContentsFilteredUpgradeContainer::new);
 	public static final UpgradeContainerType<DepositUpgradeWrapper, DepositUpgradeContainer> DEPOSIT_BASIC_TYPE = new UpgradeContainerType<>(DepositUpgradeContainer::new);
@@ -38,6 +42,8 @@ public class ModUpgradeContainers {
 		register(ModItems.ADVANCED_PICKUP_UPGRADE, PICKUP_ADVANCED_TYPE);
 		register(ModItems.FILTER_UPGRADE, FilterUpgradeContainer.BASIC_TYPE);
 		register(ModItems.ADVANCED_FILTER_UPGRADE, FilterUpgradeContainer.ADVANCED_TYPE);
+		register(ModItems.FEEDING_UPGRADE, FEEDING_BASIC_TYPE);
+		register(ModItems.ADVANCED_FEEDING_UPGRADE, FEEDING_ADVANCED_TYPE);
 		register(ModItems.RESTOCK_UPGRADE, RESTOCK_BASIC_TYPE);
 		register(ModItems.ADVANCED_RESTOCK_UPGRADE, RESTOCK_ADVANCED_TYPE);
 		register(ModItems.DEPOSIT_UPGRADE, DEPOSIT_BASIC_TYPE);
