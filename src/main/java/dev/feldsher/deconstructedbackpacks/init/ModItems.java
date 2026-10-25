@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedcore.upgrades.compacting.CompactingUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.feeding.FeedingUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.Config;
@@ -69,6 +70,10 @@ public class ModItems {
 	public static final PickupUpgradeItem ADVANCED_PICKUP_UPGRADE = item(new PickupUpgradeItem(() -> Config.SERVER.advancedPickupUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_pickup_upgrade");
 
+	public static final CompactingUpgradeItem COMPACTING_UPGRADE = item(new CompactingUpgradeItem(false, () -> Config.SERVER.compactingUpgrade.filterSlots,
+			Config.SERVER.maxUpgradesPerStorageConfig), "compacting_upgrade");
+	public static final CompactingUpgradeItem ADVANCED_COMPACTING_UPGRADE = item(new CompactingUpgradeItem(true, () -> Config.SERVER.advancedCompactingUpgrade.filterSlots,
+			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_compacting_upgrade");
 	public static final FeedingUpgradeItem FEEDING_UPGRADE = item(new FeedingUpgradeItem(() -> Config.SERVER.feedingUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "feeding_upgrade");
 	public static final FeedingUpgradeItem ADVANCED_FEEDING_UPGRADE = item(new FeedingUpgradeItem(() -> Config.SERVER.advancedFeedingUpgrade.filterSlots,
@@ -110,7 +115,7 @@ public class ModItems {
 
 	/** What 1.21 tags as backpack upgrades: the only items a backpack's upgrade slots take. */
 	public static final List<Item> BACKPACK_UPGRADES = Collections.unmodifiableList(Arrays.asList(PICKUP_UPGRADE, ADVANCED_PICKUP_UPGRADE,
-			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, EVERLASTING_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
+			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, COMPACTING_UPGRADE, ADVANCED_COMPACTING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, EVERLASTING_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
 			STACK_UPGRADE_TIER_1, STACK_UPGRADE_TIER_2, STACK_UPGRADE_TIER_3, STACK_UPGRADE_TIER_4, STACK_UPGRADE_OMEGA_TIER,
 			STACK_DOWNGRADE_TIER_1, STACK_DOWNGRADE_TIER_2, STACK_DOWNGRADE_TIER_3));
 

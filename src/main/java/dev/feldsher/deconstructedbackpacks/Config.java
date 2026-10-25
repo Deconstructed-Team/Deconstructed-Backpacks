@@ -61,6 +61,10 @@ public class Config {
 		public final FilteredUpgradeConfig filterUpgrade = new FilteredUpgradeConfig(9, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Filter Upgrade Settings")
 		public final FilteredUpgradeConfig advancedFilterUpgrade = new FilteredUpgradeConfig(16, 4);
+		@net.minecraftforge.common.config.Config.Comment("Compacting Upgrade Settings")
+		public final FilteredUpgradeConfig compactingUpgrade = new FilteredUpgradeConfig(9, 3);
+		@net.minecraftforge.common.config.Config.Comment("Advanced Compacting Upgrade Settings")
+		public final FilteredUpgradeConfig advancedCompactingUpgrade = new FilteredUpgradeConfig(16, 4);
 		@net.minecraftforge.common.config.Config.Comment("Feeding Upgrade Settings")
 		public final FilteredUpgradeConfig feedingUpgrade = new FilteredUpgradeConfig(9, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Feeding Upgrade Settings")
