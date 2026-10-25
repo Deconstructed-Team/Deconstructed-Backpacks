@@ -1,0 +1,33 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "futuremc"
+    }
+  ],
+  "type": "forge:ore_shaped",
+  "pattern": [
+    " S ",
+    "IBI",
+    " R "
+  ],
+  "key": {
+    "B": {
+      "item": "deconstructedbackpacks:upgrade_base"
+    },
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "R": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    },
+    "S": {
+      "item": "futuremc:stonecutter"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:stonecutter_upgrade"
+  }
+}
