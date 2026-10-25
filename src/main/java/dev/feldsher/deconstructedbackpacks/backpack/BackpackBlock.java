@@ -1,10 +1,9 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
 import dev.feldsher.deconstructedcore.api.IStorageFluidHandler;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidActionResult;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import dev.feldsher.deconstructedcore.util.FluidContainerHelper;
 import java.util.Optional;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedcore.upgrades.jukebox.ServerStorageSoundHandler;
@@ -214,26 +213,23 @@ public class BackpackBlock extends Block {
 		return true;
 	}
 
-	/** A fluid container in hand is emptied into the backpack's tanks, or else filled from them, a bucket at a time. */
+	/** A fluid container in hand is emptied into the backpack's tanks, or else filled from them, one of the stack. */
 	private static boolean tryFluidInteraction(World world, BlockPos pos, EntityPlayer player) {
 		ItemStack heldItem = player.getHeldItemMainhand();
 		TileEntity te = world.getTileEntity(pos);
-		if (heldItem.isEmpty() || FluidUtil.getFluidHandler(heldItem) == null || !(te instanceof BackpackBlockEntity)) {
+		if (heldItem.isEmpty() || FluidUtil.getFluidHandler(ItemHandlerHelper.copyStackWithSize(heldItem, 1)) == null || !(te instanceof BackpackBlockEntity)) {
 			return false;
 		}
 		Optional<IStorageFluidHandler> fluidHandler = ((BackpackBlockEntity) te).getBackpackWrapper().getFluidHandler();
 		if (!fluidHandler.isPresent()) {
 			return false;
 		}
-		IItemHandler playerInventory = new PlayerMainInvWrapper(player.inventory);
-		FluidActionResult resultOfEmptying = FluidUtil.tryEmptyContainerAndStow(heldItem, fluidHandler.get(), playerInventory, Fluid.BUCKET_VOLUME, player, true);
-		if (resultOfEmptying.isSuccess()) {
-			player.setHeldItem(EnumHand.MAIN_HAND, resultOfEmptying.getResult());
-		} else {
-			FluidActionResult resultOfFilling = FluidUtil.tryFillContainerAndStow(heldItem, fluidHandler.get(), playerInventory, Fluid.BUCKET_VOLUME, player, true);
-			if (resultOfFilling.isSuccess()) {
-				player.setHeldItem(EnumHand.MAIN_HAND, resultOfFilling.getResult());
-			}
+		FluidActionResult result = FluidContainerHelper.emptyContainer(heldItem, fluidHandler.get(), Integer.MAX_VALUE, true);
+		if (!result.isSuccess()) {
+			result = FluidContainerHelper.fillContainer(heldItem, fluidHandler.get(), Integer.MAX_VALUE, true);
+		}
+		if (result.isSuccess()) {
+			FluidContainerHelper.settleResult(player, heldItem, result.getResult(), stack -> player.setHeldItem(EnumHand.MAIN_HAND, stack));
 		}
 		return true;
 	}
