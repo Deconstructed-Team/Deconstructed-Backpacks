@@ -1,5 +1,11 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import dev.feldsher.deconstructedcore.api.IStorageFluidHandler;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidActionResult;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
+import java.util.Optional;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedcore.upgrades.jukebox.ServerStorageSoundHandler;
 import net.minecraft.util.text.TextFormatting;
@@ -200,7 +206,35 @@ public class BackpackBlock extends Block {
 			return true;
 		}
 
+		if (tryFluidInteraction(world, pos, player)) {
+			return true;
+		}
+
 		new BackpackContext.Block(pos).open(player);
+		return true;
+	}
+
+	/** A fluid container in hand is emptied into the backpack's tanks, or else filled from them, a bucket at a time. */
+	private static boolean tryFluidInteraction(World world, BlockPos pos, EntityPlayer player) {
+		ItemStack heldItem = player.getHeldItemMainhand();
+		TileEntity te = world.getTileEntity(pos);
+		if (heldItem.isEmpty() || FluidUtil.getFluidHandler(heldItem) == null || !(te instanceof BackpackBlockEntity)) {
+			return false;
+		}
+		Optional<IStorageFluidHandler> fluidHandler = ((BackpackBlockEntity) te).getBackpackWrapper().getFluidHandler();
+		if (!fluidHandler.isPresent()) {
+			return false;
+		}
+		IItemHandler playerInventory = new PlayerMainInvWrapper(player.inventory);
+		FluidActionResult resultOfEmptying = FluidUtil.tryEmptyContainerAndStow(heldItem, fluidHandler.get(), playerInventory, Fluid.BUCKET_VOLUME, player, true);
+		if (resultOfEmptying.isSuccess()) {
+			player.setHeldItem(EnumHand.MAIN_HAND, resultOfEmptying.getResult());
+		} else {
+			FluidActionResult resultOfFilling = FluidUtil.tryFillContainerAndStow(heldItem, fluidHandler.get(), playerInventory, Fluid.BUCKET_VOLUME, player, true);
+			if (resultOfFilling.isSuccess()) {
+				player.setHeldItem(EnumHand.MAIN_HAND, resultOfFilling.getResult());
+			}
+		}
 		return true;
 	}
 

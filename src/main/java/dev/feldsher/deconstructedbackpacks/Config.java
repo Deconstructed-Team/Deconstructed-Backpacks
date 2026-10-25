@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedcore.upgrades.tank.ITankUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.cooking.IAutoCookingUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.cooking.ICookingUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.IUpgradeCountLimitConfig;
@@ -111,6 +112,9 @@ public class Config {
 
 		@net.minecraftforge.common.config.Config.Comment("Advanced Jukebox Upgrade Settings")
 		public final JukeboxUpgradeConfig advancedJukeboxUpgrade = new JukeboxUpgradeConfig(12);
+
+		@net.minecraftforge.common.config.Config.Comment("Tank Upgrade Settings")
+		public final TankUpgradeConfig tankUpgrade = new TankUpgradeConfig();
 
 		@net.minecraftforge.common.config.Config.Comment("Stack Upgrade Settings")
 		public final StackUpgradeSettings stackUpgrade = new StackUpgradeSettings();
@@ -275,6 +279,41 @@ public class Config {
 
 		JukeboxUpgradeConfig(int defaultNumberOfSlots) {
 			numberOfSlots = defaultNumberOfSlots;
+		}
+	}
+
+	public static class TankUpgradeConfig implements ITankUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Capacity in mB the tank upgrade will have per row of storage slots")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 500, max = 20000)
+		public int capacityPerSlotRow = 4000;
+		@net.minecraftforge.common.config.Config.Comment("Ratio that gets applied (multiplies) to inventory stack multiplier before this is applied to tank capacity. Value lower than 1 makes stack multiplier affect the capacity less, higher makes it affect the capacity more. 0 turns off stack multiplier affecting tank capacity")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0, max = 5)
+		public double stackMultiplierRatio = 1;
+		@net.minecraftforge.common.config.Config.Comment("Cooldown between fill/drain actions done on fluid containers in tank slots. Only fills/drains one bucket worth to/from container after this cooldown and then waits again.")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 100)
+		public int autoFillDrainContainerCooldown = 20;
+		@net.minecraftforge.common.config.Config.Comment("How much mB can be transfered in / out per operation. This is a base transfer rate and same as max tank capacity gets multiplied by number of rows in storage and stack multiplier.")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 1000)
+		public int maxInputOutput = 20;
+
+		@Override
+		public int getCapacityPerSlotRow() {
+			return capacityPerSlotRow;
+		}
+
+		@Override
+		public double getStackMultiplierRatio() {
+			return stackMultiplierRatio;
+		}
+
+		@Override
+		public int getAutoFillDrainContainerCooldown() {
+			return autoFillDrainContainerCooldown;
+		}
+
+		@Override
+		public int getMaxInputOutput() {
+			return maxInputOutput;
 		}
 	}
 

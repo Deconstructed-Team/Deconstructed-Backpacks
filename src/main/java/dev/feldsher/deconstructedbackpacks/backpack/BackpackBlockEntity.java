@@ -14,6 +14,8 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
@@ -117,7 +119,9 @@ public class BackpackBlockEntity extends TileEntity implements ITickable {
 
 	@Override
 	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
-		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
+		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+				|| capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && getBackpackWrapper().getFluidHandler().isPresent()
+				|| super.hasCapability(capability, facing);
 	}
 
 	@Nullable
@@ -125,6 +129,10 @@ public class BackpackBlockEntity extends TileEntity implements ITickable {
 	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(getBackpackWrapper().getInventoryForInputOutput());
+		}
+		if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+			IFluidHandler fluidHandler = getBackpackWrapper().getFluidHandler().orElse(null);
+			return fluidHandler == null ? null : CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(fluidHandler);
 		}
 		return super.getCapability(capability, facing);
 	}

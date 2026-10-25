@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedcore.upgrades.tank.TankUpgradeContainer;
+import dev.feldsher.deconstructedcore.upgrades.tank.TankUpgradeWrapper;
 import dev.feldsher.deconstructedcore.upgrades.jukebox.JukeboxUpgradeContainer;
 import dev.feldsher.deconstructedcore.upgrades.jukebox.JukeboxUpgradeWrapper;
 import dev.feldsher.deconstructedcore.upgrades.cooking.AutoCookingUpgradeContainer;
@@ -68,6 +70,7 @@ public class ModUpgradeContainers {
 	public static final UpgradeContainerType<AutoCookingUpgradeWrapper, AutoCookingUpgradeContainer> AUTO_BLASTING_TYPE = new UpgradeContainerType<>(AutoCookingUpgradeContainer::new);
 	public static final UpgradeContainerType<JukeboxUpgradeWrapper, JukeboxUpgradeContainer> JUKEBOX_TYPE = new UpgradeContainerType<>(JukeboxUpgradeContainer::new);
 	public static final UpgradeContainerType<JukeboxUpgradeWrapper, JukeboxUpgradeContainer> ADVANCED_JUKEBOX_TYPE = new UpgradeContainerType<>(JukeboxUpgradeContainer::new);
+	public static final UpgradeContainerType<TankUpgradeWrapper, TankUpgradeContainer> TANK_TYPE = new UpgradeContainerType<>(TankUpgradeContainer::new);
 	public static final UpgradeContainerType<InceptionUpgradeWrapper, InceptionUpgradeContainer> INCEPTION_TYPE = new UpgradeContainerType<>(InceptionUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_BASIC_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_ADVANCED_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
@@ -103,6 +106,7 @@ public class ModUpgradeContainers {
 		register(ModItems.AUTO_BLASTING_UPGRADE, AUTO_BLASTING_TYPE);
 		register(ModItems.JUKEBOX_UPGRADE, JUKEBOX_TYPE);
 		register(ModItems.ADVANCED_JUKEBOX_UPGRADE, ADVANCED_JUKEBOX_TYPE);
+		register(ModItems.TANK_UPGRADE, TANK_TYPE);
 		register(ModItems.INCEPTION_UPGRADE, INCEPTION_TYPE);
 		register(ModItems.REFILL_UPGRADE, REFILL_BASIC_TYPE);
 		register(ModItems.ADVANCED_REFILL_UPGRADE, REFILL_ADVANCED_TYPE);

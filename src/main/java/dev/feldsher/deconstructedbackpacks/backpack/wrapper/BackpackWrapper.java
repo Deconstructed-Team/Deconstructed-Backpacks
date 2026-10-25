@@ -5,6 +5,7 @@ import dev.feldsher.deconstructedbackpacks.api.IInventoryWrapperUpgrade;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackStorage;
 import dev.feldsher.deconstructedbackpacks.init.ModItems;
+import dev.feldsher.deconstructedcore.api.IStorageFluidHandler;
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
 import dev.feldsher.deconstructedcore.common.gui.SortBy;
 import dev.feldsher.deconstructedcore.util.InventorySorter;
@@ -18,6 +19,7 @@ import dev.feldsher.deconstructedcore.settings.nosort.NoSortSettingsCategory;
 import dev.feldsher.deconstructedcore.storage.StorageContents;
 import dev.feldsher.deconstructedcore.upgrades.UpgradeHandler;
 import dev.feldsher.deconstructedcore.upgrades.stack.StackUpgradeItem;
+import dev.feldsher.deconstructedcore.upgrades.tank.TankUpgradeItem;
 import dev.feldsher.deconstructedcore.util.StorageNbt;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,7 +36,7 @@ import java.util.UUID;
  * not here: every stack with the same UUID works on the same ones, and so sees the same backpack.
  * <p>
  * The stack also carries what clients draw it with, its render info, which each stack's wrapper refreshes from the
- * shared contents. Fluids, energy and loot come with the stages that port them.
+ * shared contents. Its tanks are those of its tank upgrades. Energy and loot come with the stages that port them.
  */
 public class BackpackWrapper implements IBackpackWrapper {
 	public static final int DEFAULT_MAIN_COLOR = 0xFF_CC613A;
@@ -369,10 +371,23 @@ public class BackpackWrapper implements IBackpackWrapper {
 		return backpack;
 	}
 
+	/** Changed, the inventory has other slots: it's built again, from the contents, with them. */
 	@Override
 	public void setColumnsTaken(int columnsTaken, boolean hasChanged) {
+		boolean changed = getColumnsTaken() != columnsTaken;
 		StorageNbt.getOrCreateTag(getBackpackStack()).setInteger(StorageNbt.COLUMNS_TAKEN, columnsTaken);
+		if (changed && hasChanged) {
+			getContentsUuid().map(BackpackStorage::getContents).ifPresent(contents -> {
+				contents.removeShared(INVENTORY_HANDLER);
+				contents.removeShared(UPGRADE_PROCESSING_INVENTORY);
+			});
+		}
 		backpackSaveHandler.run();
+	}
+
+	@Override
+	public Optional<IStorageFluidHandler> getFluidHandler() {
+		return getUpgradeHandler().getTypeWrappers(TankUpgradeItem.TYPE).isEmpty() ? Optional.empty() : Optional.of(new BackpackFluidHandler(this));
 	}
 
 	@Override
