@@ -16,5 +16,6 @@ public class PacketHandler {
 		INSTANCE.registerMessage(BackpackContentsMessage.Handler.class, BackpackContentsMessage.class, id++, Side.CLIENT);
 		INSTANCE.registerMessage(InventoryInteractionMessage.Handler.class, InventoryInteractionMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(ToolSwapMessage.Handler.class, ToolSwapMessage.class, id++, Side.SERVER);
+		INSTANCE.registerMessage(BlockPickMessage.Handler.class, BlockPickMessage.class, id++, Side.SERVER);
 	}
 }

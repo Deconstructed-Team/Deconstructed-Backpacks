@@ -77,6 +77,10 @@ public class Config {
 		public final FilteredUpgradeConfig depositUpgrade = new FilteredUpgradeConfig(9, 3);
 		@net.minecraftforge.common.config.Config.Comment("Advanced Deposit Upgrade Settings")
 		public final FilteredUpgradeConfig advancedDepositUpgrade = new FilteredUpgradeConfig(16, 4);
+		@net.minecraftforge.common.config.Config.Comment("Refill Upgrade Settings")
+		public final FilteredUpgradeConfig refillUpgrade = new FilteredUpgradeConfig(6, 3);
+		@net.minecraftforge.common.config.Config.Comment("Advanced Refill Upgrade Settings")
+		public final FilteredUpgradeConfig advancedRefillUpgrade = new FilteredUpgradeConfig(12, 4);
 		@net.minecraftforge.common.config.Config.Comment("Tool Swapper Upgrade Settings")
 		public final FilteredUpgradeConfig toolSwapperUpgrade = new FilteredUpgradeConfig(8, 4);
 		@net.minecraftforge.common.config.Config.Comment("Magnet Upgrade Settings")

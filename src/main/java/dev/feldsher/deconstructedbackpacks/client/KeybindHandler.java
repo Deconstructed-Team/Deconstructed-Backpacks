@@ -1,5 +1,11 @@
 package dev.feldsher.deconstructedbackpacks.client;
 
+import net.minecraftforge.client.event.MouseEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.item.ItemStack;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.entity.EntityPlayerSP;
+import dev.feldsher.deconstructedbackpacks.network.BlockPickMessage;
 import net.minecraft.util.text.TextComponentTranslation;
 import dev.feldsher.deconstructedbackpacks.network.ToolSwapMessage;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
@@ -33,7 +39,8 @@ import org.lwjgl.input.Mouse;
  * The sort key sorts the open backpack, unless the mouse is over the player's inventory, which is left to sorting mods.
  * Both are handled before those mods see the input, so a key they share sorts only one inventory.
  * The inventory interaction key runs the backpack's restock and deposit upgrades on the inventory looked at, and
- * the tool swap key its tool swapper on the block or entity looked at. The keys of the other upgrades come with them.
+ * the tool swap key its tool swapper on the block or entity looked at. Picking a block the player has no item of, out
+ * of creative, asks the backpack's refill upgrades for it. The keys of the other upgrades come with them.
  */
 @Mod.EventBusSubscriber(modid = DeconstructedBackpacks.MOD_ID, value = Side.CLIENT)
 public class KeybindHandler {
@@ -63,6 +70,9 @@ public class KeybindHandler {
 		if (Minecraft.getMinecraft().currentScreen != null) {
 			return;
 		}
+		if (Keyboard.getEventKeyState() && Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isActiveAndMatches(Keyboard.getEventKey())) {
+			handleBlockPick();
+		}
 		if (BACKPACK_OPEN_KEYBIND.isPressed()) {
 			PacketHandler.INSTANCE.sendToServer(new BackpackOpenMessage());
 		} else if (INVENTORY_INTERACTION_KEYBIND.isPressed()) {
@@ -70,6 +80,34 @@ public class KeybindHandler {
 		} else if (TOOL_SWAP_KEYBIND.isPressed()) {
 			sendToolSwapMessage();
 		}
+	}
+
+	/** Fired before the key binding sees the click, which vanilla's pick block then ignores: the player has no such item. */
+	@SubscribeEvent
+	public static void onMouseInput(MouseEvent event) {
+		if (event.isButtonstate() && event.getButton() >= 0 && Minecraft.getMinecraft().currentScreen == null
+				&& Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isActiveAndMatches(event.getButton() - 100)) {
+			handleBlockPick();
+		}
+	}
+
+	private static void handleBlockPick() {
+		Minecraft mc = Minecraft.getMinecraft();
+		EntityPlayerSP player = mc.player;
+		RayTraceResult target = mc.objectMouseOver;
+		if (player == null || player.isCreative() || target == null || target.typeOfHit != RayTraceResult.Type.BLOCK) {
+			return;
+		}
+		BlockPos pos = target.getBlockPos();
+		IBlockState state = mc.world.getBlockState(pos);
+		if (state.getBlock().isAir(state, mc.world, pos)) {
+			return;
+		}
+		ItemStack result = state.getBlock().getPickBlock(state, target, mc.world, pos, player);
+		if (result.isEmpty() || player.inventory.getSlotFor(result) > -1) {
+			return;
+		}
+		PacketHandler.INSTANCE.sendToServer(new BlockPickMessage(result));
 	}
 
 	private static void sendToolSwapMessage() {

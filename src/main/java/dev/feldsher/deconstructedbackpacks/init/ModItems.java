@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.refill.RefillUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.upgrades.toolswapper.ToolSwapperUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.infinity.InfinityUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.compacting.CompactingUpgradeItem;
@@ -89,6 +90,10 @@ public class ModItems {
 	public static final DepositUpgradeItem ADVANCED_DEPOSIT_UPGRADE = item(new DepositUpgradeItem(() -> Config.SERVER.advancedDepositUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_deposit_upgrade");
 
+	public static final RefillUpgradeItem REFILL_UPGRADE = item(new RefillUpgradeItem(() -> Config.SERVER.refillUpgrade.filterSlots, false, false,
+			Config.SERVER.maxUpgradesPerStorageConfig), "refill_upgrade");
+	public static final RefillUpgradeItem ADVANCED_REFILL_UPGRADE = item(new RefillUpgradeItem(() -> Config.SERVER.advancedRefillUpgrade.filterSlots, true, true,
+			Config.SERVER.maxUpgradesPerStorageConfig), "advanced_refill_upgrade");
 	public static final ToolSwapperUpgradeItem TOOL_SWAPPER_UPGRADE = item(new ToolSwapperUpgradeItem(false, false, () -> Config.SERVER.toolSwapperUpgrade.filterSlots,
 			Config.SERVER.maxUpgradesPerStorageConfig), "tool_swapper_upgrade");
 	public static final ToolSwapperUpgradeItem ADVANCED_TOOL_SWAPPER_UPGRADE = item(new ToolSwapperUpgradeItem(true, true, () -> Config.SERVER.toolSwapperUpgrade.filterSlots,
@@ -125,7 +130,7 @@ public class ModItems {
 
 	/** What 1.21 tags as backpack upgrades: the only items a backpack's upgrade slots take. */
 	public static final List<Item> BACKPACK_UPGRADES = Collections.unmodifiableList(Arrays.asList(PICKUP_UPGRADE, ADVANCED_PICKUP_UPGRADE,
-			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, COMPACTING_UPGRADE, ADVANCED_COMPACTING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, TOOL_SWAPPER_UPGRADE, ADVANCED_TOOL_SWAPPER_UPGRADE, EVERLASTING_UPGRADE, INFINITY_UPGRADE, SURVIVAL_INFINITY_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
+			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, COMPACTING_UPGRADE, ADVANCED_COMPACTING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, REFILL_UPGRADE, ADVANCED_REFILL_UPGRADE, TOOL_SWAPPER_UPGRADE, ADVANCED_TOOL_SWAPPER_UPGRADE, EVERLASTING_UPGRADE, INFINITY_UPGRADE, SURVIVAL_INFINITY_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
 			STACK_UPGRADE_TIER_1, STACK_UPGRADE_TIER_2, STACK_UPGRADE_TIER_3, STACK_UPGRADE_TIER_4, STACK_UPGRADE_OMEGA_TIER,
 			STACK_DOWNGRADE_TIER_1, STACK_DOWNGRADE_TIER_2, STACK_DOWNGRADE_TIER_3));
 

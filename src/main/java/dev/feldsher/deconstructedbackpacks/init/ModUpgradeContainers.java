@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.refill.RefillUpgradeWrapper;
+import dev.feldsher.deconstructedbackpacks.upgrades.refill.RefillUpgradeContainer;
 import dev.feldsher.deconstructedbackpacks.upgrades.toolswapper.ToolSwapperUpgradeWrapper;
 import dev.feldsher.deconstructedbackpacks.upgrades.toolswapper.ToolSwapperUpgradeContainer;
 import dev.feldsher.deconstructedcore.upgrades.compacting.CompactingUpgradeWrapper;
@@ -38,6 +40,8 @@ public class ModUpgradeContainers {
 	public static final UpgradeContainerType<DepositUpgradeWrapper, DepositUpgradeContainer> DEPOSIT_BASIC_TYPE = new UpgradeContainerType<>(DepositUpgradeContainer::new);
 	public static final UpgradeContainerType<DepositUpgradeWrapper, DepositUpgradeContainer> DEPOSIT_ADVANCED_TYPE = new UpgradeContainerType<>(DepositUpgradeContainer::new);
 
+	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_BASIC_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
+	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_ADVANCED_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
 	public static final UpgradeContainerType<ToolSwapperUpgradeWrapper, ToolSwapperUpgradeContainer> TOOL_SWAPPER_TYPE = new UpgradeContainerType<>(ToolSwapperUpgradeContainer::new);
 
 	public static final UpgradeContainerType<MagnetUpgradeWrapper, MagnetUpgradeContainer> MAGNET_BASIC_TYPE = new UpgradeContainerType<>(MagnetUpgradeContainer::new);
@@ -58,6 +62,8 @@ public class ModUpgradeContainers {
 		register(ModItems.ADVANCED_RESTOCK_UPGRADE, RESTOCK_ADVANCED_TYPE);
 		register(ModItems.DEPOSIT_UPGRADE, DEPOSIT_BASIC_TYPE);
 		register(ModItems.ADVANCED_DEPOSIT_UPGRADE, DEPOSIT_ADVANCED_TYPE);
+		register(ModItems.REFILL_UPGRADE, REFILL_BASIC_TYPE);
+		register(ModItems.ADVANCED_REFILL_UPGRADE, REFILL_ADVANCED_TYPE);
 		register(ModItems.ADVANCED_TOOL_SWAPPER_UPGRADE, TOOL_SWAPPER_TYPE);
 		register(ModItems.MAGNET_UPGRADE, MAGNET_BASIC_TYPE);
 		register(ModItems.ADVANCED_MAGNET_UPGRADE, MAGNET_ADVANCED_TYPE);
