@@ -3,6 +3,8 @@ package dev.feldsher.deconstructedbackpacks.backpack.wrapper;
 import net.minecraftforge.energy.IEnergyStorage;
 import dev.feldsher.deconstructedcore.upgrades.battery.BatteryUpgradeItem;
 import dev.feldsher.deconstructedcore.inventory.IItemHandlerSimpleInserter;
+import dev.feldsher.deconstructedbackpacks.api.IEnergyStorageUpgradeWrapper;
+import dev.feldsher.deconstructedbackpacks.api.IFluidHandlerWrapperUpgrade;
 import dev.feldsher.deconstructedbackpacks.api.IInventoryWrapperUpgrade;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackStorage;
@@ -56,6 +58,8 @@ public class BackpackWrapper implements IBackpackWrapper {
 	private static final String UPGRADE_HANDLER = "upgrades";
 	private static final String SETTINGS_HANDLER = "settings";
 	private static final String UPGRADE_PROCESSING_INVENTORY = "upgradeProcessingInventory";
+	private static final String FLUID_HANDLER = "fluidHandler";
+	private static final String ENERGY_STORAGE = "energyStorage";
 
 	@Nullable
 	private UpgradeHandler dummyUpgradeHandler = null;
@@ -121,7 +125,10 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Override
 	public void refreshInventoryForUpgradeProcessing() {
 		if (getContentsUuid().isPresent()) {
-			getContents().removeShared(UPGRADE_PROCESSING_INVENTORY);
+			StorageContents contents = getContents();
+			contents.removeShared(UPGRADE_PROCESSING_INVENTORY);
+			contents.removeShared(FLUID_HANDLER);
+			contents.removeShared(ENERGY_STORAGE);
 		}
 	}
 
@@ -383,19 +390,46 @@ public class BackpackWrapper implements IBackpackWrapper {
 			getContentsUuid().map(BackpackStorage::getContents).ifPresent(contents -> {
 				contents.removeShared(INVENTORY_HANDLER);
 				contents.removeShared(UPGRADE_PROCESSING_INVENTORY);
+				contents.removeShared(FLUID_HANDLER);
+				contents.removeShared(ENERGY_STORAGE);
 			});
 		}
 		backpackSaveHandler.run();
 	}
 
+	/** The battery's, as each energy wrapping upgrade, as inception, wraps it in turn; made again when upgrades change. */
 	@Override
 	public Optional<IEnergyStorage> getEnergyStorage() {
-		return getUpgradeHandler().getTypeWrappers(BatteryUpgradeItem.TYPE).stream().findFirst().map(IEnergyStorage.class::cast);
+		if (!getContentsUuid().isPresent()) {
+			return Optional.empty();
+		}
+		Optional<IEnergyStorage> energyStorage = getContents().getShared(ENERGY_STORAGE, () -> {
+			IEnergyStorage wrapped = getUpgradeHandler().getTypeWrappers(BatteryUpgradeItem.TYPE).stream().findFirst().map(IEnergyStorage.class::cast).orElse(null);
+			for (IEnergyStorageUpgradeWrapper upgrade : getUpgradeHandler().getWrappersThatImplementFromMainStorage(IEnergyStorageUpgradeWrapper.class)) {
+				wrapped = upgrade.wrapStorage(wrapped);
+			}
+			return Optional.ofNullable(wrapped);
+		});
+		return energyStorage.filter(storage -> storage.getMaxEnergyStored() > 0);
 	}
 
+	/**
+	 * The tanks', as each fluid wrapping upgrade, as inception, wraps them in turn; made again when upgrades change.
+	 * None while there are no tanks, in the backpacks inside either.
+	 */
 	@Override
 	public Optional<IStorageFluidHandler> getFluidHandler() {
-		return getUpgradeHandler().getTypeWrappers(TankUpgradeItem.TYPE).isEmpty() ? Optional.empty() : Optional.of(new BackpackFluidHandler(this));
+		if (!getContentsUuid().isPresent()) {
+			return Optional.empty();
+		}
+		Optional<IStorageFluidHandler> fluidHandler = getContents().getShared(FLUID_HANDLER, () -> {
+			IStorageFluidHandler wrapped = getUpgradeHandler().getTypeWrappers(TankUpgradeItem.TYPE).isEmpty() ? null : new BackpackFluidHandler(this);
+			for (IFluidHandlerWrapperUpgrade upgrade : getUpgradeHandler().getWrappersThatImplementFromMainStorage(IFluidHandlerWrapperUpgrade.class)) {
+				wrapped = upgrade.wrapHandler(wrapped);
+			}
+			return Optional.ofNullable(wrapped);
+		});
+		return fluidHandler.filter(handler -> handler.getTankProperties().length > 0);
 	}
 
 	@Override

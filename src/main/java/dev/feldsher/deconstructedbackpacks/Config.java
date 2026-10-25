@@ -147,6 +147,9 @@ public class Config {
 			}
 		};
 
+		@net.minecraftforge.common.config.Config.Comment("Turns on/off item fluid handler of backpack in its item form. There are some dupe bugs caused by default fluid handling implementation that manifest when backpack is drained / filled in its item form in another mod's tank and the only way to prevent them is disallowing drain/fill in item form altogether")
+		public boolean itemFluidHandlerEnabled = true;
+
 		@net.minecraftforge.common.config.Config.Comment("List of blocks that inventory interaction upgrades can't interact with - e.g. \"minecraft:shulker_box\"")
 		public String[] noInteractionBlocks = {};
 
