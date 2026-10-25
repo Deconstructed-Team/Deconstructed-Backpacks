@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedcore.upgrades.xppump.XpPumpUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.pump.PumpUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.tank.TankUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.jukebox.JukeboxUpgradeItem;
@@ -117,6 +118,7 @@ public class ModItems {
 	public static final TankUpgradeItem TANK_UPGRADE = item(new TankUpgradeItem(Config.SERVER.tankUpgrade, Config.SERVER.maxUpgradesPerStorageConfig), "tank_upgrade");
 	public static final PumpUpgradeItem PUMP_UPGRADE = item(new PumpUpgradeItem(false, true, Config.SERVER.pumpUpgrade, Config.SERVER.maxUpgradesPerStorageConfig), "pump_upgrade");
 	public static final PumpUpgradeItem ADVANCED_PUMP_UPGRADE = item(new PumpUpgradeItem(true, true, Config.SERVER.pumpUpgrade, Config.SERVER.maxUpgradesPerStorageConfig), "advanced_pump_upgrade");
+	public static final XpPumpUpgradeItem XP_PUMP_UPGRADE = item(new XpPumpUpgradeItem(Config.SERVER.xpPumpUpgrade, Config.SERVER.maxUpgradesPerStorageConfig), "xp_pump_upgrade");
 	public static final InceptionUpgradeItem INCEPTION_UPGRADE = item(new InceptionUpgradeItem(Config.SERVER.maxUpgradesPerStorageConfig), "inception_upgrade");
 	public static final RefillUpgradeItem REFILL_UPGRADE = item(new RefillUpgradeItem(() -> Config.SERVER.refillUpgrade.filterSlots, false, false,
 			Config.SERVER.maxUpgradesPerStorageConfig), "refill_upgrade");
@@ -158,7 +160,7 @@ public class ModItems {
 
 	/** What 1.21 tags as backpack upgrades: the only items a backpack's upgrade slots take. */
 	public static final List<Item> BACKPACK_UPGRADES = Collections.unmodifiableList(Arrays.asList(PICKUP_UPGRADE, ADVANCED_PICKUP_UPGRADE,
-			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, COMPACTING_UPGRADE, ADVANCED_COMPACTING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, REFILL_UPGRADE, ADVANCED_REFILL_UPGRADE, INCEPTION_UPGRADE, CRAFTING_UPGRADE, STONECUTTER_UPGRADE, ANVIL_UPGRADE, SMITHING_UPGRADE, SMELTING_UPGRADE, AUTO_SMELTING_UPGRADE, SMOKING_UPGRADE, AUTO_SMOKING_UPGRADE, BLASTING_UPGRADE, AUTO_BLASTING_UPGRADE, JUKEBOX_UPGRADE, ADVANCED_JUKEBOX_UPGRADE, TANK_UPGRADE, PUMP_UPGRADE, ADVANCED_PUMP_UPGRADE, TOOL_SWAPPER_UPGRADE, ADVANCED_TOOL_SWAPPER_UPGRADE, EVERLASTING_UPGRADE, INFINITY_UPGRADE, SURVIVAL_INFINITY_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
+			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, COMPACTING_UPGRADE, ADVANCED_COMPACTING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, REFILL_UPGRADE, ADVANCED_REFILL_UPGRADE, INCEPTION_UPGRADE, CRAFTING_UPGRADE, STONECUTTER_UPGRADE, ANVIL_UPGRADE, SMITHING_UPGRADE, SMELTING_UPGRADE, AUTO_SMELTING_UPGRADE, SMOKING_UPGRADE, AUTO_SMOKING_UPGRADE, BLASTING_UPGRADE, AUTO_BLASTING_UPGRADE, JUKEBOX_UPGRADE, ADVANCED_JUKEBOX_UPGRADE, TANK_UPGRADE, PUMP_UPGRADE, ADVANCED_PUMP_UPGRADE, XP_PUMP_UPGRADE, TOOL_SWAPPER_UPGRADE, ADVANCED_TOOL_SWAPPER_UPGRADE, EVERLASTING_UPGRADE, INFINITY_UPGRADE, SURVIVAL_INFINITY_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
 			STACK_UPGRADE_TIER_1, STACK_UPGRADE_TIER_2, STACK_UPGRADE_TIER_3, STACK_UPGRADE_TIER_4, STACK_UPGRADE_OMEGA_TIER,
 			STACK_DOWNGRADE_TIER_1, STACK_DOWNGRADE_TIER_2, STACK_DOWNGRADE_TIER_3));
 

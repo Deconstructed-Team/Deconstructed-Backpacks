@@ -1,0 +1,26 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "RER",
+    "CPC",
+    "RER"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:experience_bottle"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    },
+    "P": {
+      "item": "deconstructedbackpacks:advanced_pump_upgrade"
+    },
+    "R": {
+      "type": "forge:ore_dict",
+      "ore": "dustRedstone"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:xp_pump_upgrade"
+  }
+}

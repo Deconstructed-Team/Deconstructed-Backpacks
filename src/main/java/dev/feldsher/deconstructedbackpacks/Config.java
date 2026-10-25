@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedcore.upgrades.xppump.IXpPumpUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.pump.IPumpUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.tank.ITankUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.cooking.IAutoCookingUpgradeConfig;
@@ -119,6 +120,9 @@ public class Config {
 
 		@net.minecraftforge.common.config.Config.Comment("Pump Upgrade Settings")
 		public final PumpUpgradeConfig pumpUpgrade = new PumpUpgradeConfig();
+
+		@net.minecraftforge.common.config.Config.Comment("Xp Pump Upgrade Settings")
+		public final XpPumpUpgradeConfig xpPumpUpgrade = new XpPumpUpgradeConfig();
 
 		@net.minecraftforge.common.config.Config.Comment("Stack Upgrade Settings")
 		public final StackUpgradeSettings stackUpgrade = new StackUpgradeSettings();
@@ -345,6 +349,24 @@ public class Config {
 		@Override
 		public double getStackMultiplierRatio() {
 			return stackMultiplierRatio;
+		}
+	}
+
+	public static class XpPumpUpgradeConfig implements IXpPumpUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Whether xp pump can mend items with mending. Set false here to turn off the feature altogether.")
+		public boolean mendingOn = true;
+		@net.minecraftforge.common.config.Config.Comment("How many experience points at a maximum would be used to mend an item per operation (every 5 ticks and 1 xp point usually translates to 2 damage repaired).")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 20)
+		public int maxXpPointsPerMending = 5;
+
+		@Override
+		public boolean isMendingOn() {
+			return mendingOn;
+		}
+
+		@Override
+		public int getMaxXpPointsPerMending() {
+			return maxXpPointsPerMending;
 		}
 	}
 
