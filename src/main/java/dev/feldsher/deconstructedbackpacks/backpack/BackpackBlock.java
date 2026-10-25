@@ -1,5 +1,9 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.Style;
+import dev.feldsher.deconstructedcore.upgrades.infinity.InfinityUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.upgrades.everlasting.EverlastingUpgradeItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.Explosion;
@@ -185,12 +189,24 @@ public class BackpackBlock extends Block {
 		}
 
 		if (player.isSneaking() && player.getHeldItemMainhand().isEmpty()) {
+			if (lacksInfinityPermission(world, pos, player)) {
+				player.sendStatusMessage(new TextComponentTranslation("gui.deconstructedbackpacks.status.infinity_upgrade_only_admin_pickup")
+						.setStyle(new Style().setColor(TextFormatting.RED)), true);
+				return true;
+			}
 			putInPlayersHandAndRemove(state, world, pos, player);
 			return true;
 		}
 
 		new BackpackContext.Block(pos).open(player);
 		return true;
+	}
+
+	/** An infinity upgrade's backpack is picked up and broken only by players with its permission level. */
+	public static boolean lacksInfinityPermission(World world, BlockPos pos, EntityPlayer player) {
+		TileEntity te = world.getTileEntity(pos);
+		return te instanceof BackpackBlockEntity && ((BackpackBlockEntity) te).getBackpackWrapper().getUpgradeHandler().getTypeWrappers(InfinityUpgradeItem.TYPE)
+				.stream().anyMatch(w -> !player.canUseCommand(w.getPermissionLevel(), ""));
 	}
 
 	private static void putInPlayersHandAndRemove(IBlockState state, World world, BlockPos pos, EntityPlayer player) {

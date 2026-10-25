@@ -1,5 +1,10 @@
 package dev.feldsher.deconstructedbackpacks.common;
 
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.Style;
+import net.minecraftforge.event.world.BlockEvent;
+import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlock;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.settings.BackpackMainSettingsCategory;
@@ -48,6 +53,15 @@ public class CommonEventHandler {
 	}
 
 	private CommonEventHandler() {}
+
+	@SubscribeEvent
+	public static void onBlockBreak(BlockEvent.BreakEvent event) {
+		if (event.getState().getBlock() instanceof BackpackBlock && BackpackBlock.lacksInfinityPermission(event.getWorld(), event.getPos(), event.getPlayer())) {
+			event.setCanceled(true);
+			event.getPlayer().sendStatusMessage(new TextComponentTranslation("gui.deconstructedbackpacks.status.infinity_upgrade_only_admin_break")
+					.setStyle(new Style().setColor(TextFormatting.RED)), true);
+		}
+	}
 
 	/**
 	 * An item entity the player walks over goes to their backpacks' pickup upgrades first. When they take any of it,

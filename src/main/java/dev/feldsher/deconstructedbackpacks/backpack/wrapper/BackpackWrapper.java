@@ -363,11 +363,21 @@ public class BackpackWrapper implements IBackpackWrapper {
 		backpackSaveHandler.run();
 	}
 
-	/** Around the slots that settings leave out of sorting, and the memorized slots, which keep what they remember. */
+	/**
+	 * Around the slots that settings leave out of sorting, the memorized slots, which keep what they remember, and the
+	 * infinite ones, whose items can't be moved.
+	 */
 	@Override
 	public void sort() {
 		Set<Integer> slotIndexesExcludedFromSort = new HashSet<>(getSettingsHandler().getTypeCategory(NoSortSettingsCategory.class).getNoSortSlots());
 		slotIndexesExcludedFromSort.addAll(getSettingsHandler().getTypeCategory(MemorySettingsCategory.class).getSlotIndexes());
+		InventoryHandler inventoryHandler = getInventoryHandler();
+		slotIndexesExcludedFromSort.addAll(inventoryHandler.getInventoryPartitioner().getNoSortSlots());
+		for (int slot = 0; slot < inventoryHandler.getSlots(); slot++) {
+			if (inventoryHandler.isInfinite(slot)) {
+				slotIndexesExcludedFromSort.add(slot);
+			}
+		}
 		InventorySorter.sortHandler(getInventoryHandler(), InventorySorter.getComparator(getSortBy()), slotIndexesExcludedFromSort);
 	}
 
