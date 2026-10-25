@@ -1,0 +1,32 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "ADA",
+    "IBI",
+    " C "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:anvil",
+      "data": 0
+    },
+    "B": {
+      "item": "deconstructedbackpacks:upgrade_base"
+    },
+    "C": {
+      "type": "forge:ore_dict",
+      "ore": "chestWood"
+    },
+    "D": {
+      "type": "forge:ore_dict",
+      "ore": "gemDiamond"
+    },
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:anvil_upgrade"
+  }
+}

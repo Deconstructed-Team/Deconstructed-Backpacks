@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.init;
 
+import dev.feldsher.deconstructedbackpacks.upgrades.anvil.AnvilUpgradeWrapper;
+import dev.feldsher.deconstructedbackpacks.upgrades.anvil.AnvilUpgradeContainer;
 import dev.feldsher.deconstructedcore.upgrades.stonecutter.StonecutterUpgradeWrapper;
 import dev.feldsher.deconstructedcore.upgrades.stonecutter.StonecutterUpgradeContainer;
 import dev.feldsher.deconstructedcore.upgrades.crafting.CraftingUpgradeWrapper;
@@ -48,6 +50,7 @@ public class ModUpgradeContainers {
 
 	public static final UpgradeContainerType<CraftingUpgradeWrapper, CraftingUpgradeContainer> CRAFTING_TYPE = new UpgradeContainerType<>(CraftingUpgradeContainer::new);
 	public static final UpgradeContainerType<StonecutterUpgradeWrapper, StonecutterUpgradeContainer> STONECUTTER_TYPE = new UpgradeContainerType<>(StonecutterUpgradeContainer::new);
+	public static final UpgradeContainerType<AnvilUpgradeWrapper, AnvilUpgradeContainer> ANVIL_TYPE = new UpgradeContainerType<>(AnvilUpgradeContainer::new);
 	public static final UpgradeContainerType<InceptionUpgradeWrapper, InceptionUpgradeContainer> INCEPTION_TYPE = new UpgradeContainerType<>(InceptionUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_BASIC_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
 	public static final UpgradeContainerType<RefillUpgradeWrapper, RefillUpgradeContainer> REFILL_ADVANCED_TYPE = new UpgradeContainerType<>(RefillUpgradeContainer::new);
@@ -73,6 +76,7 @@ public class ModUpgradeContainers {
 		register(ModItems.ADVANCED_DEPOSIT_UPGRADE, DEPOSIT_ADVANCED_TYPE);
 		register(ModItems.CRAFTING_UPGRADE, CRAFTING_TYPE);
 		register(ModItems.STONECUTTER_UPGRADE, STONECUTTER_TYPE);
+		register(ModItems.ANVIL_UPGRADE, ANVIL_TYPE);
 		register(ModItems.INCEPTION_UPGRADE, INCEPTION_TYPE);
 		register(ModItems.REFILL_UPGRADE, REFILL_BASIC_TYPE);
 		register(ModItems.ADVANCED_REFILL_UPGRADE, REFILL_ADVANCED_TYPE);
