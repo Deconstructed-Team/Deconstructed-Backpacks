@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedcore.upgrades.pump.IPumpUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.tank.ITankUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.cooking.IAutoCookingUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.cooking.ICookingUpgradeConfig;
@@ -115,6 +116,9 @@ public class Config {
 
 		@net.minecraftforge.common.config.Config.Comment("Tank Upgrade Settings")
 		public final TankUpgradeConfig tankUpgrade = new TankUpgradeConfig();
+
+		@net.minecraftforge.common.config.Config.Comment("Pump Upgrade Settings")
+		public final PumpUpgradeConfig pumpUpgrade = new PumpUpgradeConfig();
 
 		@net.minecraftforge.common.config.Config.Comment("Stack Upgrade Settings")
 		public final StackUpgradeSettings stackUpgrade = new StackUpgradeSettings();
@@ -314,6 +318,33 @@ public class Config {
 		@Override
 		public int getMaxInputOutput() {
 			return maxInputOutput;
+		}
+	}
+
+	public static class PumpUpgradeConfig implements IPumpUpgradeConfig {
+		@net.minecraftforge.common.config.Config.Comment("Number of fluid filter slots")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 20)
+		public int filterSlots = 4;
+		@net.minecraftforge.common.config.Config.Comment("How much mB can be transfered in / out per operation. This is a base transfer rate that gets multiplied by number of rows in storage and stack multiplier.")
+		@net.minecraftforge.common.config.Config.RangeInt(min = 1, max = 1000)
+		public int maxInputOutput = 20;
+		@net.minecraftforge.common.config.Config.Comment("Ratio that gets applied (multiplies) to inventory stack multiplier before this is applied to max input/output value. Value lower than 1 makes stack multiplier affect the capacity less, higher makes it affect the capacity more. 0 turns off stack multiplier affecting input/output")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0, max = 5)
+		public double stackMultiplierRatio = 1;
+
+		@Override
+		public int getFilterSlots() {
+			return filterSlots;
+		}
+
+		@Override
+		public int getMaxInputOutput() {
+			return maxInputOutput;
+		}
+
+		@Override
+		public double getStackMultiplierRatio() {
+			return stackMultiplierRatio;
 		}
 	}
 

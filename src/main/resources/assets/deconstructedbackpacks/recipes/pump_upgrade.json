@@ -1,0 +1,29 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "GUG",
+    "PBS",
+    "GUG"
+  ],
+  "key": {
+    "B": {
+      "item": "deconstructedbackpacks:upgrade_base"
+    },
+    "G": {
+      "type": "forge:ore_dict",
+      "ore": "blockGlass"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "S": {
+      "item": "minecraft:sticky_piston"
+    },
+    "U": {
+      "item": "minecraft:bucket"
+    }
+  },
+  "result": {
+    "item": "deconstructedbackpacks:pump_upgrade"
+  }
+}

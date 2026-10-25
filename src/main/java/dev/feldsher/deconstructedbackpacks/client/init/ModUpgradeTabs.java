@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.client.init;
 
+import dev.feldsher.deconstructedcore.upgrades.pump.PumpUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.tank.TankInventoryPart;
 import dev.feldsher.deconstructedcore.upgrades.tank.TankUpgradeTab;
 import dev.feldsher.deconstructedcore.upgrades.jukebox.JukeboxUpgradeTab;
@@ -72,6 +73,8 @@ public class ModUpgradeTabs {
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.ADVANCED_JUKEBOX_TYPE, (uc, p, s) -> new JukeboxUpgradeTab.Advanced(uc, p, s, Config.SERVER.advancedJukeboxUpgrade.slotsInRow));
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.TANK_TYPE, TankUpgradeTab::new);
 		UpgradeGuiManager.registerInventoryPart(ModUpgradeContainers.TANK_TYPE, TankInventoryPart::new);
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.PUMP_TYPE, PumpUpgradeTab.Basic::new);
+		UpgradeGuiManager.registerTab(ModUpgradeContainers.ADVANCED_PUMP_TYPE, PumpUpgradeTab.Advanced::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.INCEPTION_TYPE, InceptionUpgradeTab::new);
 		UpgradeGuiManager.registerTab(ModUpgradeContainers.REFILL_BASIC_TYPE, (uc, p, s) ->
 				new RefillUpgradeTab.Basic(uc, p, s, Config.SERVER.refillUpgrade.slotsInRow));
