@@ -24,6 +24,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.client.settings.KeyModifier;
+import dev.feldsher.deconstructedbackpacks.network.UpgradeToggleMessage;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -39,7 +41,8 @@ import org.lwjgl.input.Mouse;
  * The sort key sorts the open backpack, unless the mouse is over the player's inventory, which is left to sorting mods.
  * Both are handled before those mods see the input, so a key they share sorts only one inventory.
  * The inventory interaction key runs the backpack's restock and deposit upgrades on the inventory looked at, and
- * the tool swap key its tool swapper on the block or entity looked at. Picking a block the player has no item of, out
+ * the tool swap key its tool swapper on the block or entity looked at; the toggle upgrade keys switch its upgrade in
+ * that slot on or off. Picking a block the player has no item of, out
  * of creative, asks the backpack's refill upgrades for it. The keys of the other upgrades come with them.
  */
 @Mod.EventBusSubscriber(modid = DeconstructedBackpacks.MOD_ID, value = Side.CLIENT)
@@ -55,6 +58,14 @@ public class KeybindHandler {
 			KeyConflictContext.IN_GAME, Keyboard.KEY_NONE, KEYBIND_CATEGORY);
 	public static final KeyBinding SORT_KEYBIND = new KeyBinding("keybind.deconstructedbackpacks.sort",
 			KeyConflictContext.GUI, MIDDLE_MOUSE_BUTTON - 100, KEYBIND_CATEGORY);
+	/** By upgrade slot. */
+	public static final KeyBinding[] UPGRADE_SLOT_TOGGLE_KEYBINDS = {
+			new KeyBinding("keybind.deconstructedbackpacks.toggle_upgrade_1", KeyConflictContext.IN_GAME, KeyModifier.ALT, Keyboard.KEY_Z, KEYBIND_CATEGORY),
+			new KeyBinding("keybind.deconstructedbackpacks.toggle_upgrade_2", KeyConflictContext.IN_GAME, KeyModifier.ALT, Keyboard.KEY_X, KEYBIND_CATEGORY),
+			new KeyBinding("keybind.deconstructedbackpacks.toggle_upgrade_3", KeyConflictContext.IN_GAME, Keyboard.KEY_NONE, KEYBIND_CATEGORY),
+			new KeyBinding("keybind.deconstructedbackpacks.toggle_upgrade_4", KeyConflictContext.IN_GAME, Keyboard.KEY_NONE, KEYBIND_CATEGORY),
+			new KeyBinding("keybind.deconstructedbackpacks.toggle_upgrade_5", KeyConflictContext.IN_GAME, Keyboard.KEY_NONE, KEYBIND_CATEGORY)
+	};
 
 	private KeybindHandler() {}
 
@@ -63,6 +74,9 @@ public class KeybindHandler {
 		ClientRegistry.registerKeyBinding(INVENTORY_INTERACTION_KEYBIND);
 		ClientRegistry.registerKeyBinding(TOOL_SWAP_KEYBIND);
 		ClientRegistry.registerKeyBinding(SORT_KEYBIND);
+		for (KeyBinding keyBinding : UPGRADE_SLOT_TOGGLE_KEYBINDS) {
+			ClientRegistry.registerKeyBinding(keyBinding);
+		}
 	}
 
 	@SubscribeEvent
@@ -79,6 +93,12 @@ public class KeybindHandler {
 			sendInteractWithInventoryMessage();
 		} else if (TOOL_SWAP_KEYBIND.isPressed()) {
 			sendToolSwapMessage();
+		} else {
+			for (int upgradeSlot = 0; upgradeSlot < UPGRADE_SLOT_TOGGLE_KEYBINDS.length; upgradeSlot++) {
+				if (UPGRADE_SLOT_TOGGLE_KEYBINDS[upgradeSlot].isPressed()) {
+					PacketHandler.INSTANCE.sendToServer(new UpgradeToggleMessage(upgradeSlot));
+				}
+			}
 		}
 	}
 
