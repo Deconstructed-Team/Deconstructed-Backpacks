@@ -33,12 +33,13 @@ public class AnvilUpgradeTab extends UpgradeSettingsTab<AnvilUpgradeContainer> {
 		super(upgradeContainer, position, screen, SBPTranslationHelper.INSTANCE.translUpgrade("anvil"),
 				new TextComponentTranslation(SBPTranslationHelper.INSTANCE.translUpgradeKey("anvil") + TranslationHelper.TOOLTIP_SUFFIX));
 		openTabDimension = new Dimension(103, 92);
-		itemNameTextBox = new TextBox(new Position(x + 5, y + 25), new Dimension(90, 14)) {
+		itemNameTextBox = new TextBox(new Position(x + 6, y + 27), new Dimension(87, 12)) {
+			/** Its background around it as vanilla's anvil has it: the text 3 in from the left and 4 down from the top. */
 			@Override
 			protected void renderBg(Minecraft minecraft, int mouseX, int mouseY) {
 				super.renderBg(minecraft, mouseX, mouseY);
 				TextureBlitData background = getContainer().getSlots().get(0).getHasStack() ? EDIT_ITEM_NAME_BACKGROUND : EDIT_ITEM_NAME_BACKGROUND_DISABLED;
-				GuiHelper.blit(getX() - 2, getY() - 2, background, getWidth() + 4, getHeight() + 2);
+				GuiHelper.blit(getX() - 3, getY() - 4, background, getWidth() + 7, 16);
 			}
 		};
 		itemNameTextBox.setTextColor(-1);
