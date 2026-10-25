@@ -15,11 +15,34 @@ import net.minecraft.network.play.server.SPacketSetSlot;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import dev.feldsher.deconstructedcore.api.IStorageWrapper;
+import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
+
+import java.util.Optional;
 
 /**
- * Where an open backpack is. Sub-backpack and another player's backpack contexts come with the stages that port them.
+ * Where an open backpack is: carried, placed, or in a storage slot of either, a sub-backpack. Another player's
+ * backpack comes with the stage that ports it.
  */
 public abstract class BackpackContext {
+	public static final String SUBBACKPACK_DISPLAY_NAME_PREFIX = "... > ";
+
+	/** The backpack this one is open from inside of, if it is. */
+	public Optional<IStorageWrapper> getParentBackpackWrapper(EntityPlayer player) {
+		return Optional.empty();
+	}
+
+	/** The backpack in the given storage slot of this one. */
+	public abstract BackpackContext getSubBackpackContext(int subBackpackSlotIndex);
+
+	/** The backpack this one is in, or this one itself. */
+	public BackpackContext getParentBackpackContext() {
+		return this;
+	}
+
+	public String getDisplayName(EntityPlayer player) {
+		return getBackpackWrapper(player).getDisplayName();
+	}
 
 	public abstract boolean shouldLockBackpackSlot(EntityPlayer player);
 
@@ -53,7 +76,7 @@ public abstract class BackpackContext {
 
 	/** A backpack in the player's inventory, by its slot there: 0-35 the main inventory, 36-39 armor, 40 the offhand. */
 	public static class Item extends BackpackContext {
-		private final int backpackSlotIndex;
+		protected final int backpackSlotIndex;
 
 		public Item(int backpackSlotIndex) {
 			this.backpackSlotIndex = backpackSlotIndex;
@@ -85,21 +108,89 @@ public abstract class BackpackContext {
 		}
 
 		@Override
+		public BackpackContext getSubBackpackContext(int subBackpackSlotIndex) {
+			return new ItemSubBackpack(backpackSlotIndex, subBackpackSlotIndex);
+		}
+
+		@Override
 		protected void openScreen(EntityPlayer player, boolean settings) {
 			if (player instanceof EntityPlayerMP) {
-				EntityPlayerMP playerMP = (EntityPlayerMP) player;
-				ItemStack backpack = getBackpackStack(player);
-				sendContents(playerMP, BackpackWrapper.fromStack(backpack));
-				// windowId -2: a slot of the player's inventory, whichever container is open
-				playerMP.connection.sendPacket(new SPacketSetSlot(-2, backpackSlotIndex, backpack));
+				sendBackpack((EntityPlayerMP) player);
 			}
 			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.ITEM_BACKPACK_SETTINGS : GuiHandler.ITEM_BACKPACK, player.world, backpackSlotIndex, 0, 0);
 		}
+
+		protected void sendBackpack(EntityPlayerMP player) {
+			ItemStack backpack = getBackpackStack(player);
+			sendContents(player, BackpackWrapper.fromStack(backpack));
+			// windowId -2: a slot of the player's inventory, whichever container is open
+			player.connection.sendPacket(new SPacketSetSlot(-2, backpackSlotIndex, backpack));
+		}
+	}
+
+	/** A backpack in a storage slot of a carried one. */
+	public static class ItemSubBackpack extends Item {
+		private final int subBackpackSlotIndex;
+
+		public ItemSubBackpack(int backpackSlotIndex, int subBackpackSlotIndex) {
+			super(backpackSlotIndex);
+			this.subBackpackSlotIndex = subBackpackSlotIndex;
+		}
+
+		@Override
+		public Optional<IStorageWrapper> getParentBackpackWrapper(EntityPlayer player) {
+			return Optional.of(super.getBackpackWrapper(player));
+		}
+
+		@Override
+		public IBackpackWrapper getBackpackWrapper(EntityPlayer player) {
+			return BackpackWrapper.fromStack(getSubBackpackStack(super.getBackpackWrapper(player), subBackpackSlotIndex));
+		}
+
+		@Override
+		public boolean canInteractWith(EntityPlayer player) {
+			return super.canInteractWith(player) && isSubBackpack(super.getBackpackWrapper(player), subBackpackSlotIndex);
+		}
+
+		@Override
+		public BackpackContext getParentBackpackContext() {
+			return new Item(backpackSlotIndex);
+		}
+
+		@Override
+		public String getDisplayName(EntityPlayer player) {
+			return SUBBACKPACK_DISPLAY_NAME_PREFIX + super.getDisplayName(player);
+		}
+
+		@Override
+		protected void openScreen(EntityPlayer player, boolean settings) {
+			if (player instanceof EntityPlayerMP) {
+				sendBackpack((EntityPlayerMP) player);
+				sendContents((EntityPlayerMP) player, getBackpackWrapper(player));
+			}
+			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.ITEM_SUB_BACKPACK_SETTINGS : GuiHandler.ITEM_SUB_BACKPACK, player.world,
+					backpackSlotIndex, subBackpackSlotIndex, 0);
+		}
+	}
+
+	private static boolean isSubBackpack(IStorageWrapper parent, int subBackpackSlotIndex) {
+		if (!parent.getContentsUuid().isPresent()) {
+			return false;
+		}
+		InventoryHandler inventory = parent.getInventoryHandler();
+		return subBackpackSlotIndex >= 0 && subBackpackSlotIndex < inventory.getSlots() && inventory.getStackInSlot(subBackpackSlotIndex).getItem() instanceof BackpackItem;
+	}
+
+	private static ItemStack getSubBackpackStack(IStorageWrapper parent, int subBackpackSlotIndex) {
+		if (!isSubBackpack(parent, subBackpackSlotIndex)) {
+			throw new IllegalStateException("No backpack in slot " + subBackpackSlotIndex);
+		}
+		return parent.getInventoryHandler().getStackInSlot(subBackpackSlotIndex);
 	}
 
 	/** A placed backpack. */
 	public static class Block extends BackpackContext {
-		private final BlockPos pos;
+		protected final BlockPos pos;
 
 		public Block(BlockPos pos) {
 			this.pos = pos;
@@ -135,17 +226,73 @@ public abstract class BackpackContext {
 		}
 
 		@Override
+		public BackpackContext getSubBackpackContext(int subBackpackSlotIndex) {
+			return new BlockSubBackpack(pos, subBackpackSlotIndex);
+		}
+
+		@Override
 		protected void openScreen(EntityPlayer player, boolean settings) {
-			TileEntity te = player.world.getTileEntity(pos);
-			if (player instanceof EntityPlayerMP && te instanceof BackpackBlockEntity) {
-				EntityPlayerMP playerMP = (EntityPlayerMP) player;
-				sendContents(playerMP, ((BackpackBlockEntity) te).getBackpackWrapper());
-				SPacketUpdateTileEntity updatePacket = te.getUpdatePacket();
-				if (updatePacket != null) {
-					playerMP.connection.sendPacket(updatePacket);
-				}
+			if (player instanceof EntityPlayerMP) {
+				sendBackpack((EntityPlayerMP) player);
 			}
 			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.BLOCK_BACKPACK_SETTINGS : GuiHandler.BLOCK_BACKPACK, player.world, pos.getX(), pos.getY(), pos.getZ());
+		}
+
+		protected void sendBackpack(EntityPlayerMP player) {
+			TileEntity te = player.world.getTileEntity(pos);
+			if (te instanceof BackpackBlockEntity) {
+				sendContents(player, ((BackpackBlockEntity) te).getBackpackWrapper());
+				SPacketUpdateTileEntity updatePacket = te.getUpdatePacket();
+				if (updatePacket != null) {
+					player.connection.sendPacket(updatePacket);
+				}
+			}
+		}
+	}
+
+	/** A backpack in a storage slot of a placed one. */
+	public static class BlockSubBackpack extends Block {
+		private final int subBackpackSlotIndex;
+
+		public BlockSubBackpack(BlockPos pos, int subBackpackSlotIndex) {
+			super(pos);
+			this.subBackpackSlotIndex = subBackpackSlotIndex;
+		}
+
+		@Override
+		public Optional<IStorageWrapper> getParentBackpackWrapper(EntityPlayer player) {
+			return Optional.of(super.getBackpackWrapper(player));
+		}
+
+		@Override
+		public IBackpackWrapper getBackpackWrapper(EntityPlayer player) {
+			return BackpackWrapper.fromStack(getSubBackpackStack(super.getBackpackWrapper(player), subBackpackSlotIndex));
+		}
+
+		@Override
+		public boolean canInteractWith(EntityPlayer player) {
+			return super.canInteractWith(player) && isSubBackpack(super.getBackpackWrapper(player), subBackpackSlotIndex);
+		}
+
+		@Override
+		public BackpackContext getParentBackpackContext() {
+			return new Block(pos);
+		}
+
+		@Override
+		public String getDisplayName(EntityPlayer player) {
+			return SUBBACKPACK_DISPLAY_NAME_PREFIX + super.getDisplayName(player);
+		}
+
+		@Override
+		protected void openScreen(EntityPlayer player, boolean settings) {
+			if (player instanceof EntityPlayerMP) {
+				sendBackpack((EntityPlayerMP) player);
+				sendContents((EntityPlayerMP) player, getBackpackWrapper(player));
+			}
+			// 1.12's world height fits in 8 bits: the slot goes above it
+			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.BLOCK_SUB_BACKPACK_SETTINGS : GuiHandler.BLOCK_SUB_BACKPACK, player.world,
+					pos.getX(), pos.getY() | subBackpackSlotIndex << 8, pos.getZ());
 		}
 	}
 }

@@ -12,7 +12,8 @@ public class BackpackContainer extends StorageContainerMenuBase<IBackpackWrapper
 	private final BackpackContext backpackContext;
 
 	public BackpackContainer(EntityPlayer player, BackpackContext backpackContext) {
-		super(player, backpackContext.getBackpackWrapper(player), backpackContext.getBackpackSlotIndex(), backpackContext.shouldLockBackpackSlot(player));
+		super(player, backpackContext.getBackpackWrapper(player), backpackContext.getParentBackpackWrapper(player).orElse(null),
+				backpackContext.getBackpackSlotIndex(), backpackContext.shouldLockBackpackSlot(player));
 		this.backpackContext = backpackContext;
 	}
 

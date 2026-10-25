@@ -11,6 +11,7 @@ import dev.feldsher.deconstructedbackpacks.network.ToolSwapMessage;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.client.gui.BackpackScreen;
+import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
 import dev.feldsher.deconstructedbackpacks.network.BackpackOpenMessage;
 import dev.feldsher.deconstructedbackpacks.network.InventoryInteractionMessage;
 import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
@@ -37,7 +38,8 @@ import org.lwjgl.input.Mouse;
 
 /**
  * The open backpack key: in game it opens the first backpack the player carries; over a backpack in a screen's
- * player inventory it opens that one, and in a backpack's screen over anything else it closes the screen.
+ * player inventory it opens that one; in a backpack's screen, over a backpack in its storage it opens that one inside
+ * it, and over anything else it closes the screen, or goes back from a backpack open inside another.
  * The sort key sorts the open backpack, unless the mouse is over the player's inventory, which is left to sorting mods.
  * Both are handled before those mods see the input, so a key they share sorts only one inventory.
  * The inventory interaction key runs the backpack's restock and deposit upgrades on the inventory looked at, and
@@ -182,7 +184,15 @@ public class KeybindHandler {
 			PacketHandler.INSTANCE.sendToServer(new BackpackOpenMessage(slot.getSlotIndex()));
 			event.setCanceled(true);
 		} else if (screen instanceof BackpackScreen) {
-			Minecraft.getMinecraft().player.closeScreen();
+			BackpackContainer container = ((BackpackScreen) screen).getMenu();
+			if (container.isFirstLevelStorage() && slot != null && container.isStorageInventorySlot(slot.slotNumber)
+					&& slot.getStack().getItem() instanceof BackpackItem && slot.getStack().getCount() == 1) {
+				PacketHandler.INSTANCE.sendToServer(BackpackOpenMessage.subBackpack(slot.slotNumber));
+			} else if (!container.isFirstLevelStorage()) {
+				PacketHandler.INSTANCE.sendToServer(BackpackOpenMessage.parent());
+			} else {
+				Minecraft.getMinecraft().player.closeScreen();
+			}
 			event.setCanceled(true);
 		}
 	}
