@@ -62,7 +62,7 @@ public class BackpackLayerRenderer implements LayerRenderer<EntityLivingBase> {
 		BackpackModel.translateRotateAndScale(entity, false);
 
 		IBackpackWrapper wrapper = BackpackWrapper.fromStack(chestStack);
-		MODEL.render(wrapper.getMainColor(), wrapper.getAccentColor(), chestStack.getItem());
+		MODEL.render(wrapper.getMainColor(), wrapper.getAccentColor(), chestStack.getItem(), wrapper.getRenderInfo());
 		renderItemShown(wrapper.getRenderInfo());
 		GlStateManager.popMatrix();
 	}

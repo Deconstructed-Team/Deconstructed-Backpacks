@@ -1,18 +1,24 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import dev.feldsher.deconstructedcore.renderdata.TankPosition;
+import dev.feldsher.deconstructedcore.renderdata.RenderInfo;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.state.IBlockState;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * A placed backpack's shape: the boxes of its body and of what's on its sides and front, facing south as defined,
- * turned to the backpack's facing. 1.12 has no voxel shapes: the block collides and is aimed at by these boxes, and
- * its outline is drawn around them.
+ * A placed backpack's shape: the boxes of its body and of what's on its sides and front, pouches or the tanks and the
+ * battery in their place, facing south as defined, turned to the backpack's facing. 1.12 has no voxel shapes: the
+ * block collides and is aimed at by these boxes, and its outline is drawn around them.
  */
 public final class BackpackShapes {
 	private BackpackShapes() {}
@@ -70,35 +76,95 @@ public final class BackpackShapes {
 			{4, 4, 11, 12, 5, 13}
 	};
 
-	// Tanks and the battery replace the pouches with the upgrades that show them
+	private static final double[][] BATTERY = {
+			{4, 0, 11, 12, 6, 14},
+			{6, 5.25, 11.5, 7, 6.25, 12.5},
+			{7.25, 5.25, 11.5, 8.25, 6.25, 12.5},
+			{6, 7, 10.25, 7, 8, 11.25},
+			{7.25, 7, 10.25, 8.25, 8, 11.25},
+			{6.2, 5.6, 11.7, 6.8, 7.2, 12.3},
+			{6.2, 7.2, 10.7, 6.8, 7.8, 12.3},
+			{7.45, 5.6, 11.7, 8.05, 7.2, 12.3},
+			{7.45, 7.2, 10.7, 8.05, 7.8, 12.3},
+			{8.8, 4.05, 12.95, 10.2, 5.45, 14.35},
+			{8.8, 0.05, 12.95, 10.2, 1.45, 14.35},
+			{11.25, 4.25, 10.25, 12.25, 5.25, 14.25},
+			{4.5, 4.25, 13.25, 11.5, 5.25, 14.25},
+			{3.75, 4.25, 10.25, 4.75, 5.25, 14.25},
+			{11.25, 0.25, 10.25, 12.25, 1.25, 14.25},
+			{4.5, 0.25, 13.25, 11.5, 1.25, 14.25},
+			{3.75, 0.25, 10.25, 4.75, 1.25, 14.25}
+	};
 
-	private static final Map<EnumFacing, List<AxisAlignedBB>> SHAPES = new EnumMap<>(EnumFacing.class);
-	private static final Map<EnumFacing, AxisAlignedBB> ENVELOPES = new EnumMap<>(EnumFacing.class);
+	private static final double[][] LEFT_TANK = {
+			{2.5, 1.5, 6, 3.5, 7.5, 10},
+			{0.5, 10.5, 6.5, 3.5, 11.5, 9.5},
+			{0, 9.5, 6, 3, 10.5, 10},
+			{0, 8.5, 6, 3, 9.5, 10},
+			{0, 7.5, 6, 3, 8.5, 10},
+			{0, 0.5, 6, 3, 1.5, 10},
+			{0.5, 1.5, 6.5, 2.5, 7.5, 9.5}
+	};
 
-	static {
-		for (EnumFacing facing : EnumFacing.Plane.HORIZONTAL) {
-			List<AxisAlignedBB> boxes = new ArrayList<>();
-			for (double[][] part : new double[][][] {BODY, LEFT_POUCHES, RIGHT_POUCHES, FRONT_POUCH}) {
-				for (double[] box : part) {
-					boxes.add(rotate(box, facing));
-				}
-			}
-			SHAPES.put(facing, Collections.unmodifiableList(boxes));
+	private static final double[][] RIGHT_TANK = {
+			{12.5, 1.5, 6, 13.5, 7.5, 10},
+			{12.5, 10.5, 6.5, 15.5, 11.5, 9.5},
+			{13, 9.5, 6, 16, 10.5, 10},
+			{13, 8.5, 6, 16, 9.5, 10},
+			{13, 7.5, 6, 16, 8.5, 10},
+			{13, 0.5, 6, 16, 1.5, 10},
+			{13.5, 1.5, 6.5, 15.5, 7.5, 9.5}
+	};
+
+	private static final Map<Integer, List<AxisAlignedBB>> SHAPES = new ConcurrentHashMap<>();
+	private static final Map<Integer, AxisAlignedBB> ENVELOPES = new ConcurrentHashMap<>();
+
+	/** The shape of a placed backpack as its render info shows it, tanks and battery in place of pouches. */
+	public static List<AxisAlignedBB> getShape(IBlockAccess world, BlockPos pos, IBlockState state) {
+		RenderInfo renderInfo = getRenderInfo(world, pos);
+		return getShape(state.getValue(BackpackBlock.FACING), renderInfo.getTankRenderInfos().containsKey(TankPosition.LEFT),
+				renderInfo.getTankRenderInfos().containsKey(TankPosition.RIGHT), renderInfo.getBatteryRenderInfo().isPresent());
+	}
+
+	public static AxisAlignedBB getEnvelope(IBlockAccess world, BlockPos pos, IBlockState state) {
+		RenderInfo renderInfo = getRenderInfo(world, pos);
+		return getEnvelope(state.getValue(BackpackBlock.FACING), renderInfo.getTankRenderInfos().containsKey(TankPosition.LEFT),
+				renderInfo.getTankRenderInfos().containsKey(TankPosition.RIGHT), renderInfo.getBatteryRenderInfo().isPresent());
+	}
+
+	private static RenderInfo getRenderInfo(IBlockAccess world, BlockPos pos) {
+		TileEntity te = world.getTileEntity(pos);
+		return te instanceof BackpackBlockEntity ? ((BackpackBlockEntity) te).getBackpackWrapper().getRenderInfo() : RenderInfo.EMPTY;
+	}
+
+	public static List<AxisAlignedBB> getShape(EnumFacing facing, boolean leftTank, boolean rightTank, boolean battery) {
+		return SHAPES.computeIfAbsent(getKey(facing, leftTank, rightTank, battery), key -> composeShape(facing, leftTank, rightTank, battery));
+	}
+
+	/** The one box around all of the shape, which 1.12 wants for a block's bounds. */
+	public static AxisAlignedBB getEnvelope(EnumFacing facing, boolean leftTank, boolean rightTank, boolean battery) {
+		return ENVELOPES.computeIfAbsent(getKey(facing, leftTank, rightTank, battery), key -> {
+			List<AxisAlignedBB> boxes = getShape(facing, leftTank, rightTank, battery);
 			AxisAlignedBB envelope = boxes.get(0);
 			for (AxisAlignedBB box : boxes) {
 				envelope = envelope.union(box);
 			}
-			ENVELOPES.put(facing, envelope);
+			return envelope;
+		});
+	}
+
+	public static int getKey(EnumFacing facing, boolean leftTank, boolean rightTank, boolean battery) {
+		return facing.getHorizontalIndex() << 3 | (leftTank ? 4 : 0) | (rightTank ? 2 : 0) | (battery ? 1 : 0);
+	}
+
+	private static List<AxisAlignedBB> composeShape(EnumFacing facing, boolean leftTank, boolean rightTank, boolean battery) {
+		List<AxisAlignedBB> boxes = new ArrayList<>();
+		for (double[][] part : new double[][][] {BODY, leftTank ? LEFT_TANK : LEFT_POUCHES, rightTank ? RIGHT_TANK : RIGHT_POUCHES, battery ? BATTERY : FRONT_POUCH}) {
+			for (double[] box : part) {
+				boxes.add(rotate(box, facing));
+			}
 		}
-	}
-
-	public static List<AxisAlignedBB> getShape(EnumFacing facing) {
-		return SHAPES.get(facing);
-	}
-
-	/** The one box around all of the shape, which 1.12 wants for a block's bounds. */
-	public static AxisAlignedBB getEnvelope(EnumFacing facing) {
-		return ENVELOPES.get(facing);
+		return Collections.unmodifiableList(boxes);
 	}
 
 	private static AxisAlignedBB rotate(double[] box, EnumFacing facing) {

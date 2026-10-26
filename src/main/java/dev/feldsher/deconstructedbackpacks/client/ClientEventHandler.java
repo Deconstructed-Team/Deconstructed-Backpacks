@@ -1,5 +1,10 @@
 package dev.feldsher.deconstructedbackpacks.client;
 
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraft.util.EnumFacing;
+import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlock;
+import dev.feldsher.deconstructedbackpacks.client.render.BackpackBlockModel;
+import dev.feldsher.deconstructedbackpacks.client.render.BackpackParts;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlockEntity;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
@@ -36,14 +41,33 @@ public class ClientEventHandler {
 		ModItems.getBackpacks().forEach(backpack -> backpack.setTileEntityItemStackRenderer(itemStackRenderer));
 	}
 
-	/** Backpack stacks that show an item draw it on their front. */
+	/** The tanks and the battery: their parts are baked from code, so nothing else asks for the texture. */
+	@SubscribeEvent
+	public static void onTextureStitch(TextureStitchEvent.Pre event) {
+		event.getMap().registerSprite(BackpackParts.MODULES_TEXTURE);
+	}
+
+	/**
+	 * Placed backpacks and backpack stacks get the parts their render info calls for, tanks and battery in place of
+	 * pouches; stacks that show an item draw it on their front.
+	 */
 	@SubscribeEvent
 	public static void onModelBake(ModelBakeEvent event) {
+		BackpackParts.bake();
 		for (Item backpack : ModItems.getBackpacks()) {
 			ModelResourceLocation location = getInventoryModelLocation(backpack);
 			IBakedModel model = event.getModelRegistry().getObject(location);
 			if (model != null && !(model instanceof BackpackItemModel)) {
-				event.getModelRegistry().putObject(location, new BackpackItemModel(model));
+				event.getModelRegistry().putObject(location, new BackpackItemModel(model, backpack));
+			}
+		}
+		for (BackpackBlock block : ModBlocks.getBackpacks()) {
+			for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+				ModelResourceLocation location = new ModelResourceLocation(Objects.requireNonNull(block.getRegistryName()), "facing=" + facing.getName());
+				IBakedModel model = event.getModelRegistry().getObject(location);
+				if (model != null && !(model instanceof BackpackBlockModel)) {
+					event.getModelRegistry().putObject(location, new BackpackBlockModel(model, block.getBackpackItem(), facing));
+				}
 			}
 		}
 	}

@@ -20,8 +20,8 @@ import org.lwjgl.opengl.GL11;
 import java.util.List;
 
 /**
- * A backpack stack that shows an item: its own model, tinted as usual, with the item on its front. Only such stacks
- * come here, through {@link BackpackItemModel}; the rest draw as plain models.
+ * A backpack stack that shows an item: its own model with its parts, tinted as usual, with the item on its front. Only
+ * such stacks come here, through {@link BackpackItemModel}; the rest draw as models.
  */
 public class BackpackItemStackRenderer extends TileEntityItemStackRenderer {
 	@Override
@@ -29,7 +29,7 @@ public class BackpackItemStackRenderer extends TileEntityItemStackRenderer {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		IBakedModel model = minecraft.getRenderItem().getItemModelMesher().getItemModel(stack);
 		if (model instanceof BackpackItemModel) {
-			renderModel(((BackpackItemModel) model).getOriginalModel(), stack, minecraft.getItemColors());
+			renderModel((BackpackItemModel) model, stack, minecraft.getItemColors());
 		}
 		BackpackWrapper.fromStack(stack).getRenderInfo().getItemDisplayRenderInfo().getDisplayItem().ifPresent(displayItem -> {
 			GlStateManager.pushMatrix();
@@ -48,14 +48,14 @@ public class BackpackItemStackRenderer extends TileEntityItemStackRenderer {
 	}
 
 	/** As vanilla draws an item's model, with its tints. */
-	private static void renderModel(IBakedModel model, ItemStack stack, ItemColors itemColors) {
+	private static void renderModel(BackpackItemModel model, ItemStack stack, ItemColors itemColors) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
 		for (EnumFacing facing : EnumFacing.values()) {
-			renderQuads(buffer, model.getQuads(null, facing, 0), stack, itemColors);
+			renderQuads(buffer, model.getQuads(stack, facing), stack, itemColors);
 		}
-		renderQuads(buffer, model.getQuads(null, null, 0), stack, itemColors);
+		renderQuads(buffer, model.getQuads(stack, null), stack, itemColors);
 		tessellator.draw();
 	}
 

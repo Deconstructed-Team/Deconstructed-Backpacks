@@ -304,7 +304,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 			return;
 		}
 		ItemDisplaySettingsCategory itemDisplay = getSettingsHandler().getTypeCategory(ItemDisplaySettingsCategory.class);
-		NBTTagCompound renderInfoTag = new RenderInfo(itemDisplay.buildItemDisplayRenderInfo()).serialize();
+		NBTTagCompound renderInfoTag = getUpgradeHandler().buildRenderInfo(itemDisplay.buildItemDisplayRenderInfo()).serialize();
 		NBTTagCompound tag = getBackpackStack().getTagCompound();
 		NBTTagCompound currentTag = tag != null ? tag.getCompoundTag(RenderInfo.RENDER_INFO_TAG) : new NBTTagCompound();
 		if (renderInfoTag.equals(currentTag)) {

@@ -1,5 +1,11 @@
 package dev.feldsher.deconstructedbackpacks.client.render;
 
+import dev.feldsher.deconstructedcore.renderdata.TankPosition;
+import dev.feldsher.deconstructedcore.renderdata.RenderInfo;
+import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlockEntity;
+import net.minecraft.world.World;
+import net.minecraft.tileentity.TileEntity;
+import java.util.HashMap;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlock;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackShapes;
@@ -29,9 +35,15 @@ public final class BackpackOutlineRenderer {
 	// as vanilla's selection box: lifted off the faces so that they don't hide the lines
 	private static final double GROW = 0.002;
 
-	private static final Map<EnumFacing, List<double[]>> OUTLINES = new EnumMap<>(EnumFacing.class);
+	/** By the shape's key: its facing, and tanks and battery or pouches. */
+	private static final Map<Integer, List<double[]>> OUTLINES = new HashMap<>();
 
 	private BackpackOutlineRenderer() {}
+
+	private static RenderInfo getRenderInfo(World world, BlockPos pos) {
+		TileEntity te = world.getTileEntity(pos);
+		return te instanceof BackpackBlockEntity ? ((BackpackBlockEntity) te).getBackpackWrapper().getRenderInfo() : RenderInfo.EMPTY;
+	}
 
 	@SubscribeEvent
 	public static void onDrawBlockHighlight(DrawBlockHighlightEvent event) {
@@ -48,8 +60,13 @@ public final class BackpackOutlineRenderer {
 		event.setCanceled(true);
 
 		EnumFacing facing = state.getValue(BackpackBlock.FACING);
-		List<double[]> edges = OUTLINES.computeIfAbsent(facing, f -> ShapeOutline.getEdges(BackpackShapes.getShape(f)));
-		AxisAlignedBB envelope = BackpackShapes.getEnvelope(facing);
+		RenderInfo renderInfo = getRenderInfo(player.world, pos);
+		boolean leftTank = renderInfo.getTankRenderInfos().containsKey(TankPosition.LEFT);
+		boolean rightTank = renderInfo.getTankRenderInfos().containsKey(TankPosition.RIGHT);
+		boolean battery = renderInfo.getBatteryRenderInfo().isPresent();
+		List<double[]> edges = OUTLINES.computeIfAbsent(BackpackShapes.getKey(facing, leftTank, rightTank, battery),
+				key -> ShapeOutline.getEdges(BackpackShapes.getShape(facing, leftTank, rightTank, battery)));
+		AxisAlignedBB envelope = BackpackShapes.getEnvelope(facing, leftTank, rightTank, battery);
 		double centerX = (envelope.minX + envelope.maxX) / 2;
 		double centerY = (envelope.minY + envelope.maxY) / 2;
 		double centerZ = (envelope.minZ + envelope.maxZ) / 2;

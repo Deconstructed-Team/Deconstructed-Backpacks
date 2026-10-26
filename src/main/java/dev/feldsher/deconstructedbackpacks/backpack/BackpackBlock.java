@@ -1,5 +1,11 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import dev.feldsher.deconstructedcore.renderdata.RenderInfo;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraft.block.properties.IProperty;
 import dev.feldsher.deconstructedcore.api.IStorageFluidHandler;
 import net.minecraftforge.fluids.FluidActionResult;
 import net.minecraftforge.fluids.FluidUtil;
@@ -55,6 +61,28 @@ import java.util.function.Supplier;
  */
 public class BackpackBlock extends Block {
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+	/** What the backpack shows, for its model: tanks and battery in place of pouches, the fluids, the charge. */
+	public static final IUnlistedProperty<RenderInfo> RENDER_INFO = new IUnlistedProperty<RenderInfo>() {
+		@Override
+		public String getName() {
+			return "render_info";
+		}
+
+		@Override
+		public boolean isValid(RenderInfo value) {
+			return value != null;
+		}
+
+		@Override
+		public Class<RenderInfo> getType() {
+			return RenderInfo.class;
+		}
+
+		@Override
+		public String valueToString(RenderInfo value) {
+			return value.serialize().toString();
+		}
+	};
 
 	private final Supplier<BackpackItem> backpackItem;
 
@@ -75,7 +103,22 @@ public class BackpackBlock extends Block {
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, FACING);
+		return new ExtendedBlockState(this, new IProperty[] {FACING}, new IUnlistedProperty[] {RENDER_INFO});
+	}
+
+	@Override
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+		TileEntity te = world.getTileEntity(pos);
+		if (state instanceof IExtendedBlockState && te instanceof BackpackBlockEntity) {
+			return ((IExtendedBlockState) state).withProperty(RENDER_INFO, ((BackpackBlockEntity) te).getBackpackWrapper().getRenderInfo());
+		}
+		return state;
+	}
+
+	/** The tanks' glass lets through what's behind it. */
+	@Override
+	public BlockRenderLayer getRenderLayer() {
+		return BlockRenderLayer.CUTOUT;
 	}
 
 	@Override
@@ -100,13 +143,13 @@ public class BackpackBlock extends Block {
 
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return BackpackShapes.getEnvelope(state.getValue(FACING));
+		return BackpackShapes.getEnvelope(source, pos, state);
 	}
 
 	@Override
 	public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes,
 			@Nullable Entity entity, boolean isActualState) {
-		for (AxisAlignedBB box : BackpackShapes.getShape(state.getValue(FACING))) {
+		for (AxisAlignedBB box : BackpackShapes.getShape(world, pos, state)) {
 			addCollisionBoxToList(pos, entityBox, collidingBoxes, box);
 		}
 	}
@@ -117,7 +160,7 @@ public class BackpackBlock extends Block {
 	public RayTraceResult collisionRayTrace(IBlockState state, World world, BlockPos pos, Vec3d start, Vec3d end) {
 		RayTraceResult closest = null;
 		double closestDistance = Double.MAX_VALUE;
-		for (AxisAlignedBB box : BackpackShapes.getShape(state.getValue(FACING))) {
+		for (AxisAlignedBB box : BackpackShapes.getShape(world, pos, state)) {
 			RayTraceResult result = rayTrace(pos, start, end, box);
 			if (result != null) {
 				double distance = result.hitVec.squareDistanceTo(start);
