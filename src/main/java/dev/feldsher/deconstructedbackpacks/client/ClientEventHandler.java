@@ -7,7 +7,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.entity.player.EntityPlayer;
 import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
 import dev.feldsher.deconstructedbackpacks.network.AnotherPlayerBackpackOpenMessage;
-import dev.feldsher.deconstructedbackpacks.Config;
+import dev.feldsher.deconstructedbackpacks.network.ServerConfigSyncMessage;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraft.util.EnumFacing;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlock;
@@ -55,7 +55,7 @@ public class ClientEventHandler {
 	 */
 	@SubscribeEvent
 	public static void onEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
-		if (!event.getWorld().isRemote || !Config.SERVER.allowOpeningOtherPlayerBackpacks || !(event.getTarget() instanceof EntityPlayer)) {
+		if (!event.getWorld().isRemote || !ServerConfigSyncMessage.allowsOpeningOtherPlayerBackpacks() || !(event.getTarget() instanceof EntityPlayer)) {
 			return;
 		}
 		EntityPlayer targetPlayer = (EntityPlayer) event.getTarget();

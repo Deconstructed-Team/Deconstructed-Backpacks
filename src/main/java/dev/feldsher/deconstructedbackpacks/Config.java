@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedbackpacks.network.ServerConfigSyncMessage;
 import dev.feldsher.deconstructedcore.upgrades.battery.IBatteryUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.xppump.IXpPumpUpgradeConfig;
 import dev.feldsher.deconstructedcore.upgrades.pump.IPumpUpgradeConfig;
@@ -576,6 +577,7 @@ public class Config {
 		if (event.getModID().equals(DeconstructedBackpacks.MOD_ID)) {
 			ConfigManager.sync(DeconstructedBackpacks.MOD_ID, net.minecraftforge.common.config.Config.Type.INSTANCE);
 			SERVER.clearCache();
+			ServerConfigSyncMessage.sendToAll();
 		}
 	}
 }

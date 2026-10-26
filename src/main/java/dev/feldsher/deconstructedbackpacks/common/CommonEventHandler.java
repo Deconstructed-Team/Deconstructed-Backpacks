@@ -4,6 +4,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import dev.feldsher.deconstructedbackpacks.Config;
+import dev.feldsher.deconstructedbackpacks.network.ServerConfigSyncMessage;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -54,6 +55,9 @@ public class CommonEventHandler {
 	@SubscribeEvent
 	public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
 		syncPlayerSettings(event.player);
+		if (event.player instanceof EntityPlayerMP) {
+			ServerConfigSyncMessage.sendTo((EntityPlayerMP) event.player);
+		}
 	}
 
 	@SubscribeEvent

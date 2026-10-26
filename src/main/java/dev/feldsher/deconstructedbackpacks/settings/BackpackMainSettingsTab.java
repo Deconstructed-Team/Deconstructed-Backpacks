@@ -3,7 +3,7 @@ package dev.feldsher.deconstructedbackpacks.settings;
 import dev.feldsher.deconstructedcore.client.gui.controls.ToggleButton;
 import dev.feldsher.deconstructedcore.client.gui.controls.ButtonDefinitions;
 import dev.feldsher.deconstructedcore.client.gui.controls.ButtonDefinition;
-import dev.feldsher.deconstructedbackpacks.Config;
+import dev.feldsher.deconstructedbackpacks.network.ServerConfigSyncMessage;
 import dev.feldsher.deconstructedbackpacks.client.gui.SBPTranslationHelper;
 import dev.feldsher.deconstructedcore.client.gui.SettingsScreen;
 import dev.feldsher.deconstructedcore.client.gui.controls.ImageButton;
@@ -41,7 +41,7 @@ public class BackpackMainSettingsTab extends MainSettingsTab<BackpackMainSetting
 		super(container, position, screen, BACKPACK_CONTEXT_TOOLTIP, new TextComponentTranslation(SBPTranslationHelper.INSTANCE.translSettingsButton("context_backpack")),
 				SBPTranslationHelper.INSTANCE.translSettings("backpack"), SBPTranslationHelper.INSTANCE.translSettingsTooltip("backpack"),
 				onTabIconClicked -> new ImageButton(new Position(position.x() + 1, position.y() + 4), Dimension.SQUARE_16, ICON, onTabIconClicked));
-		if (Config.SERVER.allowOpeningOtherPlayerBackpacks) {
+		if (ServerConfigSyncMessage.allowsOpeningOtherPlayerBackpacks()) {
 			addHideableChild(new ToggleButton<>(new Position(x + 57, y + 46), ANOTHER_PLAYER_CAN_OPEN, button -> container.toggleAnotherPlayerCanOpen(), container::canAnotherPlayerOpen));
 		}
 	}
