@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.common.gui;
 
+import net.minecraft.network.play.server.SPacketEntityEquipment;
 import javax.annotation.Nullable;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.Entity;
@@ -223,10 +224,21 @@ public abstract class BackpackContext {
 			return new AnotherPlayerSubBackpack(otherPlayerId, subBackpackSlotIndex);
 		}
 
+		/**
+		 * Its contents, and the stack as it is now: the client has the other player's equipment only as the tracker
+		 * sends it, a tick late, and builds the container's slots from the stack, as a backpack reopened for an upgrade
+		 * that takes columns needs at once.
+		 */
+		protected void sendBackpack(EntityPlayerMP player) {
+			ItemStack backpack = getBackpackStack(player);
+			sendContents(player, BackpackWrapper.fromStack(backpack));
+			player.connection.sendPacket(new SPacketEntityEquipment(otherPlayerId, EntityEquipmentSlot.CHEST, backpack));
+		}
+
 		@Override
 		protected void openScreen(EntityPlayer player, boolean settings) {
 			if (player instanceof EntityPlayerMP) {
-				sendContents((EntityPlayerMP) player, getBackpackWrapper(player));
+				sendBackpack((EntityPlayerMP) player);
 			}
 			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.ANOTHER_PLAYER_BACKPACK_SETTINGS : GuiHandler.ANOTHER_PLAYER_BACKPACK, player.world,
 					otherPlayerId, 0, 0);
@@ -270,7 +282,7 @@ public abstract class BackpackContext {
 		@Override
 		protected void openScreen(EntityPlayer player, boolean settings) {
 			if (player instanceof EntityPlayerMP) {
-				sendContents((EntityPlayerMP) player, super.getBackpackWrapper(player));
+				super.sendBackpack((EntityPlayerMP) player);
 				sendContents((EntityPlayerMP) player, getBackpackWrapper(player));
 			}
 			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.ANOTHER_PLAYER_SUB_BACKPACK_SETTINGS : GuiHandler.ANOTHER_PLAYER_SUB_BACKPACK, player.world,
