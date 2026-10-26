@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -67,6 +69,7 @@ public class EntityBackpackAdditionHandler {
 	private static final float MAX_LOCAL_DIFFICULTY = 6.75f;
 
 	private static final String SPAWNED_WITH_BACKPACK = "spawnedWithBackpack";
+	private static final Set<Entity> TRAVELLING = Collections.newSetFromMap(new WeakHashMap<>());
 	private static final String SPAWNED_WITH_JUKEBOX_UPGRADE = DeconstructedBackpacks.MOD_ID + ":jukebox";
 	private static final UUID HEALTH_BONUS_ID = UUID.fromString("9ebd2a3e-1d6d-4a73-9c5d-4f6c2e0b8a71");
 
@@ -131,7 +134,7 @@ public class EntityBackpackAdditionHandler {
 		Config.EntityBackpackAdditionsConfig config = Config.SERVER.entityBackpackAdditions;
 		Random rnd = world.rand;
 		ResourceLocation entityName = EntityList.getKey(monster);
-		if (entityName == null || !config.canWearBackpack(entityName) || config.chance <= 0 || rnd.nextInt((int) (1 / config.chance)) != 0) {
+		if (entityName == null || !config.canWearBackpack(entityName) || rnd.nextDouble() >= config.chance) {
 			return;
 		}
 
@@ -311,8 +314,22 @@ public class EntityBackpackAdditionHandler {
 		}
 	}
 
+	/** A mob going to another dimension is removed here, and goes on there as a copy, with the same backpack. */
+	static void onTravelToDimension(Entity entity) {
+		if (!entity.world.isRemote && entity.getTags().contains(SPAWNED_WITH_BACKPACK)) {
+			TRAVELLING.add(entity);
+		}
+	}
+
+	/**
+	 * The contents go with the mob, as it despawns: not as its chunk unloads, the mob being saved with the backpack,
+	 * nor as it goes to another dimension. Its death sees to them with its drops.
+	 */
 	static void removeBackpackUuid(Entity entity) {
 		if (entity.world.isRemote || !(entity instanceof EntityMob) || !entity.getTags().contains(SPAWNED_WITH_BACKPACK)) {
+			return;
+		}
+		if (!entity.isDead || TRAVELLING.remove(entity)) {
 			return;
 		}
 		removeContentsUuid(((EntityMob) entity).getItemStackFromSlot(EntityEquipmentSlot.CHEST));

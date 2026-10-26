@@ -1,6 +1,9 @@
 package dev.feldsher.deconstructedbackpacks.common;
 
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import dev.feldsher.deconstructedbackpacks.Config;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -75,9 +78,16 @@ public class CommonEventHandler {
 	@SubscribeEvent
 	public static void onLivingSpecialSpawn(LivingSpawnEvent.SpecialSpawn event) {
 		EntityLivingBase entity = event.getEntityLiving();
-		if (entity instanceof EntityMob && !entity.world.isRemote && entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty()) {
+		// a spawner's mobs only when the config says so, or a spawner makes a farm of loot and armor
+		if (entity instanceof EntityMob && !entity.world.isRemote && entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty()
+				&& (event.getSpawner() == null || Config.SERVER.entityBackpackAdditions.spawnersToo)) {
 			EntityBackpackAdditionHandler.addBackpack((EntityMob) entity, entity.world);
 		}
+	}
+
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public static void onTravelToDimension(EntityTravelToDimensionEvent event) {
+		EntityBackpackAdditionHandler.onTravelToDimension(event.getEntity());
 	}
 
 	@SubscribeEvent

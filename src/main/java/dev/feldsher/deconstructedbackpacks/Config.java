@@ -225,6 +225,8 @@ public class Config {
 		@net.minecraftforge.common.config.Config.Comment("Chance of an entity spawning with Backpack")
 		@net.minecraftforge.common.config.Config.RangeDouble(min = 0, max = 1)
 		public double chance = 0.01;
+		@net.minecraftforge.common.config.Config.Comment("Whether mobs from spawners can spawn with Backpack too")
+		public boolean spawnersToo = false;
 		@net.minecraftforge.common.config.Config.Comment("Turns on/off addition of loot into backpacks")
 		public boolean addLoot = true;
 		@net.minecraftforge.common.config.Config.Comment("Turns on/off buffing the entity that wears backpack with potion effects. These are scaled based on how much loot is added.")
