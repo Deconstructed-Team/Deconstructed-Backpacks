@@ -30,6 +30,11 @@ public final class BackpackStorage {
 		CONTENTS.setClientContents(backpackUuid, contents);
 	}
 
+	/** Whether the client has the backpack's contents from the server, or only an empty stand-in. */
+	public static boolean hasClientBackpackContents(UUID backpackUuid) {
+		return CONTENTS.hasReceivedClientContents(backpackUuid);
+	}
+
 	public static void removeBackpackContents(UUID backpackUuid) {
 		CONTENTS.remove(backpackUuid);
 	}

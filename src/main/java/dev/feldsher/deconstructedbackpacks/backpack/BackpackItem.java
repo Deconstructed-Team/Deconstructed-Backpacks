@@ -39,16 +39,33 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
+import dev.feldsher.deconstructedbackpacks.common.gui.BackpackSettingsContainerMenu;
+import dev.feldsher.deconstructedbackpacks.network.BackpackContentsMessage;
+import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
+import dev.feldsher.deconstructedbackpacks.network.RequestBackpackContentsMessage;
+import dev.feldsher.deconstructedcore.api.IStashStorageItem;
+import dev.feldsher.deconstructedcore.api.IStorageWrapper;
+import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
+import dev.feldsher.deconstructedcore.settings.memory.MemorySettingsCategory;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.List;
 import java.util.function.IntSupplier;
 
 /**
- * A backpack: a storage carried as an item, opened from the hand.
- * Stashing items into it from a slot comes with the
- * stages that port them.
+ * A backpack: a storage carried as an item, opened from the hand. Items can be stashed into it in any inventory
+ * screen; to show which, the client asks for the contents of a backpack it hasn't opened.
  */
-public class BackpackItem extends Item {
+public class BackpackItem extends Item implements IStashStorageItem {
+	private static final long CONTENTS_REQUEST_INTERVAL_MS = 5000;
+	private static final Map<UUID, Long> CONTENTS_REQUEST_TIMES = new HashMap<>();
 	/** How often a backpack's stack, carried or placed, catches up with what its contents show. */
 	public static final int RENDER_INFO_REFRESH_TICKS = 10;
 	private final IntSupplier numberOfSlots;
@@ -240,6 +257,60 @@ public class BackpackItem extends Item {
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
 		return slotChanged;
+	}
+
+	@Override
+	public ItemStack stash(ItemStack storageStack, ItemStack stack, boolean simulate) {
+		return BackpackWrapper.fromStack(storageStack).getInventoryForUpgradeProcessing().insertItem(stack, simulate);
+	}
+
+	@Override
+	public StashResult getItemStashable(ItemStack storageStack, ItemStack stack) {
+		IBackpackWrapper wrapper = BackpackWrapper.fromStack(storageStack);
+		Optional<UUID> uuid = wrapper.getContentsUuid();
+		// Without contents yet it's empty, once they're made; the client asks for those it hasn't got
+		if (!uuid.isPresent() || FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && !hasClientContents(uuid.get())) {
+			return StashResult.SPACE;
+		}
+		if (wrapper.getInventoryForUpgradeProcessing().insertItem(stack, true).getCount() == stack.getCount()) {
+			return StashResult.NO_SPACE;
+		}
+		InventoryHandler inventory = wrapper.getInventoryHandler();
+		for (int slot = 0; slot < inventory.getSlots(); slot++) {
+			if (inventory.getStackInSlot(slot).getItem() == stack.getItem()) {
+				return StashResult.MATCH_AND_SPACE;
+			}
+		}
+		return wrapper.getSettingsHandler().getTypeCategory(MemorySettingsCategory.class).matchesFilter(stack) ? StashResult.MATCH_AND_SPACE : StashResult.SPACE;
+	}
+
+	private static boolean hasClientContents(UUID uuid) {
+		if (BackpackStorage.hasClientBackpackContents(uuid)) {
+			return true;
+		}
+		long now = System.currentTimeMillis();
+		Long lastRequest = CONTENTS_REQUEST_TIMES.get(uuid);
+		if (lastRequest == null || now - lastRequest > CONTENTS_REQUEST_INTERVAL_MS) {
+			CONTENTS_REQUEST_TIMES.put(uuid, now);
+			PacketHandler.INSTANCE.sendToServer(new RequestBackpackContentsMessage(uuid));
+		}
+		return false;
+	}
+
+	/** The client sees the new contents, unless the backpack is open, where its container keeps them in step. */
+	@Override
+	public void onStashed(EntityPlayerMP player, ItemStack storageStack) {
+		BackpackWrapper.fromStack(storageStack).getContentsUuid().ifPresent(uuid -> {
+			if (!isOpen(player, uuid)) {
+				PacketHandler.INSTANCE.sendTo(new BackpackContentsMessage(uuid, BackpackStorage.getOrCreateBackpackContents(uuid)), player);
+			}
+		});
+	}
+
+	private static boolean isOpen(EntityPlayer player, UUID uuid) {
+		IStorageWrapper openWrapper = player.openContainer instanceof BackpackContainer ? ((BackpackContainer) player.openContainer).getStorageWrapper()
+				: player.openContainer instanceof BackpackSettingsContainerMenu ? ((BackpackSettingsContainerMenu) player.openContainer).getStorageWrapper() : null;
+		return openWrapper != null && openWrapper.getContentsUuid().map(uuid::equals).orElse(false);
 	}
 
 	@Override

@@ -18,5 +18,6 @@ public class PacketHandler {
 		INSTANCE.registerMessage(ToolSwapMessage.Handler.class, ToolSwapMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(BlockPickMessage.Handler.class, BlockPickMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(UpgradeToggleMessage.Handler.class, UpgradeToggleMessage.class, id++, Side.SERVER);
+		INSTANCE.registerMessage(RequestBackpackContentsMessage.Handler.class, RequestBackpackContentsMessage.class, id++, Side.SERVER);
 	}
 }
