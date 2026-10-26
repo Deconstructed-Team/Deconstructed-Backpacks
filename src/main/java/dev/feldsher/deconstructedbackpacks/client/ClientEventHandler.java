@@ -1,13 +1,12 @@
 package dev.feldsher.deconstructedbackpacks.client;
 
+import dev.feldsher.deconstructedbackpacks.util.PlayerInventoryProvider;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
 import dev.feldsher.deconstructedbackpacks.network.AnotherPlayerBackpackOpenMessage;
-import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.Config;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraft.util.EnumFacing;
@@ -60,7 +59,7 @@ public class ClientEventHandler {
 			return;
 		}
 		EntityPlayer targetPlayer = (EntityPlayer) event.getTarget();
-		if (!(targetPlayer.getItemStackFromSlot(EntityEquipmentSlot.CHEST).getItem() instanceof BackpackItem)) {
+		if (PlayerInventoryProvider.getRenderedBackpack(targetPlayer).isEmpty()) {
 			return;
 		}
 		EntityPlayer sourcePlayer = event.getEntityPlayer();

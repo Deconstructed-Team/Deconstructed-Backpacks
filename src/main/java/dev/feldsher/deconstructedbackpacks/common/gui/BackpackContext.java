@@ -1,5 +1,7 @@
 package dev.feldsher.deconstructedbackpacks.common.gui;
 
+import dev.feldsher.deconstructedbackpacks.network.BackpackSlotSyncMessage;
+import dev.feldsher.deconstructedbackpacks.util.PlayerInventoryProvider;
 import net.minecraft.network.play.server.SPacketEntityEquipment;
 import javax.annotation.Nullable;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -78,7 +80,7 @@ public abstract class BackpackContext {
 				PacketHandler.INSTANCE.sendTo(new BackpackContentsMessage(uuid, BackpackStorage.getOrCreateBackpackContents(uuid)), player));
 	}
 
-	/** A backpack in the player's inventory, by its slot there: 0-35 the main inventory, 36-39 armor, 40 the offhand. */
+	/** A backpack the player carries, by its slot as {@link PlayerInventoryProvider} numbers them, Baubles' too. */
 	public static class Item extends BackpackContext {
 		protected final int backpackSlotIndex;
 
@@ -98,7 +100,7 @@ public abstract class BackpackContext {
 		}
 
 		private ItemStack getBackpackStack(EntityPlayer player) {
-			return player.inventory.getStackInSlot(backpackSlotIndex);
+			return PlayerInventoryProvider.getStackInSlot(player, backpackSlotIndex);
 		}
 
 		@Override
@@ -127,8 +129,12 @@ public abstract class BackpackContext {
 		protected void sendBackpack(EntityPlayerMP player) {
 			ItemStack backpack = getBackpackStack(player);
 			sendContents(player, BackpackWrapper.fromStack(backpack));
-			// windowId -2: a slot of the player's inventory, whichever container is open
-			player.connection.sendPacket(new SPacketSetSlot(-2, backpackSlotIndex, backpack));
+			if (PlayerInventoryProvider.isPlayerInventorySlot(backpackSlotIndex)) {
+				// windowId -2: a slot of the player's inventory, whichever container is open
+				player.connection.sendPacket(new SPacketSetSlot(-2, backpackSlotIndex, backpack));
+			} else {
+				PacketHandler.INSTANCE.sendTo(new BackpackSlotSyncMessage(player.getEntityId(), backpackSlotIndex, backpack), player);
+			}
 		}
 	}
 
@@ -177,7 +183,10 @@ public abstract class BackpackContext {
 		}
 	}
 
-	/** The backpack another player wears, which the config and that player's setting let others open. */
+	/**
+	 * The backpack another player wears, which the config and that player's setting let others open: the first worn one,
+	 * in Baubles, else in the chest slot.
+	 */
 	public static class AnotherPlayer extends BackpackContext {
 		private static final double MAX_DISTANCE_SQ = 8 * 8;
 		protected final int otherPlayerId;
@@ -194,7 +203,16 @@ public abstract class BackpackContext {
 
 		protected ItemStack getBackpackStack(EntityPlayer player) {
 			EntityPlayer otherPlayer = getOtherPlayer(player);
-			return otherPlayer == null ? ItemStack.EMPTY : otherPlayer.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+			return otherPlayer == null ? ItemStack.EMPTY : PlayerInventoryProvider.getStackInSlot(otherPlayer, getWornBackpackSlot(otherPlayer));
+		}
+
+		private static int getWornBackpackSlot(EntityPlayer otherPlayer) {
+			int[] wornSlot = {-1};
+			PlayerInventoryProvider.runOnBackpacks(otherPlayer, (backpack, slot) -> {
+				wornSlot[0] = slot;
+				return true;
+			}, true);
+			return wornSlot[0];
 		}
 
 		@Override
@@ -230,9 +248,18 @@ public abstract class BackpackContext {
 		 * that takes columns needs at once.
 		 */
 		protected void sendBackpack(EntityPlayerMP player) {
-			ItemStack backpack = getBackpackStack(player);
+			EntityPlayer otherPlayer = getOtherPlayer(player);
+			if (otherPlayer == null) {
+				return;
+			}
+			int slot = getWornBackpackSlot(otherPlayer);
+			ItemStack backpack = PlayerInventoryProvider.getStackInSlot(otherPlayer, slot);
 			sendContents(player, BackpackWrapper.fromStack(backpack));
-			player.connection.sendPacket(new SPacketEntityEquipment(otherPlayerId, EntityEquipmentSlot.CHEST, backpack));
+			if (slot == PlayerInventoryProvider.CHEST_SLOT) {
+				player.connection.sendPacket(new SPacketEntityEquipment(otherPlayerId, EntityEquipmentSlot.CHEST, backpack));
+			} else {
+				PacketHandler.INSTANCE.sendTo(new BackpackSlotSyncMessage(otherPlayerId, slot, backpack), player);
+			}
 		}
 
 		@Override

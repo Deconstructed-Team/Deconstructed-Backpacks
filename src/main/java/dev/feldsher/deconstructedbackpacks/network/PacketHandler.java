@@ -22,5 +22,6 @@ public class PacketHandler {
 		INSTANCE.registerMessage(RequestBackpackContentsMessage.Handler.class, RequestBackpackContentsMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(NetworkStashMessage.Handler.class, NetworkStashMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(AnotherPlayerBackpackOpenMessage.Handler.class, AnotherPlayerBackpackOpenMessage.class, id++, Side.SERVER);
+		INSTANCE.registerMessage(BackpackSlotSyncMessage.Handler.class, BackpackSlotSyncMessage.class, id++, Side.CLIENT);
 	}
 }

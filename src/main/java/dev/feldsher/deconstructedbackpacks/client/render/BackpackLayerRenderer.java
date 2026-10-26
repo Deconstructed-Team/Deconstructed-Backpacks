@@ -16,6 +16,8 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import dev.feldsher.deconstructedbackpacks.util.PlayerInventoryProvider;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 
@@ -53,7 +55,9 @@ public class BackpackLayerRenderer implements LayerRenderer<EntityLivingBase> {
 	@Override
 	public void doRenderLayer(EntityLivingBase entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		ItemStack chestStack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		if (!(chestStack.getItem() instanceof BackpackItem)) {
+		// a player's may be in Baubles, over the chest slot's armor
+		ItemStack backpack = entity instanceof EntityPlayer ? PlayerInventoryProvider.getRenderedBackpack((EntityPlayer) entity) : chestStack;
+		if (!(backpack.getItem() instanceof BackpackItem)) {
 			return;
 		}
 
@@ -69,10 +73,10 @@ public class BackpackLayerRenderer implements LayerRenderer<EntityLivingBase> {
 			// lower than a biped's, on its shorter legs
 			((ModelCreeper) renderer.getMainModel()).body.postRender(scale);
 		}
-		BackpackModel.translateRotateAndScale(entity, false);
+		BackpackModel.translateRotateAndScale(entity, backpack != chestStack && !chestStack.isEmpty());
 
-		IBackpackWrapper wrapper = BackpackWrapper.fromStack(chestStack);
-		MODEL.render(wrapper.getMainColor(), wrapper.getAccentColor(), chestStack.getItem(), wrapper.getRenderInfo());
+		IBackpackWrapper wrapper = BackpackWrapper.fromStack(backpack);
+		MODEL.render(wrapper.getMainColor(), wrapper.getAccentColor(), backpack.getItem(), wrapper.getRenderInfo());
 		renderItemShown(wrapper.getRenderInfo());
 		GlStateManager.popMatrix();
 		renderUpgrades(entity, wrapper.getRenderInfo(), renderer.getMainModel() instanceof ModelCreeper ? CREEPER_BODY_DROP : 0);

@@ -1,9 +1,9 @@
 package dev.feldsher.deconstructedbackpacks.network;
 
+import dev.feldsher.deconstructedbackpacks.util.PlayerInventoryProvider;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContext;
-import dev.feldsher.deconstructedbackpacks.common.gui.GuiHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -18,7 +18,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * backpack in one of its storage slots, or goes back from such a one to the backpack it's in.
  */
 public class BackpackOpenMessage implements IMessage {
-	private static final int CHEST_SLOT = 38;
 	private static final byte INVENTORY = 0;
 	private static final byte SUB_BACKPACK = 1;
 	private static final byte PARENT = 2;
@@ -87,17 +86,11 @@ public class BackpackOpenMessage implements IMessage {
 				return;
 			}
 
-			for (int slot = 0; slot < player.inventory.mainInventory.size(); slot++) {
-				if (isBackpack(player.inventory.getStackInSlot(slot))) {
-					openBackpack(player, slot);
-					return;
-				}
-			}
-			if (isBackpack(player.inventory.getStackInSlot(GuiHandler.OFFHAND_SLOT))) {
-				openBackpack(player, GuiHandler.OFFHAND_SLOT);
-			} else if (isBackpack(player.inventory.getStackInSlot(CHEST_SLOT))) {
-				openBackpack(player, CHEST_SLOT);
-			}
+			// The first one carried, worn ones first, as PlayerInventoryProvider orders them
+			PlayerInventoryProvider.runOnBackpacks(player, (backpack, slot) -> {
+				openBackpack(player, slot);
+				return true;
+			});
 		}
 
 		/** Only one level deep, as the inception upgrade works: a sub-backpack's own sub-backpacks aren't opened. */

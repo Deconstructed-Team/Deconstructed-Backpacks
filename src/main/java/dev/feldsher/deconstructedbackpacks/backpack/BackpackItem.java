@@ -234,11 +234,15 @@ public class BackpackItem extends Item implements IStashStorageItem {
 	/** The upgrades of every backpack a player carries tick, wherever in the inventory it is. */
 	@Override
 	public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-		if (world.isRemote || !(entity instanceof EntityPlayer)) {
-			return;
+		if (entity instanceof EntityPlayer) {
+			tickCarried(stack, (EntityPlayer) entity);
 		}
-		EntityPlayer player = (EntityPlayer) entity;
-		if (player.isSpectator() || player.isDead) {
+	}
+
+	/** On the server, a backpack the player carries: in the inventory, or in a slot a mod adds, as Baubles'. */
+	public void tickCarried(ItemStack stack, EntityPlayer player) {
+		World world = player.world;
+		if (world.isRemote || player.isSpectator() || player.isDead) {
 			return;
 		}
 		IBackpackWrapper wrapper = BackpackWrapper.fromStack(stack);

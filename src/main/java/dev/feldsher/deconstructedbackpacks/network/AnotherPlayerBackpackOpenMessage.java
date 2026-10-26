@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.network;
 
+import dev.feldsher.deconstructedbackpacks.util.PlayerInventoryProvider;
 import dev.feldsher.deconstructedbackpacks.Config;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
@@ -11,7 +12,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -60,7 +60,7 @@ public class AnotherPlayerBackpackOpenMessage implements IMessage {
 				return;
 			}
 			EntityPlayer anotherPlayer = (EntityPlayer) entity;
-			ItemStack backpack = anotherPlayer.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+			ItemStack backpack = PlayerInventoryProvider.getRenderedBackpack(anotherPlayer);
 			if (!(backpack.getItem() instanceof BackpackItem)) {
 				return;
 			}

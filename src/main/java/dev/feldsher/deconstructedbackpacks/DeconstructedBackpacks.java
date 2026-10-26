@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedbackpacks.compat.baubles.BaublesCompat;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import dev.feldsher.deconstructedbackpacks.command.DbpCommand;
@@ -38,6 +39,7 @@ public class DeconstructedBackpacks {
 	public void preInit(FMLPreInitializationEvent event) {
 		LOGGER.info("{} {} loading", Tags.MOD_NAME, Tags.VERSION);
 		PacketHandler.init();
+		BaublesCompat.init();
 	}
 
 	@Mod.EventHandler

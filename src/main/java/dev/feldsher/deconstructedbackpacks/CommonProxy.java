@@ -3,6 +3,8 @@ package dev.feldsher.deconstructedbackpacks;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackSettingsContainerMenu;
 
+import net.minecraft.world.World;
+
 import javax.annotation.Nullable;
 
 /** What only one side does. The server's half does nothing; the client's is {@link dev.feldsher.deconstructedbackpacks.client.ClientProxy}. */
@@ -22,6 +24,12 @@ public class CommonProxy {
 
 	@Nullable
 	public Object createBackpackSettingsScreen(BackpackSettingsContainerMenu container) {
+		return null;
+	}
+
+	/** The world the client shows; none on a server. */
+	@Nullable
+	public World getClientWorld() {
 		return null;
 	}
 }

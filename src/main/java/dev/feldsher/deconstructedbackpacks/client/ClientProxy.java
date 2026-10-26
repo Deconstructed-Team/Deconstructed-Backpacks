@@ -12,6 +12,7 @@ import dev.feldsher.deconstructedbackpacks.client.gui.BackpackSettingsScreen;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackSettingsContainerMenu;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 
 @SuppressWarnings("unused") // instantiated by @SidedProxy
@@ -39,5 +40,10 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public Object createBackpackSettingsScreen(BackpackSettingsContainerMenu container) {
 		return new BackpackSettingsScreen(container);
+	}
+
+	@Override
+	public World getClientWorld() {
+		return Minecraft.getMinecraft().world;
 	}
 }
