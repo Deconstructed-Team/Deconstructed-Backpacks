@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks.common.gui;
 
+import dev.feldsher.deconstructedbackpacks.backpack.UUIDDeduplicator;
 import net.minecraft.item.ItemStack;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackAccessLogger;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
@@ -22,6 +23,10 @@ public class BackpackContainer extends StorageContainerMenuBase<IBackpackWrapper
 			ItemStack backpack = storageWrapper.getBackpack();
 			BackpackAccessLogger.logPlayerAccess(player, backpack.getItem(), backpackUuid, backpack.getDisplayName(),
 					storageWrapper.getMainColor(), storageWrapper.getAccentColor(), storageWrapper.getColumnsTaken());
+
+			if (!player.world.isRemote) {
+				UUIDDeduplicator.checkForDuplicateBackpacksAndRemoveTheirUUID(player, backpackUuid, storageWrapper.getBackpack());
+			}
 		});
 	}
 

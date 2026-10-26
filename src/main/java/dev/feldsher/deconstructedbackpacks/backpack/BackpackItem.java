@@ -99,12 +99,18 @@ public class BackpackItem extends Item implements IStashStorageItem {
 		return true;
 	}
 
-	/** Dropped with the everlasting upgrade, it's indestructible; fire resistant ones don't burn. */
+	/**
+	 * Dropped with the everlasting upgrade, it's indestructible; fire resistant ones don't burn. Forge asks this as each
+	 * dropped backpack joins the world, so that's also where a duplicate next to the original loses its contents.
+	 */
 	@Nullable
 	@Override
 	public Entity createEntity(World world, Entity location, ItemStack stack) {
 		if (!(location instanceof EntityItem)) {
 			return null;
+		}
+		if (!world.isRemote) {
+			UUIDDeduplicator.dedupeBackpackItemEntityInArea((EntityItem) location);
 		}
 		if (hasEverlastingUpgrade(stack)) {
 			return new EverlastingBackpackItemEntity(world, (EntityItem) location, stack);
