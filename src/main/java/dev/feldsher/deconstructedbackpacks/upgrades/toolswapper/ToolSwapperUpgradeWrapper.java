@@ -120,7 +120,7 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		}
 		if (!selectedTool.isEmpty() && hasSpaceInBackpackOrCanPlaceInTheSlotOfSwappedTool(backpackInventory, mainHandItem, selectedTool, selectedSlot)) {
 			player.setHeldItem(EnumHand.MAIN_HAND, backpackInventory.extractItem(selectedSlot, 1, false));
-			backpackInventory.insertItem(mainHandItem, false);
+			giveNotInserted(player, backpackInventory.insertItem(mainHandItem, false));
 			return true;
 		}
 		return false;
@@ -222,11 +222,18 @@ public class ToolSwapperUpgradeWrapper extends UpgradeWrapperBase<ToolSwapperUpg
 		InventoryHelper.extractFromInventory(weaponCopy, backpackInventory, false);
 		if (backpackInventory.insertItem(mainHandItem, true).isEmpty()) {
 			player.setHeldItem(EnumHand.MAIN_HAND, weaponCopy);
-			backpackInventory.insertItem(mainHandItem, false);
+			giveNotInserted(player, backpackInventory.insertItem(mainHandItem, false));
 			return true;
 		}
-		backpackInventory.insertItem(weaponCopy, false);
+		giveNotInserted(player, backpackInventory.insertItem(weaponCopy, false));
 		return false;
+	}
+
+	/** A backpack may take less than it said it would; what it didn't goes to the player, not lost. */
+	private static void giveNotInserted(EntityPlayer player, ItemStack notInserted) {
+		if (!notInserted.isEmpty()) {
+			ItemHandlerHelper.giveItemToPlayer(player, notInserted);
+		}
 	}
 
 	@Override

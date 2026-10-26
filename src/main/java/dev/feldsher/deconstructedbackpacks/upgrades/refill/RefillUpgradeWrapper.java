@@ -174,8 +174,12 @@ public class RefillUpgradeWrapper extends UpgradeWrapperBase<RefillUpgradeWrappe
 			return true;
 		}
 		ItemStack extracted = InventoryHelper.extractFromInventory(toExtract, inventoryHandler, false);
-		inventoryHandler.insertItem(mainHandItem, false);
+		// what the backpack doesn't take after all goes to the player
+		ItemStack notInserted = inventoryHandler.insertItem(mainHandItem, false);
 		player.setHeldItem(EnumHand.MAIN_HAND, extracted);
+		if (!notInserted.isEmpty()) {
+			ItemHandlerHelper.giveItemToPlayer(player, notInserted);
+		}
 		return true;
 	}
 
