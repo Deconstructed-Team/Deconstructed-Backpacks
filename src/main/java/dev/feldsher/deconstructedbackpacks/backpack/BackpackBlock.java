@@ -1,5 +1,10 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
+import dev.feldsher.deconstructedcore.client.render.UpgradeRenderRegistry;
+import java.util.Random;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraft.client.Minecraft;
 import dev.feldsher.deconstructedcore.renderdata.RenderInfo;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -113,6 +118,19 @@ public class BackpackBlock extends Block {
 			return ((IExtendedBlockState) state).withProperty(RENDER_INFO, ((BackpackBlockEntity) te).getBackpackWrapper().getRenderInfo());
 		}
 		return state;
+	}
+
+	/** What its working upgrades show, as a furnace's flames, from the middle of its back face. */
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+		TileEntity te = world.getTileEntity(pos);
+		if (!(te instanceof BackpackBlockEntity) || Minecraft.getMinecraft().isGamePaused()) {
+			return;
+		}
+		float yRot = (float) Math.toRadians(state.getValue(FACING).getHorizontalAngle());
+		UpgradeRenderRegistry.render(((BackpackBlockEntity) te).getBackpackWrapper().getRenderInfo().getUpgradeRenderData(), world, rand,
+				offset -> offset.add(0, 0, 0.41).rotateYaw(-yRot).add(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5));
 	}
 
 	/** The tanks' glass lets through what's behind it. */
