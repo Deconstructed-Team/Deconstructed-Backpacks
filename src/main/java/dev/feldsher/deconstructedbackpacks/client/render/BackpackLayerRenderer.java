@@ -19,8 +19,8 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 
 /**
- * A backpack in the chest slot, on the back of whoever wears it: players and every mob drawn with a biped model.
- * Its displayed item is on its front; upgrade particles come with the upgrades that make them.
+ * A backpack in the chest slot, on the back of whoever wears it: players and every living entity, as mobs that spawn with one.
+ * Its displayed item is on its front, its working upgrades' particles come off its back.
  */
 public class BackpackLayerRenderer implements LayerRenderer<EntityLivingBase> {
 	private static final BackpackModel MODEL = new BackpackModel();
@@ -30,13 +30,13 @@ public class BackpackLayerRenderer implements LayerRenderer<EntityLivingBase> {
 		this.renderer = renderer;
 	}
 
-	/** Adds the layer to the players' renderers and to every living entity's renderer with a biped model. */
+	/** Adds the layer to the players' renderers and to every living entity's renderer. */
 	public static void addToRenderers(RenderManager renderManager) {
 		for (RenderPlayer playerRenderer : renderManager.getSkinMap().values()) {
 			playerRenderer.addLayer(new BackpackLayerRenderer(playerRenderer));
 		}
 		for (Render<?> render : renderManager.entityRenderMap.values()) {
-			if (render instanceof RenderLivingBase && ((RenderLivingBase<?>) render).getMainModel() instanceof ModelBiped) {
+			if (render instanceof RenderLivingBase) {
 				addLayer((RenderLivingBase<?>) render);
 			}
 		}
@@ -50,16 +50,19 @@ public class BackpackLayerRenderer implements LayerRenderer<EntityLivingBase> {
 	@Override
 	public void doRenderLayer(EntityLivingBase entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 		ItemStack chestStack = entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
-		if (!(chestStack.getItem() instanceof BackpackItem) || !(renderer.getMainModel() instanceof ModelBiped)) {
+		if (!(chestStack.getItem() instanceof BackpackItem)) {
 			return;
 		}
 
 		GlStateManager.pushMatrix();
-		// ModelBiped moves itself down when sneaking, and so does every layer that follows its body
-		if (entity.isSneaking()) {
-			GlStateManager.translate(0.0F, 0.2F, 0.0F);
+		// on a model with no body to follow, as a creeper's, it's where a body would be
+		if (renderer.getMainModel() instanceof ModelBiped) {
+			// ModelBiped moves itself down when sneaking, and so does every layer that follows its body
+			if (entity.isSneaking()) {
+				GlStateManager.translate(0.0F, 0.2F, 0.0F);
+			}
+			((ModelBiped) renderer.getMainModel()).bipedBody.postRender(scale);
 		}
-		((ModelBiped) renderer.getMainModel()).bipedBody.postRender(scale);
 		BackpackModel.translateRotateAndScale(entity, false);
 
 		IBackpackWrapper wrapper = BackpackWrapper.fromStack(chestStack);

@@ -1,5 +1,14 @@
 package dev.feldsher.deconstructedbackpacks.common;
 
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.entity.EntityMobGriefingEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.EntityLivingBase;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import net.minecraft.util.EnumActionResult;
@@ -62,6 +71,38 @@ public class CommonEventHandler {
 	}
 
 	private CommonEventHandler() {}
+
+	@SubscribeEvent
+	public static void onLivingSpecialSpawn(LivingSpawnEvent.SpecialSpawn event) {
+		EntityLivingBase entity = event.getEntityLiving();
+		if (entity instanceof EntityMob && !entity.world.isRemote && entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty()) {
+			EntityBackpackAdditionHandler.addBackpack((EntityMob) entity, entity.world);
+		}
+	}
+
+	@SubscribeEvent
+	public static void onLivingDrops(LivingDropsEvent event) {
+		EntityBackpackAdditionHandler.handleBackpackDrop(event);
+	}
+
+	@SubscribeEvent
+	public static void onEntityMobGriefing(EntityMobGriefingEvent event) {
+		if (event.getEntity() instanceof EntityCreeper) {
+			EntityBackpackAdditionHandler.removeBeneficialEffects((EntityCreeper) event.getEntity());
+		}
+	}
+
+	@SubscribeEvent
+	public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
+		EntityBackpackAdditionHandler.onLivingUpdate(event.getEntityLiving());
+	}
+
+	@SubscribeEvent
+	public static void onWorldLoad(WorldEvent.Load event) {
+		if (!event.getWorld().isRemote) {
+			event.getWorld().addEventListener(new EntityBackpackAdditionHandler.RemovalListener());
+		}
+	}
 
 	@SubscribeEvent
 	public static void onBlockBreak(BlockEvent.BreakEvent event) {

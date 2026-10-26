@@ -1,5 +1,14 @@
 package dev.feldsher.deconstructedbackpacks.backpack.wrapper;
 
+import java.util.List;
+import dev.feldsher.deconstructedcore.util.RandHelper;
+import dev.feldsher.deconstructedcore.util.LootHelper;
+import dev.feldsher.deconstructedcore.util.InventoryHelper;
+import net.minecraftforge.common.util.Constants;
+import net.minecraft.world.WorldServer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.energy.IEnergyStorage;
 import dev.feldsher.deconstructedcore.upgrades.battery.BatteryUpgradeItem;
 import dev.feldsher.deconstructedcore.inventory.IItemHandlerSimpleInserter;
@@ -40,8 +49,8 @@ import java.util.UUID;
  * not here: every stack with the same UUID works on the same ones, and so sees the same backpack.
  * <p>
  * The stack also carries what clients draw it with, its render info, which each stack's wrapper refreshes from the
- * shared contents. Its tanks are those of its tank upgrades, its energy its battery upgrade's. Loot comes with the stage that
- * ports it.
+ * shared contents. Its tanks are those of its tank upgrades, its energy its battery upgrade's. A backpack a mob spawned with
+ * also carries the loot it holds, put in as it's first opened.
  */
 public class BackpackWrapper implements IBackpackWrapper {
 	public static final int DEFAULT_MAIN_COLOR = 0xFF_CC613A;
@@ -60,6 +69,10 @@ public class BackpackWrapper implements IBackpackWrapper {
 	private static final String UPGRADE_PROCESSING_INVENTORY = "upgradeProcessingInventory";
 	private static final String FLUID_HANDLER = "fluidHandler";
 	private static final String ENERGY_STORAGE = "energyStorage";
+	private static final String LOOT_TABLE = "loot_table";
+	private static final String LOOT_FACTOR = "loot_factor";
+	// what 1.21 keeps in the container component
+	private static final String CONTAINER = "container";
 
 	@Nullable
 	private UpgradeHandler dummyUpgradeHandler = null;
@@ -361,6 +374,64 @@ public class BackpackWrapper implements IBackpackWrapper {
 	@Override
 	public void setContentsUuid(UUID storageUuid) {
 		StorageNbt.setStorageUuid(getBackpackStack(), storageUuid);
+	}
+
+	@Override
+	public void setLoot(ResourceLocation lootTableName, float lootFactor) {
+		NBTTagCompound tag = StorageNbt.getOrCreateTag(getBackpackStack());
+		tag.setString(LOOT_TABLE, lootTableName.toString());
+		tag.setFloat(LOOT_FACTOR, lootFactor);
+		backpackSaveHandler.run();
+	}
+
+	@Override
+	public void setExtraItems(List<ItemStack> extraItems) {
+		NBTTagList items = new NBTTagList();
+		extraItems.forEach(stack -> items.appendTag(stack.writeToNBT(new NBTTagCompound())));
+		StorageNbt.getOrCreateTag(getBackpackStack()).setTag(CONTAINER, items);
+		backpackSaveHandler.run();
+	}
+
+	@Override
+	public void fillWithLoot(EntityPlayer player) {
+		if (!(player.world instanceof WorldServer)) {
+			return;
+		}
+		fillWithLootFromTable((WorldServer) player.world, player);
+		fillWithExtraItems(player);
+	}
+
+	private void fillWithLootFromTable(WorldServer world, EntityPlayer player) {
+		NBTTagCompound tag = getBackpackStack().getTagCompound();
+		if (tag == null || !tag.hasKey(LOOT_TABLE)) {
+			return;
+		}
+		ResourceLocation lootTable = new ResourceLocation(tag.getString(LOOT_TABLE));
+		float lootFactor = tag.getFloat(LOOT_FACTOR);
+		tag.removeTag(LOOT_TABLE);
+		tag.removeTag(LOOT_FACTOR);
+
+		List<ItemStack> loot = LootHelper.getLoot(lootTable, world, player);
+		loot.removeIf(stack -> stack.getItem() instanceof BackpackItem);
+		loot = RandHelper.getNRandomElements(loot, (int) (loot.size() * lootFactor), world.rand);
+		LootHelper.fillWithLoot(world.rand, loot, getInventoryHandler());
+		backpackSaveHandler.run();
+	}
+
+	private void fillWithExtraItems(EntityPlayer player) {
+		NBTTagCompound tag = getBackpackStack().getTagCompound();
+		if (tag == null || !tag.hasKey(CONTAINER)) {
+			return;
+		}
+		NBTTagList items = tag.getTagList(CONTAINER, Constants.NBT.TAG_COMPOUND);
+		tag.removeTag(CONTAINER);
+		for (int i = 0; i < items.tagCount(); i++) {
+			ItemStack stack = new ItemStack(items.getCompoundTagAt(i));
+			if (!stack.isEmpty()) {
+				InventoryHelper.insertOrDropItem(player, stack, getInventoryHandler());
+			}
+		}
+		backpackSaveHandler.run();
 	}
 
 	@Override

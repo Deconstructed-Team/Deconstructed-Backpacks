@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @net.minecraftforge.common.config.Config(modid = DeconstructedBackpacks.MOD_ID)
@@ -150,6 +151,9 @@ public class Config {
 		@net.minecraftforge.common.config.Config.Comment("Determines whether player can right click on backpack that another player is wearing to open it. If off will turn off that capability for everyone and remove related settings from backpack.")
 		public boolean allowOpeningOtherPlayerBackpacks = true;
 
+		@net.minecraftforge.common.config.Config.Comment("Settings for Spawning Entities with Backpack")
+		public final EntityBackpackAdditionsConfig entityBackpackAdditions = new EntityBackpackAdditionsConfig();
+
 		@net.minecraftforge.common.config.Config.Comment("Turns on/off item fluid handler of backpack in its item form. There are some dupe bugs caused by default fluid handling implementation that manifest when backpack is drained / filled in its item form in another mod's tank and the only way to prevent them is disallowing drain/fill in item form altogether")
 		public boolean itemFluidHandlerEnabled = true;
 
@@ -204,6 +208,7 @@ public class Config {
 			disallowedItemsSet = null;
 			noInteractionBlocksSet = null;
 			maxUpgrades = null;
+			entityBackpackAdditions.clearCache();
 			stackUpgrade.config.clearNonStackableItems();
 		}
 	}
@@ -214,6 +219,93 @@ public class Config {
 
 		@net.minecraftforge.common.config.Config.Ignore
 		public final StackUpgradeConfig config = new StackUpgradeConfig(() -> nonStackableItems);
+	}
+
+	public static class EntityBackpackAdditionsConfig {
+		@net.minecraftforge.common.config.Config.Comment("Chance of an entity spawning with Backpack")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0, max = 1)
+		public double chance = 0.01;
+		@net.minecraftforge.common.config.Config.Comment("Turns on/off addition of loot into backpacks")
+		public boolean addLoot = true;
+		@net.minecraftforge.common.config.Config.Comment("Turns on/off buffing the entity that wears backpack with potion effects. These are scaled based on how much loot is added.")
+		public boolean buffWithPotionEffects = true;
+		@net.minecraftforge.common.config.Config.Comment("Turns on/off buffing the entity that wears backpack with additional health. Health is scaled based on backpack tier the mob wears.")
+		public boolean buffHealth = true;
+		@net.minecraftforge.common.config.Config.Comment("Turns on/off equiping the entity that wears backpack with armor. What armor material and how enchanted is scaled based on backpack tier the mob wears.")
+		public boolean equipWithArmor = true;
+		@net.minecraftforge.common.config.Config.Comment("Map of entities that can spawn with backpack and related loot tables (if adding a loot is enabled) in format of \"EntityRegistryName|LootTableName\"")
+		public String[] entityLootTableList = {
+				"minecraft:creeper|minecraft:chests/desert_pyramid",
+				"minecraft:enderman|minecraft:chests/end_city_treasure",
+				"minecraft:evocation_illager|minecraft:chests/woodland_mansion",
+				"minecraft:husk|minecraft:chests/desert_pyramid",
+				"minecraft:skeleton|minecraft:chests/simple_dungeon",
+				"minecraft:stray|minecraft:chests/igloo_chest",
+				"minecraft:vex|minecraft:chests/woodland_mansion",
+				"minecraft:vindication_illager|minecraft:chests/woodland_mansion",
+				"minecraft:witch|minecraft:chests/jungle_temple",
+				"minecraft:wither_skeleton|minecraft:chests/nether_bridge",
+				"minecraft:zombie|minecraft:chests/simple_dungeon",
+				"minecraft:zombie_villager|minecraft:chests/village_blacksmith",
+				"minecraft:zombie_pigman|minecraft:chests/nether_bridge"
+		};
+		@net.minecraftforge.common.config.Config.Comment("List of music discs that are not supposed to be played by entities")
+		public String[] discBlockList = {"botania:recordgaia1", "botania:recordgaia2"};
+		@net.minecraftforge.common.config.Config.Comment("Turns on/off a chance that the entity that wears backpack gets jukebox upgrade and plays a music disc.")
+		public boolean playJukebox = true;
+		@net.minecraftforge.common.config.Config.Comment("Determines whether backpack drops to fake players if killed by them in addition to real ones that it always drops to")
+		public boolean dropToFakePlayers = false;
+		@net.minecraftforge.common.config.Config.Comment("Chance of mob dropping backpack when killed by player")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0, max = 1)
+		public double backpackDropChance = 0.5;
+		@net.minecraftforge.common.config.Config.Comment("Chance increase per looting level of mob dropping backpack")
+		@net.minecraftforge.common.config.Config.RangeDouble(min = 0, max = 0.3)
+		public double lootingChanceIncreasePerLevel = 0.15;
+
+		@net.minecraftforge.common.config.Config.Ignore
+		@Nullable
+		private Map<ResourceLocation, Optional<ResourceLocation>> entityLootTables = null;
+		@net.minecraftforge.common.config.Config.Ignore
+		@Nullable
+		private Set<ResourceLocation> blockedDiscs = null;
+
+		/** The loot table of the entity's backpack, empty if it gets none ("null" in the list). */
+		public Optional<ResourceLocation> getLootTableName(ResourceLocation entityName) {
+			return getEntityLootTables().getOrDefault(entityName, Optional.empty());
+		}
+
+		public boolean canWearBackpack(ResourceLocation entityName) {
+			return getEntityLootTables().containsKey(entityName);
+		}
+
+		public boolean isDiscBlocked(ResourceLocation discName) {
+			if (blockedDiscs == null) {
+				blockedDiscs = new HashSet<>();
+				for (String disc : discBlockList) {
+					blockedDiscs.add(new ResourceLocation(disc));
+				}
+			}
+			return blockedDiscs.contains(discName);
+		}
+
+		private Map<ResourceLocation, Optional<ResourceLocation>> getEntityLootTables() {
+			if (entityLootTables == null) {
+				entityLootTables = new HashMap<>();
+				for (String mapping : entityLootTableList) {
+					String[] entityLoot = mapping.split("\\|");
+					if (entityLoot.length < 2) {
+						continue;
+					}
+					entityLootTables.put(new ResourceLocation(entityLoot[0]), entityLoot[1].equals("null") ? Optional.empty() : Optional.of(new ResourceLocation(entityLoot[1])));
+				}
+			}
+			return entityLootTables;
+		}
+
+		private void clearCache() {
+			entityLootTables = null;
+			blockedDiscs = null;
+		}
 	}
 
 	public static class BackpackConfig {

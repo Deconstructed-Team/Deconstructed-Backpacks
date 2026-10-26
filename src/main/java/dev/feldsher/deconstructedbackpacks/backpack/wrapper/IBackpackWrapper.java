@@ -2,7 +2,9 @@ package dev.feldsher.deconstructedbackpacks.backpack.wrapper;
 
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface IBackpackWrapper extends IStorageWrapper {
@@ -21,6 +23,12 @@ public interface IBackpackWrapper extends IStorageWrapper {
 	void ensureSlotNumbersAtLeast(int numberOfInventorySlots, int numberOfUpgradeSlots);
 
 	void setContentsUuid(UUID storageUuid);
+
+	/** Loot to put in as it's first opened: the share of what the table gives, 0 to 1. */
+	void setLoot(ResourceLocation lootTableName, float lootFactor);
+
+	/** Items to put in its inventory as it's first opened, or to drop if they don't fit. */
+	void setExtraItems(List<ItemStack> extraItems);
 
 	default void removeContentsUuid() {
 		//noop by default
