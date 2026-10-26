@@ -5,6 +5,8 @@ import dev.feldsher.deconstructedcore.util.RandHelper;
 import dev.feldsher.deconstructedcore.util.LootHelper;
 import dev.feldsher.deconstructedcore.util.InventoryHelper;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraft.world.WorldServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.nbt.NBTTagList;
@@ -118,8 +120,26 @@ public class BackpackWrapper implements IBackpackWrapper {
 			contents.addSlotChangeListener(this, slotChangeListener);
 			listenedContents = contents;
 		}
-		return contents.getShared(INVENTORY_HANDLER, () -> new BackpackInventoryHandler(getNumberOfInventorySlots() - (getNumberOfSlotRows() * getColumnsTaken()),
+		InventoryHandler inventoryHandler = contents.getShared(INVENTORY_HANDLER, () -> new BackpackInventoryHandler(getExpectedInventorySlots(),
 				this, contents.getNbt(), contents::onSlotChanged, StackUpgradeItem.getInventorySlotLimit(this)));
+		growToExpectedSize(inventoryHandler, getExpectedInventorySlots());
+		return inventoryHandler;
+	}
+
+	private int getExpectedInventorySlots() {
+		return getNumberOfInventorySlots() - (getNumberOfSlotRows() * getColumnsTaken());
+	}
+
+	/**
+	 * A tier up, the shared inventory gets the slots added, in place: what holds it, as another player's open
+	 * container, a backpack around this one or a pipe, goes on with the one live inventory. Grown only on the server,
+	 * whose inventory the client's copies come from, and never shrunk here: another stack with these contents, as the
+	 * one in a crafting grid while the next tier shows as the result, may still have the slot counts it had before.
+	 */
+	private static void growToExpectedSize(InventoryHandler inventoryHandler, int expectedSlots) {
+		if (inventoryHandler.getSlots() < expectedSlots && FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			inventoryHandler.changeSlots(expectedSlots - inventoryHandler.getSlots());
+		}
 	}
 
 	/** The inventory as each inventory wrapping upgrade, as inception, wraps it in turn; made again when upgrades change. */
@@ -162,12 +182,18 @@ public class BackpackWrapper implements IBackpackWrapper {
 		}
 		dummyUpgradeHandler = null;
 		StorageContents contents = getContents();
-		return contents.getShared(UPGRADE_HANDLER, () -> new UpgradeHandler(getNumberOfUpgradeSlots(), this, contents.getNbt(), contents::markDirty, this::onUpgradesChanged) {
+		UpgradeHandler upgradeHandler = contents.getShared(UPGRADE_HANDLER, () -> new UpgradeHandler(getNumberOfUpgradeSlots(), this, contents.getNbt(), contents::markDirty, this::onUpgradesChanged) {
 			@Override
 			public boolean isItemValid(int slot, ItemStack stack) {
 				return super.isItemValid(slot, stack) && (stack.isEmpty() || ModItems.isBackpackUpgrade(stack.getItem()));
 			}
 		});
+		// as the inventory, in place and only grown
+		int expectedSlots = getNumberOfUpgradeSlots();
+		if (upgradeHandler.getSlots() < expectedSlots && FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			upgradeHandler.increaseSize(expectedSlots - upgradeHandler.getSlots());
+		}
+		return upgradeHandler;
 	}
 
 	@Override
@@ -348,18 +374,11 @@ public class BackpackWrapper implements IBackpackWrapper {
 		getUpgradeHandler().setPersistent(persistent);
 	}
 
+	/** Only the stack's counts: the shared handlers grow to them as they're next asked for. */
 	@Override
 	public void setSlotNumbers(int numberOfInventorySlots, int numberOfUpgradeSlots) {
-		boolean changed = getNumberOfInventorySlots() != numberOfInventorySlots || getNumberOfUpgradeSlots() != numberOfUpgradeSlots;
 		setNumberOfInventorySlots(numberOfInventorySlots);
 		setNumberOfUpgradeSlots(numberOfUpgradeSlots);
-		if (changed) {
-			// The shared handlers have the old slot counts: they're built again, from the contents, with the new ones
-			getContentsUuid().map(BackpackStorage::getContents).ifPresent(contents -> {
-				contents.removeShared(INVENTORY_HANDLER);
-				contents.removeShared(UPGRADE_HANDLER);
-			});
-		}
 	}
 
 	@Override
@@ -452,18 +471,18 @@ public class BackpackWrapper implements IBackpackWrapper {
 		return backpack;
 	}
 
-	/** Changed, the inventory has other slots: it's built again, from the contents, with them. */
+	/**
+	 * Changed, the inventory gets or gives up the columns' slots, in place, so that it stays the one live inventory.
+	 * The slots given up were checked empty before the upgrade went in.
+	 */
 	@Override
 	public void setColumnsTaken(int columnsTaken, boolean hasChanged) {
-		boolean changed = getColumnsTaken() != columnsTaken;
+		int originalColumnsTaken = getColumnsTaken();
+		InventoryHandler inventoryHandler = hasChanged && originalColumnsTaken != columnsTaken && getContentsUuid().isPresent() ? getInventoryHandler() : null;
 		StorageNbt.getOrCreateTag(getBackpackStack()).setInteger(StorageNbt.COLUMNS_TAKEN, columnsTaken);
-		if (changed && hasChanged) {
-			getContentsUuid().map(BackpackStorage::getContents).ifPresent(contents -> {
-				contents.removeShared(INVENTORY_HANDLER);
-				contents.removeShared(UPGRADE_PROCESSING_INVENTORY);
-				contents.removeShared(FLUID_HANDLER);
-				contents.removeShared(ENERGY_STORAGE);
-			});
+		if (inventoryHandler != null) {
+			inventoryHandler.changeSlots((originalColumnsTaken - columnsTaken) * getNumberOfSlotRows());
+			refreshInventoryForUpgradeProcessing();
 		}
 		backpackSaveHandler.run();
 	}
