@@ -1,5 +1,6 @@
 package dev.feldsher.deconstructedbackpacks;
 
+import dev.feldsher.deconstructedbackpacks.compat.botania.BotaniaCompat;
 import dev.feldsher.deconstructedbackpacks.compat.baubles.BaublesCompat;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -40,6 +41,7 @@ public class DeconstructedBackpacks {
 		LOGGER.info("{} {} loading", Tags.MOD_NAME, Tags.VERSION);
 		PacketHandler.init();
 		BaublesCompat.init();
+		BotaniaCompat.init();
 	}
 
 	@Mod.EventHandler

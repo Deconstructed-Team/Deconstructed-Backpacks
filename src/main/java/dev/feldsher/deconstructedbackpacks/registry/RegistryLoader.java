@@ -29,7 +29,7 @@ import java.util.Optional;
  */
 public class RegistryLoader {
 	private static final String MOD_FILES_PATH = "/assets/" + DeconstructedBackpacks.MOD_ID + "/registry/";
-	private static final String[] MOD_FILES = {"block_tools", "entity_tools", "swords"};
+	private static final String[] MOD_FILES = {"block_tools", "entity_tools", "swords", "compat/botania/block_tools"};
 	private static final Map<String, IRegistryDataLoader> loaders = new HashMap<>();
 	private static final Gson GSON = new Gson();
 
