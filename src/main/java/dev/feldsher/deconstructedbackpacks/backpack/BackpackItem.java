@@ -44,6 +44,7 @@ import dev.feldsher.deconstructedbackpacks.network.BackpackContentsMessage;
 import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
 import dev.feldsher.deconstructedbackpacks.network.RequestBackpackContentsMessage;
 import dev.feldsher.deconstructedcore.api.IStashStorageItem;
+import dev.feldsher.deconstructedcore.util.ColorHelper;
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.settings.memory.MemorySettingsCategory;
@@ -52,6 +53,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -135,6 +137,11 @@ public class BackpackItem extends Item implements IStashStorageItem {
 			setColors(stack, color.getColorValue(), color.getColorValue());
 			items.add(stack);
 		}
+
+		ItemStack stack = new ItemStack(this);
+		setColors(stack, ColorHelper.calculateColor(BackpackWrapper.DEFAULT_MAIN_COLOR, BackpackWrapper.DEFAULT_MAIN_COLOR, Arrays.asList(EnumDyeColor.YELLOW, EnumDyeColor.LIME)),
+				ColorHelper.calculateColor(BackpackWrapper.DEFAULT_ACCENT_COLOR, BackpackWrapper.DEFAULT_ACCENT_COLOR, Arrays.asList(EnumDyeColor.BLUE, EnumDyeColor.BLACK)));
+		items.add(stack);
 	}
 
 	@Override

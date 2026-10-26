@@ -1,5 +1,10 @@
 package dev.feldsher.deconstructedbackpacks.common;
 
+import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
+import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockCauldron;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import dev.feldsher.deconstructedbackpacks.api.IBlockClickResponseUpgrade;
@@ -81,6 +86,26 @@ public class CommonEventHandler {
 			}
 			return false;
 		});
+	}
+
+	/** A dyed backpack washed in a cauldron with water gets its default colors back, as dyed leather armor does. */
+	@SubscribeEvent
+	public static void onBlockRightClick(PlayerInteractEvent.RightClickBlock event) {
+		ItemStack stack = event.getItemStack();
+		IBlockState state = event.getWorld().getBlockState(event.getPos());
+		if (!(stack.getItem() instanceof BackpackItem) || !(state.getBlock() instanceof BlockCauldron) || state.getValue(BlockCauldron.LEVEL) <= 0) {
+			return;
+		}
+		IBackpackWrapper wrapper = BackpackWrapper.fromStack(stack);
+		if (wrapper.getMainColor() == BackpackWrapper.DEFAULT_MAIN_COLOR && wrapper.getAccentColor() == BackpackWrapper.DEFAULT_ACCENT_COLOR) {
+			return;
+		}
+		if (!event.getWorld().isRemote) {
+			wrapper.setColors(BackpackWrapper.DEFAULT_MAIN_COLOR, BackpackWrapper.DEFAULT_ACCENT_COLOR);
+			((BlockCauldron) state.getBlock()).setWaterLevel(event.getWorld(), event.getPos(), state, state.getValue(BlockCauldron.LEVEL) - 1);
+		}
+		event.setCanceled(true);
+		event.setCancellationResult(EnumActionResult.SUCCESS);
 	}
 
 	@SubscribeEvent
