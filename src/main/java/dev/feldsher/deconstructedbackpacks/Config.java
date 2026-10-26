@@ -147,6 +147,9 @@ public class Config {
 			}
 		};
 
+		@net.minecraftforge.common.config.Config.Comment("Determines whether player can right click on backpack that another player is wearing to open it. If off will turn off that capability for everyone and remove related settings from backpack.")
+		public boolean allowOpeningOtherPlayerBackpacks = true;
+
 		@net.minecraftforge.common.config.Config.Comment("Turns on/off item fluid handler of backpack in its item form. There are some dupe bugs caused by default fluid handling implementation that manifest when backpack is drained / filled in its item form in another mod's tank and the only way to prevent them is disallowing drain/fill in item form altogether")
 		public boolean itemFluidHandlerEnabled = true;
 

@@ -11,7 +11,8 @@ import javax.annotation.Nullable;
 /**
  * Opens backpack containers. What 1.21 writes into the menu's buffer goes in the three ints:
  * for {@link #ITEM_BACKPACK}, x is the backpack's slot in the player's inventory; for {@link #BLOCK_BACKPACK}, x y z are its position.
- * For a sub-backpack, its slot in the parent goes in y, above the 8 bits of a block's height.
+ * For a sub-backpack, its slot in the parent goes in y, above the 8 bits of a block's height. For another player's
+ * backpack, x is that player's entity id.
  */
 public class GuiHandler implements IGuiHandler {
 	public static final int ITEM_BACKPACK = 0;
@@ -22,6 +23,10 @@ public class GuiHandler implements IGuiHandler {
 	public static final int BLOCK_SUB_BACKPACK = 5;
 	public static final int ITEM_SUB_BACKPACK_SETTINGS = 6;
 	public static final int BLOCK_SUB_BACKPACK_SETTINGS = 7;
+	public static final int ANOTHER_PLAYER_BACKPACK = 8;
+	public static final int ANOTHER_PLAYER_SUB_BACKPACK = 9;
+	public static final int ANOTHER_PLAYER_BACKPACK_SETTINGS = 10;
+	public static final int ANOTHER_PLAYER_SUB_BACKPACK_SETTINGS = 11;
 	/** The offhand's slot in the player's inventory. */
 	public static final int OFFHAND_SLOT = 40;
 
@@ -40,6 +45,12 @@ public class GuiHandler implements IGuiHandler {
 			case BLOCK_SUB_BACKPACK:
 			case BLOCK_SUB_BACKPACK_SETTINGS:
 				return new BackpackContext.BlockSubBackpack(new BlockPos(x, y & 0xFF, z), y >>> 8);
+			case ANOTHER_PLAYER_BACKPACK:
+			case ANOTHER_PLAYER_BACKPACK_SETTINGS:
+				return new BackpackContext.AnotherPlayer(x);
+			case ANOTHER_PLAYER_SUB_BACKPACK:
+			case ANOTHER_PLAYER_SUB_BACKPACK_SETTINGS:
+				return new BackpackContext.AnotherPlayerSubBackpack(x, y);
 			default:
 				return null;
 		}
@@ -67,6 +78,7 @@ public class GuiHandler implements IGuiHandler {
 	}
 
 	private static boolean isSettings(int id) {
-		return id == ITEM_BACKPACK_SETTINGS || id == BLOCK_BACKPACK_SETTINGS || id == ITEM_SUB_BACKPACK_SETTINGS || id == BLOCK_SUB_BACKPACK_SETTINGS;
+		return id == ITEM_BACKPACK_SETTINGS || id == BLOCK_BACKPACK_SETTINGS || id == ITEM_SUB_BACKPACK_SETTINGS || id == BLOCK_SUB_BACKPACK_SETTINGS
+				|| id == ANOTHER_PLAYER_BACKPACK_SETTINGS || id == ANOTHER_PLAYER_SUB_BACKPACK_SETTINGS;
 	}
 }

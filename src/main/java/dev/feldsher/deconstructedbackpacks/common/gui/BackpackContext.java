@@ -1,5 +1,8 @@
 package dev.feldsher.deconstructedbackpacks.common.gui;
 
+import javax.annotation.Nullable;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.Entity;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlockEntity;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
@@ -21,8 +24,8 @@ import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import java.util.Optional;
 
 /**
- * Where an open backpack is: carried, placed, or in a storage slot of either, a sub-backpack. Another player's
- * backpack comes with the stage that ports it.
+ * Where an open backpack is: carried, placed, worn by another player, or in a storage slot of any of these, a
+ * sub-backpack.
  */
 public abstract class BackpackContext {
 	public static final String SUBBACKPACK_DISPLAY_NAME_PREFIX = "... > ";
@@ -170,6 +173,108 @@ public abstract class BackpackContext {
 			}
 			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.ITEM_SUB_BACKPACK_SETTINGS : GuiHandler.ITEM_SUB_BACKPACK, player.world,
 					backpackSlotIndex, subBackpackSlotIndex, 0);
+		}
+	}
+
+	/** The backpack another player wears, which the config and that player's setting let others open. */
+	public static class AnotherPlayer extends BackpackContext {
+		private static final double MAX_DISTANCE_SQ = 8 * 8;
+		protected final int otherPlayerId;
+
+		public AnotherPlayer(int otherPlayerId) {
+			this.otherPlayerId = otherPlayerId;
+		}
+
+		@Nullable
+		protected EntityPlayer getOtherPlayer(EntityPlayer player) {
+			Entity entity = player.world.getEntityByID(otherPlayerId);
+			return entity instanceof EntityPlayer && entity != player ? (EntityPlayer) entity : null;
+		}
+
+		protected ItemStack getBackpackStack(EntityPlayer player) {
+			EntityPlayer otherPlayer = getOtherPlayer(player);
+			return otherPlayer == null ? ItemStack.EMPTY : otherPlayer.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+		}
+
+		@Override
+		public boolean shouldLockBackpackSlot(EntityPlayer player) {
+			return false;
+		}
+
+		@Override
+		public IBackpackWrapper getBackpackWrapper(EntityPlayer player) {
+			return BackpackWrapper.fromStack(getBackpackStack(player));
+		}
+
+		@Override
+		public int getBackpackSlotIndex() {
+			return -1;
+		}
+
+		@Override
+		public boolean canInteractWith(EntityPlayer player) {
+			EntityPlayer otherPlayer = getOtherPlayer(player);
+			return otherPlayer != null && otherPlayer.isEntityAlive() && player.getDistanceSq(otherPlayer) < MAX_DISTANCE_SQ
+					&& getBackpackStack(player).getItem() instanceof BackpackItem;
+		}
+
+		@Override
+		public BackpackContext getSubBackpackContext(int subBackpackSlotIndex) {
+			return new AnotherPlayerSubBackpack(otherPlayerId, subBackpackSlotIndex);
+		}
+
+		@Override
+		protected void openScreen(EntityPlayer player, boolean settings) {
+			if (player instanceof EntityPlayerMP) {
+				sendContents((EntityPlayerMP) player, getBackpackWrapper(player));
+			}
+			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.ANOTHER_PLAYER_BACKPACK_SETTINGS : GuiHandler.ANOTHER_PLAYER_BACKPACK, player.world,
+					otherPlayerId, 0, 0);
+		}
+	}
+
+	/** A backpack in a storage slot of the one another player wears. */
+	public static class AnotherPlayerSubBackpack extends AnotherPlayer {
+		private final int subBackpackSlotIndex;
+
+		public AnotherPlayerSubBackpack(int otherPlayerId, int subBackpackSlotIndex) {
+			super(otherPlayerId);
+			this.subBackpackSlotIndex = subBackpackSlotIndex;
+		}
+
+		@Override
+		public Optional<IStorageWrapper> getParentBackpackWrapper(EntityPlayer player) {
+			return Optional.of(super.getBackpackWrapper(player));
+		}
+
+		@Override
+		public IBackpackWrapper getBackpackWrapper(EntityPlayer player) {
+			return BackpackWrapper.fromStack(getSubBackpackStack(super.getBackpackWrapper(player), subBackpackSlotIndex));
+		}
+
+		@Override
+		public boolean canInteractWith(EntityPlayer player) {
+			return super.canInteractWith(player) && isSubBackpack(super.getBackpackWrapper(player), subBackpackSlotIndex);
+		}
+
+		@Override
+		public BackpackContext getParentBackpackContext() {
+			return new AnotherPlayer(otherPlayerId);
+		}
+
+		@Override
+		public String getDisplayName(EntityPlayer player) {
+			return SUBBACKPACK_DISPLAY_NAME_PREFIX + super.getDisplayName(player);
+		}
+
+		@Override
+		protected void openScreen(EntityPlayer player, boolean settings) {
+			if (player instanceof EntityPlayerMP) {
+				sendContents((EntityPlayerMP) player, super.getBackpackWrapper(player));
+				sendContents((EntityPlayerMP) player, getBackpackWrapper(player));
+			}
+			player.openGui(DeconstructedBackpacks.instance, settings ? GuiHandler.ANOTHER_PLAYER_SUB_BACKPACK_SETTINGS : GuiHandler.ANOTHER_PLAYER_SUB_BACKPACK, player.world,
+					otherPlayerId, subBackpackSlotIndex, 0);
 		}
 	}
 

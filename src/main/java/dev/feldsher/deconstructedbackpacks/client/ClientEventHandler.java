@@ -1,5 +1,14 @@
 package dev.feldsher.deconstructedbackpacks.client;
 
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.player.EntityPlayer;
+import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
+import dev.feldsher.deconstructedbackpacks.network.AnotherPlayerBackpackOpenMessage;
+import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
+import dev.feldsher.deconstructedbackpacks.Config;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraft.util.EnumFacing;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlock;
@@ -39,6 +48,33 @@ public class ClientEventHandler {
 		}
 		BackpackItemStackRenderer itemStackRenderer = new BackpackItemStackRenderer();
 		ModItems.getBackpacks().forEach(backpack -> backpack.setTileEntityItemStackRenderer(itemStackRenderer));
+	}
+
+	/**
+	 * A right click on another player's back, at the height of a backpack worn there, asks the server to open it, as
+	 * the config and that player's setting allow.
+	 */
+	@SubscribeEvent
+	public static void onEntityInteract(PlayerInteractEvent.EntityInteractSpecific event) {
+		if (!event.getWorld().isRemote || !Config.SERVER.allowOpeningOtherPlayerBackpacks || !(event.getTarget() instanceof EntityPlayer)) {
+			return;
+		}
+		EntityPlayer targetPlayer = (EntityPlayer) event.getTarget();
+		if (!(targetPlayer.getItemStackFromSlot(EntityEquipmentSlot.CHEST).getItem() instanceof BackpackItem)) {
+			return;
+		}
+		EntityPlayer sourcePlayer = event.getEntityPlayer();
+		Vec3d targetViewVector = Vec3d.fromPitchYaw(targetPlayer.rotationPitch, targetPlayer.renderYawOffset);
+		Vec3d hitVector = event.getLocalPos();
+		Vec3d toTarget = targetPlayer.getPositionVector().subtract(sourcePlayer.getPositionVector()).normalize();
+		toTarget = new Vec3d(toTarget.x, 0, toTarget.z);
+		boolean isPointingAtBody = hitVector.y >= 0.9D && hitVector.y < 1.6D;
+		boolean isPointingAtBack = toTarget.dotProduct(targetViewVector) > 0.0D;
+		if (isPointingAtBody && isPointingAtBack) {
+			PacketHandler.INSTANCE.sendToServer(new AnotherPlayerBackpackOpenMessage(targetPlayer.getEntityId()));
+			event.setCanceled(true);
+			event.setCancellationResult(EnumActionResult.SUCCESS);
+		}
 	}
 
 	/** The tanks and the battery: their parts are baked from code, so nothing else asks for the texture. */

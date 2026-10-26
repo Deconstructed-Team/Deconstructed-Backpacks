@@ -1,14 +1,14 @@
 package dev.feldsher.deconstructedbackpacks.common.gui;
 
+import dev.feldsher.deconstructedbackpacks.settings.BackpackMainSettingsContainer;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.settings.BackpackMainSettingsCategory;
 import dev.feldsher.deconstructedcore.common.gui.SettingsContainerMenu;
-import dev.feldsher.deconstructedcore.settings.main.MainSettingsContainer;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class BackpackSettingsContainerMenu extends SettingsContainerMenu<IBackpackWrapper> {
 	static {
-		addFactory(BackpackMainSettingsCategory.NAME, MainSettingsContainer::new);
+		addFactory(BackpackMainSettingsCategory.NAME, BackpackMainSettingsContainer::new);
 	}
 
 	private final BackpackContext backpackContext;

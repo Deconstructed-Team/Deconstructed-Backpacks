@@ -21,5 +21,6 @@ public class PacketHandler {
 		INSTANCE.registerMessage(UpgradeToggleMessage.Handler.class, UpgradeToggleMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(RequestBackpackContentsMessage.Handler.class, RequestBackpackContentsMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(NetworkStashMessage.Handler.class, NetworkStashMessage.class, id++, Side.SERVER);
+		INSTANCE.registerMessage(AnotherPlayerBackpackOpenMessage.Handler.class, AnotherPlayerBackpackOpenMessage.class, id++, Side.SERVER);
 	}
 }

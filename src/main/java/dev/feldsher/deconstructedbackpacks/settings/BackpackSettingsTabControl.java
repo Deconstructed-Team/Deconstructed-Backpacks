@@ -4,7 +4,6 @@ import dev.feldsher.deconstructedcore.client.gui.SettingsScreen;
 import dev.feldsher.deconstructedcore.client.gui.Tab;
 import dev.feldsher.deconstructedcore.client.gui.utils.Position;
 import dev.feldsher.deconstructedcore.settings.StorageSettingsTabControlBase;
-import dev.feldsher.deconstructedcore.settings.main.MainSettingsContainer;
 import dev.feldsher.deconstructedcore.settings.itemdisplay.ItemDisplaySettingsCategory;
 import dev.feldsher.deconstructedcore.settings.itemdisplay.ItemDisplaySettingsContainer;
 import dev.feldsher.deconstructedcore.settings.itemdisplay.ItemDisplaySettingsTab;
@@ -23,7 +22,7 @@ public class BackpackSettingsTabControl extends StorageSettingsTabControlBase {
 	private static final Map<String, ISettingsTabFactory<?, ?>> SETTINGS_TAB_FACTORIES = new HashMap<>();
 
 	static {
-		SETTINGS_TAB_FACTORIES.put(BackpackMainSettingsCategory.NAME, (ISettingsTabFactory<MainSettingsContainer, BackpackMainSettingsTab>) BackpackMainSettingsTab::new);
+		SETTINGS_TAB_FACTORIES.put(BackpackMainSettingsCategory.NAME, (ISettingsTabFactory<BackpackMainSettingsContainer, BackpackMainSettingsTab>) BackpackMainSettingsTab::new);
 		SETTINGS_TAB_FACTORIES.put(NoSortSettingsCategory.NAME, (ISettingsTabFactory<NoSortSettingsContainer, NoSortSettingsTab>) NoSortSettingsTab::new);
 		SETTINGS_TAB_FACTORIES.put(MemorySettingsCategory.NAME, (ISettingsTabFactory<MemorySettingsContainer, MemorySettingsTab>) MemorySettingsTab::new);
 		SETTINGS_TAB_FACTORIES.put(ItemDisplaySettingsCategory.NAME, (ISettingsTabFactory<ItemDisplaySettingsContainer, ItemDisplaySettingsTab>) ItemDisplaySettingsTab::new);
