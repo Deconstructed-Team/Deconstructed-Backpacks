@@ -3,6 +3,7 @@ package dev.feldsher.deconstructedbackpacks.network;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import dev.feldsher.deconstructedbackpacks.compat.ae2.NetworkStashMessage;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class PacketHandler {
@@ -19,5 +20,6 @@ public class PacketHandler {
 		INSTANCE.registerMessage(BlockPickMessage.Handler.class, BlockPickMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(UpgradeToggleMessage.Handler.class, UpgradeToggleMessage.class, id++, Side.SERVER);
 		INSTANCE.registerMessage(RequestBackpackContentsMessage.Handler.class, RequestBackpackContentsMessage.class, id++, Side.SERVER);
+		INSTANCE.registerMessage(NetworkStashMessage.Handler.class, NetworkStashMessage.class, id++, Side.SERVER);
 	}
 }

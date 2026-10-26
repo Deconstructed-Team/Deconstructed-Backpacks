@@ -1,5 +1,19 @@
 apply from: rootProject.file('gradle/scripts/mod.gradle')
 
+repositories {
+    // AE2UD is released on GitHub only
+    ivy {
+        name = 'AE2UD GitHub releases'
+        url = 'https://github.com/romanfedyniak/AE2UD/releases/download/'
+        patternLayout {
+            artifact 'v[revision]/[module]-[revision](-[classifier]).[ext]'
+        }
+        metadataSources { artifact() }
+        content { includeGroup 'romanfedyniak' }
+    }
+}
+
 dependencies {
     implementation project(':core')
+    compileOnly 'romanfedyniak:ae2ud:1.6.2:dev'
 }
