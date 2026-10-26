@@ -17,4 +17,5 @@ dependencies {
     implementation project(':core')
     compileOnly 'romanfedyniak:ae2ud:1.6.2:dev'
     compileOnly rfg.deobf('curse.maven:baubles-227083:2518667')
+    compileOnly rfg.deobf('maven.modrinth:had-enough-items:4.36.1')
 }
