@@ -1,10 +1,12 @@
 package dev.feldsher.deconstructedbackpacks.backpack;
 
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
+import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
 import dev.feldsher.deconstructedcore.storage.StorageContents;
 import dev.feldsher.deconstructedcore.storage.StorageContentsManager;
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -37,5 +39,16 @@ public final class BackpackStorage {
 
 	public static void removeBackpackContents(UUID backpackUuid) {
 		CONTENTS.remove(backpackUuid);
+	}
+
+	/**
+	 * Removes the contents of backpacks no player ever opened, as those of mobs' backpacks; with onlyWithEmptyInventory,
+	 * only those that never had anything in their inventory.
+	 *
+	 * @return how many were removed
+	 */
+	public static int removeNonPlayerBackpackContents(boolean onlyWithEmptyInventory) {
+		Set<UUID> opened = BackpackAccessLogger.getBackpackUuids();
+		return CONTENTS.removeMatching((uuid, contents) -> !opened.contains(uuid) && (!onlyWithEmptyInventory || !contents.hasKey(InventoryHandler.INVENTORY_TAG)));
 	}
 }

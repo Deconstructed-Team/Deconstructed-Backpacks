@@ -1,6 +1,8 @@
 package dev.feldsher.deconstructedbackpacks;
 
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import dev.feldsher.deconstructedbackpacks.command.DbpCommand;
 import net.minecraftforge.fml.common.Loader;
 import dev.feldsher.deconstructedbackpacks.registry.RegistryLoader;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContainer;
@@ -58,6 +60,11 @@ public class DeconstructedBackpacks {
 	@Mod.EventHandler
 	public void serverAboutToStart(FMLServerAboutToStartEvent event) {
 		RegistryLoader.load(Loader.instance().getConfigDir());
+	}
+
+	@Mod.EventHandler
+	public void serverStarting(FMLServerStartingEvent event) {
+		event.registerServerCommand(new DbpCommand());
 	}
 
 	public static ResourceLocation getRL(String regName) {
