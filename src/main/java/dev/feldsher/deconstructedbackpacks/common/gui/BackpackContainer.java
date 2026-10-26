@@ -34,9 +34,14 @@ public class BackpackContainer extends StorageContainerMenuBase<IBackpackWrapper
 		return backpackContext;
 	}
 
+	/**
+	 * Still the backpack it was opened on: a mod that moves stacks around without asking the slots, as Bogosorter's
+	 * hotbar swap, could put another backpack where this one was, and this one in a slot that isn't locked.
+	 */
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		return backpackContext.canInteractWith(player);
+		return backpackContext.canInteractWith(player) && (player.world.isRemote
+				|| backpackContext.getBackpackWrapper(player).getContentsUuid().equals(storageWrapper.getContentsUuid()));
 	}
 
 	@Override
