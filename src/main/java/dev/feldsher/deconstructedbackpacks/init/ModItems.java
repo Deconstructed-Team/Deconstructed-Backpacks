@@ -11,6 +11,7 @@ import dev.feldsher.deconstructedcore.upgrades.cooking.CookingType;
 import dev.feldsher.deconstructedbackpacks.upgrades.smithing.SmithingUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.upgrades.anvil.AnvilUpgradeItem;
 import dev.feldsher.deconstructedcore.upgrades.stonecutter.StonecutterUpgradeItem;
+import dev.feldsher.deconstructedcore.compat.chisel.ChiselCarvingResults;
 import dev.feldsher.deconstructedcore.upgrades.crafting.CraftingUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.upgrades.inception.InceptionUpgradeItem;
 import dev.feldsher.deconstructedbackpacks.upgrades.refill.RefillUpgradeItem;
@@ -105,6 +106,7 @@ public class ModItems {
 
 	public static final CraftingUpgradeItem CRAFTING_UPGRADE = item(new CraftingUpgradeItem(Config.SERVER.maxUpgradesPerStorageConfig), "crafting_upgrade");
 	public static final StonecutterUpgradeItem STONECUTTER_UPGRADE = item(new StonecutterUpgradeItem(Config.SERVER.maxUpgradesPerStorageConfig), "stonecutter_upgrade");
+	public static final StonecutterUpgradeItem CHISEL_UPGRADE = item(new StonecutterUpgradeItem(Config.SERVER.maxUpgradesPerStorageConfig, ChiselCarvingResults.INSTANCE, "chisel"), "chisel_upgrade");
 	public static final AnvilUpgradeItem ANVIL_UPGRADE = item(new AnvilUpgradeItem(Config.SERVER.maxUpgradesPerStorageConfig), "anvil_upgrade");
 	public static final SmithingUpgradeItem SMITHING_UPGRADE = item(new SmithingUpgradeItem(Config.SERVER.maxUpgradesPerStorageConfig), "smithing_upgrade");
 	public static final CookingUpgradeItem SMELTING_UPGRADE = item(new CookingUpgradeItem(CookingType.SMELTING, Config.SERVER.smeltingUpgrade, Config.SERVER.maxUpgradesPerStorageConfig), "smelting_upgrade");
@@ -162,7 +164,7 @@ public class ModItems {
 
 	/** What 1.21 tags as backpack upgrades: the only items a backpack's upgrade slots take. */
 	public static final List<Item> BACKPACK_UPGRADES = Collections.unmodifiableList(Arrays.asList(PICKUP_UPGRADE, ADVANCED_PICKUP_UPGRADE,
-			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, COMPACTING_UPGRADE, ADVANCED_COMPACTING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, REFILL_UPGRADE, ADVANCED_REFILL_UPGRADE, INCEPTION_UPGRADE, CRAFTING_UPGRADE, STONECUTTER_UPGRADE, ANVIL_UPGRADE, SMITHING_UPGRADE, SMELTING_UPGRADE, AUTO_SMELTING_UPGRADE, SMOKING_UPGRADE, AUTO_SMOKING_UPGRADE, BLASTING_UPGRADE, AUTO_BLASTING_UPGRADE, JUKEBOX_UPGRADE, ADVANCED_JUKEBOX_UPGRADE, TANK_UPGRADE, PUMP_UPGRADE, ADVANCED_PUMP_UPGRADE, XP_PUMP_UPGRADE, BATTERY_UPGRADE, TOOL_SWAPPER_UPGRADE, ADVANCED_TOOL_SWAPPER_UPGRADE, EVERLASTING_UPGRADE, INFINITY_UPGRADE, SURVIVAL_INFINITY_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
+			FILTER_UPGRADE, ADVANCED_FILTER_UPGRADE, FEEDING_UPGRADE, ADVANCED_FEEDING_UPGRADE, COMPACTING_UPGRADE, ADVANCED_COMPACTING_UPGRADE, RESTOCK_UPGRADE, ADVANCED_RESTOCK_UPGRADE, DEPOSIT_UPGRADE, ADVANCED_DEPOSIT_UPGRADE, REFILL_UPGRADE, ADVANCED_REFILL_UPGRADE, INCEPTION_UPGRADE, CRAFTING_UPGRADE, STONECUTTER_UPGRADE, CHISEL_UPGRADE, ANVIL_UPGRADE, SMITHING_UPGRADE, SMELTING_UPGRADE, AUTO_SMELTING_UPGRADE, SMOKING_UPGRADE, AUTO_SMOKING_UPGRADE, BLASTING_UPGRADE, AUTO_BLASTING_UPGRADE, JUKEBOX_UPGRADE, ADVANCED_JUKEBOX_UPGRADE, TANK_UPGRADE, PUMP_UPGRADE, ADVANCED_PUMP_UPGRADE, XP_PUMP_UPGRADE, BATTERY_UPGRADE, TOOL_SWAPPER_UPGRADE, ADVANCED_TOOL_SWAPPER_UPGRADE, EVERLASTING_UPGRADE, INFINITY_UPGRADE, SURVIVAL_INFINITY_UPGRADE, MAGNET_UPGRADE, ADVANCED_MAGNET_UPGRADE, VOID_UPGRADE, ADVANCED_VOID_UPGRADE,
 			STACK_UPGRADE_TIER_1, STACK_UPGRADE_TIER_2, STACK_UPGRADE_TIER_3, STACK_UPGRADE_TIER_4, STACK_UPGRADE_OMEGA_TIER,
 			STACK_DOWNGRADE_TIER_1, STACK_DOWNGRADE_TIER_2, STACK_DOWNGRADE_TIER_3));
 

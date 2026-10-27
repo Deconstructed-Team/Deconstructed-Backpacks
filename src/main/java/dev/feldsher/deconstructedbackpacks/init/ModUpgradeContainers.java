@@ -106,6 +106,7 @@ public class ModUpgradeContainers {
 		register(ModItems.ADVANCED_DEPOSIT_UPGRADE, DEPOSIT_ADVANCED_TYPE);
 		register(ModItems.CRAFTING_UPGRADE, CRAFTING_TYPE);
 		register(ModItems.STONECUTTER_UPGRADE, STONECUTTER_TYPE);
+		register(ModItems.CHISEL_UPGRADE, STONECUTTER_TYPE);
 		register(ModItems.ANVIL_UPGRADE, ANVIL_TYPE);
 		register(ModItems.SMITHING_UPGRADE, SMITHING_TYPE);
 		register(ModItems.SMELTING_UPGRADE, SMELTING_TYPE);
