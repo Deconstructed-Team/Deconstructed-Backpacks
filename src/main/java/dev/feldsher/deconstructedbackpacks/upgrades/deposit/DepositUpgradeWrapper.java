@@ -22,7 +22,7 @@ public class DepositUpgradeWrapper extends UpgradeWrapperBase<DepositUpgradeWrap
 
 	public DepositUpgradeWrapper(IStorageWrapper backpackWrapper, ItemStack upgrade, Consumer<ItemStack> upgradeSaveHandler) {
 		super(backpackWrapper, upgrade, upgradeSaveHandler);
-		filterLogic = new DepositFilterLogic(upgrade, upgradeSaveHandler, upgradeItem.getFilterSlotCount(), "filter_attributes");
+		filterLogic = new DepositFilterLogic(upgrade, this.upgradeSaveHandler, upgradeItem.getFilterSlotCount(), "filter_attributes");
 	}
 
 	@Override

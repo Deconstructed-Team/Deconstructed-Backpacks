@@ -76,6 +76,8 @@ public abstract class BackpackContext {
 	protected static void sendContents(EntityPlayerMP player, IBackpackWrapper wrapper) {
 		// Contents are created with their UUID the first time the backpack is opened
 		wrapper.getInventoryHandler();
+		// opened, it's the backpack these contents are now, as one crafted a tier up by automation, never carried
+		wrapper.growHandlersToSlotNumbers();
 		wrapper.getContentsUuid().ifPresent(uuid ->
 				PacketHandler.INSTANCE.sendTo(new BackpackContentsMessage(uuid, BackpackStorage.getOrCreateBackpackContents(uuid)), player));
 	}

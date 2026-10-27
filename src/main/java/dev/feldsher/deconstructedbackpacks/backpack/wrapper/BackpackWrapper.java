@@ -120,10 +120,8 @@ public class BackpackWrapper implements IBackpackWrapper {
 			contents.addSlotChangeListener(this, slotChangeListener);
 			listenedContents = contents;
 		}
-		InventoryHandler inventoryHandler = contents.getShared(INVENTORY_HANDLER, () -> new BackpackInventoryHandler(getExpectedInventorySlots(),
+		return contents.getShared(INVENTORY_HANDLER, () -> new BackpackInventoryHandler(getSavedSize(contents, InventoryHandler.INVENTORY_TAG, getExpectedInventorySlots()),
 				this, contents.getNbt(), contents::onSlotChanged, StackUpgradeItem.getInventorySlotLimit(this)));
-		growToExpectedSize(inventoryHandler, getExpectedInventorySlots());
-		return inventoryHandler;
 	}
 
 	private int getExpectedInventorySlots() {
@@ -131,14 +129,34 @@ public class BackpackWrapper implements IBackpackWrapper {
 	}
 
 	/**
-	 * A tier up, the shared inventory gets the slots added, in place: what holds it, as another player's open
-	 * container, a backpack around this one or a pipe, goes on with the one live inventory. Grown only on the server,
-	 * whose inventory the client's copies come from, and never shrunk here: another stack with these contents, as the
-	 * one in a crafting grid while the next tier shows as the result, may still have the slot counts it had before.
+	 * A handler is as big as it was saved: not as the stack asking says, which may be another with these contents, as
+	 * the next tier shown as a crafting result before it's crafted.
 	 */
-	private static void growToExpectedSize(InventoryHandler inventoryHandler, int expectedSlots) {
-		if (inventoryHandler.getSlots() < expectedSlots && FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			inventoryHandler.changeSlots(expectedSlots - inventoryHandler.getSlots());
+	private static int getSavedSize(StorageContents contents, String handlerTag, int defaultSize) {
+		NBTTagCompound handlerNbt = contents.getNbt().getCompoundTag(handlerTag);
+		return handlerNbt.hasKey("Size", Constants.NBT.TAG_INT) ? handlerNbt.getInteger("Size") : defaultSize;
+	}
+
+	/**
+	 * A tier up, the shared handlers get the slots added, in place: what holds them, as another player's open
+	 * container, a backpack around this one or a pipe, goes on with the one live inventory. Only for a backpack that's
+	 * really this one, as it's crafted, carried or opened, on the server, whose handlers the client's copies come from.
+	 * Never shrunk here: that drops what's in the slots past the new end.
+	 */
+	@Override
+	public void growHandlersToSlotNumbers() {
+		if (!getContentsUuid().isPresent() || FMLCommonHandler.instance().getEffectiveSide() != Side.SERVER) {
+			return;
+		}
+		InventoryHandler inventoryHandler = getInventoryHandler();
+		int expectedInventorySlots = getExpectedInventorySlots();
+		if (inventoryHandler.getSlots() < expectedInventorySlots) {
+			inventoryHandler.changeSlots(expectedInventorySlots - inventoryHandler.getSlots());
+		}
+		UpgradeHandler upgradeHandler = getUpgradeHandler();
+		int expectedUpgradeSlots = getNumberOfUpgradeSlots();
+		if (upgradeHandler.getSlots() < expectedUpgradeSlots) {
+			upgradeHandler.increaseSize(expectedUpgradeSlots - upgradeHandler.getSlots());
 		}
 	}
 
@@ -182,18 +200,13 @@ public class BackpackWrapper implements IBackpackWrapper {
 		}
 		dummyUpgradeHandler = null;
 		StorageContents contents = getContents();
-		UpgradeHandler upgradeHandler = contents.getShared(UPGRADE_HANDLER, () -> new UpgradeHandler(getNumberOfUpgradeSlots(), this, contents.getNbt(), contents::markDirty, this::onUpgradesChanged) {
+		return contents.getShared(UPGRADE_HANDLER, () -> new UpgradeHandler(getSavedSize(contents, UpgradeHandler.UPGRADE_INVENTORY_TAG, getNumberOfUpgradeSlots()),
+				this, contents.getNbt(), contents::markDirty, this::onUpgradesChanged) {
 			@Override
 			public boolean isItemValid(int slot, ItemStack stack) {
 				return super.isItemValid(slot, stack) && (stack.isEmpty() || ModItems.isBackpackUpgrade(stack.getItem()));
 			}
 		});
-		// as the inventory, in place and only grown
-		int expectedSlots = getNumberOfUpgradeSlots();
-		if (upgradeHandler.getSlots() < expectedSlots && FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			upgradeHandler.increaseSize(expectedSlots - upgradeHandler.getSlots());
-		}
-		return upgradeHandler;
 	}
 
 	@Override
@@ -374,7 +387,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 		getUpgradeHandler().setPersistent(persistent);
 	}
 
-	/** Only the stack's counts: the shared handlers grow to them as they're next asked for. */
+	/** Only the stack's counts: the shared handlers grow to them with {@link #growHandlersToSlotNumbers()}. */
 	@Override
 	public void setSlotNumbers(int numberOfInventorySlots, int numberOfUpgradeSlots) {
 		setNumberOfInventorySlots(numberOfInventorySlots);
@@ -388,6 +401,7 @@ public class BackpackWrapper implements IBackpackWrapper {
 		if (inventorySlots != getNumberOfInventorySlots() || upgradeSlots != getNumberOfUpgradeSlots()) {
 			setSlotNumbers(inventorySlots, upgradeSlots);
 		}
+		growHandlersToSlotNumbers();
 	}
 
 	@Override

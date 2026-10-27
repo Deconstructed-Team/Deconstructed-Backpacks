@@ -60,6 +60,14 @@ public class CommonEventHandler {
 		}
 	}
 
+	/** A backpack crafted a tier up is this backpack now: its contents get the new tier's slots. */
+	@SubscribeEvent
+	public static void onItemCrafted(PlayerEvent.ItemCraftedEvent event) {
+		if (!event.player.world.isRemote && event.crafting.getItem() instanceof BackpackItem) {
+			BackpackWrapper.fromStack(event.crafting).growHandlersToSlotNumbers();
+		}
+	}
+
 	@SubscribeEvent
 	public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
 		syncPlayerSettings(event.player);
