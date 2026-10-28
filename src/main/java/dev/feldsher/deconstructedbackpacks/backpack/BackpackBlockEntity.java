@@ -21,6 +21,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
+import net.minecraft.init.Items;
 
 /**
  * A placed backpack: it holds the backpack stack, and through it the contents.
@@ -42,7 +43,7 @@ public class BackpackBlockEntity extends TileEntity implements ITickable {
 
 	public IBackpackWrapper getBackpackWrapper() {
 		if (backpackWrapper == null) {
-			setBackpack(new ItemStack(getBlockType() instanceof BackpackBlock ? ((BackpackBlock) getBlockType()).getBackpackItem() : net.minecraft.init.Items.AIR));
+			setBackpack(new ItemStack(getBlockType() instanceof BackpackBlock ? ((BackpackBlock) getBlockType()).getBackpackItem() : Items.AIR));
 		}
 		return backpackWrapper;
 	}

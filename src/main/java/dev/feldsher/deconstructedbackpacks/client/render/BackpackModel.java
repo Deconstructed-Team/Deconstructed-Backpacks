@@ -26,6 +26,7 @@ import net.minecraft.util.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.entity.player.EntityPlayer;
 
 /**
  * The backpack worn on the back: 1.21's BackpackModel, its cubes and UVs as they are, on 1.12's model renderers, which
@@ -370,7 +371,7 @@ public class BackpackModel extends ModelBase {
 
 		GlStateManager.translate(0, yOffset, zOffset);
 
-		if (livingEntity instanceof net.minecraft.entity.player.EntityPlayer) {
+		if (livingEntity instanceof EntityPlayer) {
 			return;
 		}
 
