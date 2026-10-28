@@ -3,6 +3,7 @@ package dev.feldsher.deconstructedbackpacks.network;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackStorage;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
+import dev.feldsher.deconstructedcore.util.RequestThrottle;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Slot;
@@ -40,11 +41,13 @@ public class RequestBackpackContentsMessage implements IMessage {
 	}
 
 	public static class Handler implements IMessageHandler<RequestBackpackContentsMessage, IMessage> {
+		private static final RequestThrottle THROTTLE = new RequestThrottle(1000);
+
 		@Override
 		public IMessage onMessage(RequestBackpackContentsMessage message, MessageContext ctx) {
 			EntityPlayerMP player = ctx.getServerHandler().player;
 			player.getServerWorld().addScheduledTask(() -> {
-				if (isAtHand(player, message.backpackUuid)) {
+				if (isAtHand(player, message.backpackUuid) && THROTTLE.tryAnswer(player, message.backpackUuid)) {
 					PacketHandler.INSTANCE.sendTo(new BackpackContentsMessage(message.backpackUuid, BackpackStorage.getOrCreateBackpackContents(message.backpackUuid)), player);
 				}
 			});
