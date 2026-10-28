@@ -45,7 +45,7 @@ public class AnvilUpgradeContainer extends UpgradeContainerBase<AnvilUpgradeWrap
 				}
 			});
 		}
-		resultSlot = anvilMenuDelegate.getSlot(2);
+		resultSlot = new ResultSlot(anvilMenuDelegate.getSlot(2));
 		slots.add(resultSlot);
 	}
 
@@ -163,6 +163,42 @@ public class AnvilUpgradeContainer extends UpgradeContainerBase<AnvilUpgradeWrap
 		public void markDirty() {
 			super.markDirty();
 			anvilMenuDelegate.onCraftMatrixChanged(this);
+		}
+	}
+
+	/**
+	 * Vanilla's result slot, taken only while the inputs make it: another player's screen of the same upgrade can have
+	 * used them up, and the result this one worked out would come of nothing. Then it's worked out again, not taken.
+	 */
+	private class ResultSlot extends Slot {
+		private final Slot anvilResultSlot;
+
+		private ResultSlot(Slot anvilResultSlot) {
+			super(anvilResultSlot.inventory, anvilResultSlot.getSlotIndex(), anvilResultSlot.xPos, anvilResultSlot.yPos);
+			this.anvilResultSlot = anvilResultSlot;
+		}
+
+		@Override
+		public boolean isItemValid(@Nonnull ItemStack stack) {
+			return false;
+		}
+
+		@Override
+		public boolean canTakeStack(EntityPlayer player) {
+			if (!player.world.isRemote) {
+				ItemStack shown = getStack().copy();
+				anvilMenuDelegate.updateRepairOutput();
+				if (!ItemStack.areItemStacksEqual(shown, getStack())) {
+					return false;
+				}
+			}
+			return anvilResultSlot.canTakeStack(player);
+		}
+
+		@Nonnull
+		@Override
+		public ItemStack onTake(EntityPlayer player, @Nonnull ItemStack stack) {
+			return anvilResultSlot.onTake(player, stack);
 		}
 	}
 

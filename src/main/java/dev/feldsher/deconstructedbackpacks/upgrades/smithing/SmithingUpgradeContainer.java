@@ -111,6 +111,22 @@ public class SmithingUpgradeContainer extends UpgradeContainerBase<SmithingUpgra
 			return false;
 		}
 
+		/**
+		 * Only while the inputs make it: another player's screen of the same upgrade can have used them up, and the
+		 * result this one worked out would come of nothing. Then it's worked out again, not taken.
+		 */
+		@Override
+		public boolean canTakeStack(EntityPlayer thePlayer) {
+			if (!thePlayer.world.isRemote) {
+				ItemStack shown = getStack().copy();
+				updateResult();
+				if (!ItemStack.areItemStacksEqual(shown, getStack())) {
+					return false;
+				}
+			}
+			return super.canTakeStack(thePlayer);
+		}
+
 		@Nonnull
 		@Override
 		public ItemStack onTake(EntityPlayer thePlayer, @Nonnull ItemStack stack) {
