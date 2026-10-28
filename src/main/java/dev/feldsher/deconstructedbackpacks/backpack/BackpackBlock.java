@@ -299,7 +299,7 @@ public class BackpackBlock extends Block {
 	public static boolean lacksInfinityPermission(World world, BlockPos pos, EntityPlayer player) {
 		TileEntity te = world.getTileEntity(pos);
 		return te instanceof BackpackBlockEntity && ((BackpackBlockEntity) te).getBackpackWrapper().getUpgradeHandler().getTypeWrappers(InfinityUpgradeItem.TYPE)
-				.stream().anyMatch(w -> !player.canUseCommand(w.getPermissionLevel(), ""));
+				.stream().anyMatch(w -> !InfinityUpgradeItem.hasPermission(player, w.getPermissionLevel()));
 	}
 
 	private static void putInPlayersHandAndRemove(IBlockState state, World world, BlockPos pos, EntityPlayer player) {
