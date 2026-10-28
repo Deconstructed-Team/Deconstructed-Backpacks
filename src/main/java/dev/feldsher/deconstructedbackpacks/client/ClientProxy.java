@@ -1,7 +1,5 @@
 package dev.feldsher.deconstructedbackpacks.client;
 
-import dev.feldsher.deconstructedcore.client.render.StorageContentsTooltip;
-import dev.feldsher.deconstructedbackpacks.client.render.BackpackContentsTooltipSource;
 import dev.feldsher.deconstructedbackpacks.compat.ae2.Ae2Compat;
 import dev.feldsher.deconstructedbackpacks.compat.ae2.TerminalStashExtension;
 import dev.feldsher.deconstructedbackpacks.CommonProxy;
@@ -24,7 +22,6 @@ public class ClientProxy extends CommonProxy {
 		KeybindHandler.register();
 		ClientRegistry.bindTileEntitySpecialRenderer(BackpackBlockEntity.class, new BackpackBlockEntityRenderer());
 		ModUpgradeTabs.register();
-		StorageContentsTooltip.registerSource(new BackpackContentsTooltipSource());
 		if (Ae2Compat.isAvailable()) {
 			TerminalStashExtension.register();
 		}
