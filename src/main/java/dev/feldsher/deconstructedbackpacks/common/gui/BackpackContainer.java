@@ -54,6 +54,12 @@ public class BackpackContainer extends StorageContainerMenuBase<IBackpackWrapper
 		backpackContext.openSettings(player);
 	}
 
+	/** Another player's backpack is only looked into: its settings are its owner's. */
+	@Override
+	public boolean canOpenSettings() {
+		return !(backpackContext instanceof BackpackContext.AnotherPlayer);
+	}
+
 	@Override
 	protected void onUpgradeChanged() {
 		if (player instanceof EntityPlayerMP) {

@@ -22,8 +22,10 @@ public class BackpackSettingsContainerMenu extends SettingsContainerMenu<IBackpa
 		return backpackContext;
 	}
 
+	/** As the backpack's container: still the same backpack, not another put where it was. */
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		return backpackContext.canInteractWith(player);
+		return backpackContext.canInteractWith(player) && (player.world.isRemote
+				|| backpackContext.getBackpackWrapper(player).getContentsUuid().equals(getStorageWrapper().getContentsUuid()));
 	}
 }

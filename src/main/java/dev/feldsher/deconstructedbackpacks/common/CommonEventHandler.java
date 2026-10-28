@@ -199,6 +199,11 @@ public class CommonEventHandler {
 		}
 
 		EntityPlayer player = event.getEntityPlayer();
+		// one thrown to another player is theirs, as vanilla keeps it; 1.12 asks before it checks that
+		String owner = itemEntity.getOwner();
+		if (owner != null && !owner.equals(player.getName())) {
+			return;
+		}
 		World world = player.world;
 		AtomicReference<ItemStack> remainingStackSimulated = new AtomicReference<>(itemEntity.getItem().copy());
 		PlayerInventoryProvider.runOnBackpacks(player, (backpack, slot) -> {

@@ -6,6 +6,7 @@ import net.minecraft.network.play.server.SPacketEntityEquipment;
 import javax.annotation.Nullable;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.Entity;
+import dev.feldsher.deconstructedbackpacks.Config;
 import dev.feldsher.deconstructedbackpacks.DeconstructedBackpacks;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackBlockEntity;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
@@ -14,6 +15,7 @@ import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.backpack.wrapper.IBackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.network.BackpackContentsMessage;
 import dev.feldsher.deconstructedbackpacks.network.PacketHandler;
+import dev.feldsher.deconstructedbackpacks.settings.BackpackMainSettingsCategory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -23,6 +25,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import dev.feldsher.deconstructedcore.api.IStorageWrapper;
 import dev.feldsher.deconstructedcore.inventory.InventoryHandler;
+import dev.feldsher.deconstructedcore.settings.SettingsManager;
+import dev.feldsher.deconstructedcore.settings.main.MainSettingsCategory;
 
 import java.util.Optional;
 
@@ -232,11 +236,22 @@ public abstract class BackpackContext {
 			return -1;
 		}
 
+		/** Only while the server and the backpack's owner still let it be opened: turned off, the viewer is put out. */
 		@Override
 		public boolean canInteractWith(EntityPlayer player) {
 			EntityPlayer otherPlayer = getOtherPlayer(player);
+			ItemStack backpack = getBackpackStack(player);
 			return otherPlayer != null && otherPlayer.isEntityAlive() && player.getDistanceSq(otherPlayer) < MAX_DISTANCE_SQ
-					&& getBackpackStack(player).getItem() instanceof BackpackItem;
+					&& backpack.getItem() instanceof BackpackItem && (player.world.isRemote || canBeOpenedBy(otherPlayer, backpack));
+		}
+
+		/** Whether the server lets players open others' backpacks, and the owner theirs. */
+		public static boolean canBeOpenedBy(EntityPlayer owner, ItemStack backpack) {
+			if (!Config.SERVER.allowOpeningOtherPlayerBackpacks) {
+				return false;
+			}
+			MainSettingsCategory<?> category = BackpackWrapper.fromStack(backpack).getSettingsHandler().getGlobalSettingsCategory();
+			return SettingsManager.getSettingValue(owner, category.getPlayerSettingsTagName(), category, BackpackMainSettingsCategory.ANOTHER_PLAYER_CAN_OPEN);
 		}
 
 		@Override

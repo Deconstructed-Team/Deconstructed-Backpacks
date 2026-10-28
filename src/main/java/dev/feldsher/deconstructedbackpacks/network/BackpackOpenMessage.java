@@ -75,7 +75,10 @@ public class BackpackOpenMessage implements IMessage {
 			}
 			// From the backpack's settings, back to the backpack
 			if (player.openContainer instanceof BackpackSettingsContainerMenu) {
-				((BackpackSettingsContainerMenu) player.openContainer).getBackpackContext().open(player);
+				BackpackSettingsContainerMenu settings = (BackpackSettingsContainerMenu) player.openContainer;
+				if (settings.canInteractWith(player)) {
+					settings.getBackpackContext().open(player);
+				}
 				return;
 			}
 			int slotIndex = message.slotIndex;

@@ -60,7 +60,8 @@ public class GuiHandler implements IGuiHandler {
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
 		BackpackContext context = getContext(id, x, y, z);
-		if (context == null || !context.canInteractWith(player)) {
+		// another player's backpack is only looked into: its settings are its owner's
+		if (context == null || !context.canInteractWith(player) || isSettings(id) && context instanceof BackpackContext.AnotherPlayer) {
 			return null;
 		}
 		return isSettings(id) ? new BackpackSettingsContainerMenu(player, context) : new BackpackContainer(player, context);

@@ -3,11 +3,7 @@ package dev.feldsher.deconstructedbackpacks.network;
 import dev.feldsher.deconstructedbackpacks.util.PlayerInventoryProvider;
 import dev.feldsher.deconstructedbackpacks.Config;
 import dev.feldsher.deconstructedbackpacks.backpack.BackpackItem;
-import dev.feldsher.deconstructedbackpacks.backpack.wrapper.BackpackWrapper;
 import dev.feldsher.deconstructedbackpacks.common.gui.BackpackContext;
-import dev.feldsher.deconstructedbackpacks.settings.BackpackMainSettingsCategory;
-import dev.feldsher.deconstructedcore.settings.SettingsManager;
-import dev.feldsher.deconstructedcore.settings.main.MainSettingsCategory;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -64,7 +60,7 @@ public class AnotherPlayerBackpackOpenMessage implements IMessage {
 			if (!(backpack.getItem() instanceof BackpackItem)) {
 				return;
 			}
-			if (!canAnotherPlayerOpen(anotherPlayer, backpack)) {
+			if (!BackpackContext.AnotherPlayer.canBeOpenedBy(anotherPlayer, backpack)) {
 				player.sendStatusMessage(new TextComponentTranslation("gui.deconstructedbackpacks.status.backpack_cannot_be_open_by_another_player"), true);
 				return;
 			}
@@ -72,11 +68,6 @@ public class AnotherPlayerBackpackOpenMessage implements IMessage {
 			if (context.canInteractWith(player)) {
 				context.open(player);
 			}
-		}
-
-		private static boolean canAnotherPlayerOpen(EntityPlayer anotherPlayer, ItemStack backpack) {
-			MainSettingsCategory<?> category = BackpackWrapper.fromStack(backpack).getSettingsHandler().getGlobalSettingsCategory();
-			return SettingsManager.getSettingValue(anotherPlayer, category.getPlayerSettingsTagName(), category, BackpackMainSettingsCategory.ANOTHER_PLAYER_CAN_OPEN);
 		}
 	}
 }
