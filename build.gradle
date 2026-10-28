@@ -1,4 +1,17 @@
-apply from: rootProject.file('gradle/scripts/mod.gradle')
+/**
+ * Deconstructed Backpacks's build: ForgeDevEnv's, in gradle/scripts/mod.gradle, with the plugins it needs and the IDEA settings.
+ */
+import org.jetbrains.gradle.ext.Gradle
+
+plugins {
+    id 'idea'
+    id 'org.jetbrains.gradle.plugin.idea-ext' version '1.4.1'
+    id 'com.gtnewhorizons.retrofuturagradle' version '2.0.3'
+    id 'com.gradleup.shadow' version '9.6.+'
+    id 'maven-publish'
+}
+
+apply from: 'gradle/scripts/mod.gradle'
 
 repositories {
     // AE2UD is released on GitHub only
@@ -14,8 +27,29 @@ repositories {
 }
 
 dependencies {
-    implementation project(':core')
+    implementation rfg.deobf("com.github.Deconstructed-Team:Deconstructed-Core:${propertyString('core_version')}")
     compileOnly 'romanfedyniak:ae2ud:1.6.2:dev'
     compileOnly rfg.deobf('curse.maven:baubles-227083:2518667')
     compileOnly rfg.deobf('maven.modrinth:had-enough-items:4.36.1')
+}
+
+idea {
+    project {
+        settings {
+            runConfigurations {
+                "1. Run Client"(Gradle) {
+                    taskNames = ['runClient']
+                }
+                "2. Run Server"(Gradle) {
+                    taskNames = ['runServer']
+                }
+            }
+            compiler.javac {
+                javacAdditionalOptions = '-encoding utf8'
+            }
+            taskTriggers {
+                afterSync('cleanroomAfterSync')
+            }
+        }
+    }
 }
